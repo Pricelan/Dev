@@ -1,0 +1,21 @@
+package de.priceland_digital.shop_backend.component.mapper;
+
+import de.priceland_digital.shop_backend.entity.Software;
+import de.priceland_digital.shop_backend.service.dto.antwort.SoftwareAntwort;
+
+public class SoftwareMapper {
+
+    public static SoftwareAntwort toAntwort(Software software) {
+        return new SoftwareAntwort(
+                software.getId(),
+                software.getName(),
+                software.getVersion(),
+                software.getPreis(),
+                software.getSoftwareBeschreibung(),
+                software.getDownloadLink(),
+                software.getKategorieListe(),
+                software.getHersteller().getName()
+        );
+    }
+    
+}

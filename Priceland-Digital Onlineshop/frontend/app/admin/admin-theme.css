@@ -1,0 +1,88 @@
+:root {
+  --primary: #1f6bff;
+  --primary-dark: #0049c7;
+  --danger: #d7263d;
+  --bg: #f3f5fa;
+  --card: #ffffff;
+  --border: #d7dce5;
+  --text: #111827;
+  --muted: #6b7280;
+}
+
+/* Layout Section */
+.admin-section {
+  margin-top: 1rem;
+}
+
+.admin-section h2 {
+  margin-bottom: .25rem;
+}
+
+.muted {
+  color: var(--muted);
+  margin-bottom: 1.5rem;
+}
+
+/* Grid Layout */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill,minmax(320px,1fr));
+  gap: 1.25rem;
+}
+
+/* Card */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.25rem;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.badge {
+  background: var(--primary);
+  color: white;
+  padding: .25rem .5rem;
+  border-radius: 8px;
+  font-size: .85rem;
+}
+
+.card-body p {
+  margin: .4rem 0;
+}
+
+/* Actions */
+.card-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: .5rem;
+  margin-top: .75rem;
+}
+
+/* Buttons */
+.btn-secondary {
+  background: var(--primary-dark);
+  color: white;
+  border-radius: 10px;
+  padding: .5rem .9rem;
+  border: none;
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: white;
+  border-radius: 10px;
+  padding: .5rem .9rem;
+  border: none;
+}
+.search-input {
+  width: 300px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid #cfd6e6;
+}
