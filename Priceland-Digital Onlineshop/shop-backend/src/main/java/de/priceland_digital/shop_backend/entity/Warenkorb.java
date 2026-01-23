@@ -66,9 +66,10 @@ public class Warenkorb {
     }
 
     
-public BigDecimal getGesamtpreis(Warenkorb warenkorb) {
-     BigDecimal gesamtpreis = BigDecimal.ZERO;
-    for (WarenkorbItem position : warenkorb.getPositionen()) {
+public BigDecimal getGesamtpreis() { // Parameter entfernt
+    BigDecimal gesamtpreis = BigDecimal.ZERO;
+    // Wir nutzen 'this', um auf die eigenen Positionen zuzugreifen
+    for (WarenkorbItem position : this.positionen) {
         BigDecimal preis = position.getSoftware().getPreis();
         BigDecimal menge = BigDecimal.valueOf(position.getMenge());
         gesamtpreis = gesamtpreis.add(preis.multiply(menge));
@@ -76,9 +77,9 @@ public BigDecimal getGesamtpreis(Warenkorb warenkorb) {
     return gesamtpreis;
 }
 
-public int getGesamtmenge(Warenkorb warenkorb) {
+public int getGesamtmenge() { // Parameter entfernt
     int gesamtmenge = 0;
-    for (WarenkorbItem position : warenkorb.getPositionen()) {
+    for (WarenkorbItem position : this.positionen) {
         gesamtmenge += position.getMenge(); 
     }
     return gesamtmenge;

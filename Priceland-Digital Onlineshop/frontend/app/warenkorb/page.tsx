@@ -10,6 +10,7 @@ export default function WarenkorbPage() {
   const { kunde } = useKunde();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const [zahlungsMethode, setZahlungsMethode] = useState("PAYPAL");
   const [warenkorb, setWarenkorb] = useState<Warenkorb>({
     warenkorbId: 0,
     gesamtmenge: 0,
@@ -55,7 +56,7 @@ export default function WarenkorbPage() {
     let body;
 
     if (kunde) {
-      body = { gastToken: token, kundeId: kunde.id };
+      body = { gastToken: token, kundeId: kunde.id, zahlungsMethode };
     } else {
       const gastData = JSON.parse(localStorage.getItem("gastCheckout") || "{}");
       body = {
@@ -123,6 +124,23 @@ export default function WarenkorbPage() {
         </div>
 
         <div className="mt-8 bg-white border rounded-lg p-6 shadow-md">
+
+         {/* BEZAHLMETHODE AUSWAHL (Nur für eingeloggte Kunden relevant) */}
+          {kunde && (
+            <div className="mb-6 p-4 bg-blue-50 rounded-xl border border-blue-100">
+              <label className="block text-sm font-bold text-blue-800 mb-2">Bezahlmethode wählen:</label>
+              <select 
+                value={zahlungsMethode} 
+                onChange={(e) => setZahlungsMethode(e.target.value)}
+                className="w-full border p-2 rounded bg-white font-medium focus:ring-2 focus:ring-blue-500 outline-none"
+              >
+                <option value="PAYPAL">PayPal (Sofort-Download)</option>
+                <option value="KREDITKARTE">Kreditkarte</option>
+                <option value="VORKASSE">Vorkasse (Manuelle Freischaltung)</option>
+              </select>
+            </div>
+          )}
+          
           <div className="flex justify-between mb-6">
             <span className="text-xl font-semibold">Gesamtsumme</span>
             <span className="text-xl font-bold text-green-700">{gesamtpreis.toFixed(2)} €</span>

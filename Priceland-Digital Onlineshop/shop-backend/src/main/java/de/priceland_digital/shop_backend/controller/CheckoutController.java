@@ -67,7 +67,7 @@ public BestellAntwort checkout(HttpSession session, @RequestBody CheckoutAnfrage
     }
 
     // 4. Jetzt erst den Checkout mit dem (nun befüllten) kundenWk ausführen
-    Bestellung b = bestellService.checkout(kundenWk, kunde);
+    Bestellung b = bestellService.checkout(kundenWk, kunde, request.getZahlungsMethode());
     return BestellMapper.toAntwort(b);
 }
     // --- PFAD B: Gast-Checkout ---
@@ -88,11 +88,12 @@ public BestellAntwort checkout(HttpSession session, @RequestBody CheckoutAnfrage
     neuerGast.setPlz(request.getPlz());
     neuerGast.setOrt(request.getOrt());
     neuerGast.setTelefonnummer(request.getTelefonnummer());
+    neuerGast.setZahlungsMethode(request.getZahlungsMethode());
 
     // Jetzt speichern (da Felder befüllt sind, gibt es keine ValidationException mehr)
     neuerGast = gastRepository.save(neuerGast);
 
-    Bestellung b = bestellService.checkoutGast(wk, neuerGast);
+    Bestellung b = bestellService.checkoutGast(wk, neuerGast, request.getZahlungsMethode());
     return BestellMapper.toAntwort(b);
 }
 }

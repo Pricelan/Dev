@@ -1,16 +1,29 @@
-"use client"
+"use client";
 
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import Link from "next/link";
 import { Bestellung } from "@/types/bestellung";
 
+// 1. Die Hilfsfunktion AUSSERHALB der Komponente definieren
+const getStatusStyle = (status: string) => {
+  switch (status) {
+    case 'BEZAHLT':
+    case 'ABGESCHLOSSEN':
+      return 'bg-green-100 text-green-700 border-green-200';
+    case 'IN_BEARBEITUNG':
+      return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+    case 'STORNIERT':
+      return 'bg-red-100 text-red-700 border-red-200';
+    default:
+      return 'bg-gray-100 text-gray-700 border-gray-200';
+  }
+};
+
 export default function AdminOrders() {
   const [orders, setOrders] = useState<Bestellung[]>([]);
 
-  // Funktion zum Laden der Bestellungen
   const loadOrders = () => {
-    // Pfad an deinen Controller anpassen (z.B. /api/bestellungen)
     apiFetch("/bestellungen") 
       .then(setOrders)
       .catch(console.error);
@@ -19,7 +32,6 @@ export default function AdminOrders() {
   useEffect(() => {
     loadOrders();
   }, []);
-
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -49,18 +61,18 @@ export default function AdminOrders() {
                   <td className="px-6 py-4 font-bold text-gray-700">#{order.id}</td>
                   <td className="px-6 py-4 text-gray-600">{order.käuferName}</td>
                   <td className="px-6 py-4">
-                    <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase ${
-                      order.status === 'BEZAHLT' || order.status === 'ABGESCHLOSSEN' 
-                        ? 'bg-green-100 text-green-700' 
-                        : 'bg-yellow-100 text-yellow-700'
-                    }`}>
+                    {/* HIER nutzen wir jetzt die Funktion */}
+                    <span className={`px-3 py-1 rounded-full border text-[10px] font-bold uppercase ${getStatusStyle(order.status)}`}>
                       {order.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 font-bold text-gray-900">{Number(order.gesamtpreis).toFixed(2)} €</td>
-                  <td className="px-6 py-4 text-gray-500 text-sm">{new Date(order.erstelltAm).toLocaleDateString("de-DE")}</td>
-                  <td className="px-6 py-4 text-right flex justify-end gap-3">
-                  
+                  <td className="px-6 py-4 font-bold text-gray-900">
+                    {Number(order.gesamtpreis).toFixed(2)} €
+                  </td>
+                  <td className="px-6 py-4 text-gray-500 text-sm">
+                    {new Date(order.erstelltAm).toLocaleDateString("de-DE")}
+                  </td>
+                  <td className="px-6 py-4 text-right">
                     <button className="text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-lg text-xs font-bold transition-all">
                       Details
                     </button>
@@ -69,6 +81,7 @@ export default function AdminOrders() {
               ))}
             </tbody>
           </table>
+          
           {orders.length === 0 && (
             <div className="p-10 text-center text-gray-400 italic">
               Keine Bestellungen gefunden.

@@ -16,26 +16,30 @@ export default function GastCheckoutPage() {
     ort: "",
     telefonnummer: ""
   });
+
+  const [zahlungsMethode, setZahlungsMethode] = useState("VORKASSE");
   const [loading, setLoading] = useState(false);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
-  async function submit() {
+ async function submit() {
   try {
     setLoading(true);
     const token = getGastToken();
 
+    // WICHTIG: Die zahlungsMethode muss mit in das Objekt!
     const payload = {
       gastToken: token,
+      zahlungsMethode: zahlungsMethode, // <--- Das hat gefehlt!
       ...form 
     };
 
     const res = await fetch("http://localhost:8080/api/checkout/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      credentials: "include", // <--- Erlaubt dem Backend Kurt zu erkennen!
+      credentials: "include", 
       body: JSON.stringify(payload)
     });
   
@@ -46,10 +50,7 @@ export default function GastCheckoutPage() {
     }
 
     const order = await res.json();
-    
-    // LocalStorage nach Erfolg setzen
     localStorage.setItem("gastCheckout", JSON.stringify(form));
-    
     router.push(`/checkout/erfolgreich?orderId=${order.id}`);
   } catch (err) {
     console.error(err);
@@ -74,6 +75,22 @@ export default function GastCheckoutPage() {
         <input name="plz" value={form.plz} placeholder="PLZ" className="border p-2 w-full rounded" onChange={handleChange} />
         <input name="ort" value={form.ort} placeholder="Ort" className="border p-2 w-full rounded" onChange={handleChange} />
         <input name="telefonnummer" value={form.telefonnummer} placeholder="Telefonnummer" className="border p-2 w-full rounded" onChange={handleChange} />
+      </div>
+
+      <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <label className="block text-sm font-bold text-gray-700 mb-2">Bezahlmethode wählen:</label>
+          <select 
+            value={zahlungsMethode} 
+            onChange={(e) => setZahlungsMethode(e.target.value)}
+            className="w-full border p-2 rounded bg-white font-medium"
+          >
+            <option value="PAYPAL">PayPal</option>
+            <option value="KREDITKARTE">Kreditkarte</option>
+            <option value="LASTSCHRIFT">Lastschrift</option>
+            <option value="VORKASSE">Vorkasse (Überweisung)</option>
+          </select>
+        </div>
+
 
         <button
           onClick={submit}
@@ -83,6 +100,5 @@ export default function GastCheckoutPage() {
           {loading ? "Bestelle..." : "Bestellung abschließen"}
         </button>
       </div>
-    </div>
   );
 }

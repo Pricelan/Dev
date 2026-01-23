@@ -7,8 +7,8 @@ import { useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/api';
 
 export default function AdminDashboard() {
-  
-  
+   
+
    const [umsatz, setUmsatz] = useState(0);
    const [loading, setLoading] = useState(true);
 const handleLogout = async () => {
@@ -150,3 +150,4 @@ return (
     </div>
   );
 }
+

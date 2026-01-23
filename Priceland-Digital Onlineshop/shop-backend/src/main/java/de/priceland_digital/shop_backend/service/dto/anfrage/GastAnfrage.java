@@ -1,4 +1,5 @@
 package de.priceland_digital.shop_backend.service.dto.anfrage;
+import de.priceland_digital.shop_backend.status.ZahlungsMethode;
 
 public class GastAnfrage {
 
@@ -10,6 +11,7 @@ public class GastAnfrage {
     private String plz;
     private String ort;
     private String telefonnummer;
+    private ZahlungsMethode zahlungsMethode;
 
     public GastAnfrage() {
     }
@@ -64,5 +66,10 @@ public class GastAnfrage {
     public void setTelefonnummer(String telefonnummer) {
         this.telefonnummer = telefonnummer;
     }
-    
+    public ZahlungsMethode getZahlungsMethode() {
+        return zahlungsMethode;
+    }
+    public void setZahlungsMethode(ZahlungsMethode zahlungsMethode) {
+        this.zahlungsMethode = zahlungsMethode;
+    }
 }

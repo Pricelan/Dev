@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.priceland_digital.shop_backend.status.ZahlungsMethode;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -28,21 +29,23 @@ public class Gast {
     private String nachname;
     @NotBlank
     @Email
-    @Column(unique = true)
+    @Column(unique = false)
     private String email;
     private String strasse;
     private String hausnummer;
     private String plz;
     private String ort;
     private String telefonnummer;
-     private LocalDateTime erstelltAm = LocalDateTime.now();
+    private LocalDateTime erstelltAm = LocalDateTime.now();
+    private ZahlungsMethode zahlungsMethode;
    @OneToMany(mappedBy = "gast", cascade = CascadeType.ALL)
     private List<Bestellung> bestellungen = new ArrayList<>();
     private String rolle = "GAST";
+
     //Konstructor//
     public Gast() {
     }
-    public Gast(String vorname, String nachname, String email, String strasse, String hausnummer, String plz, String ort, String telefonnummer) {
+    public Gast(String vorname, String nachname, String email, String strasse, String hausnummer, String plz, String ort, String telefonnummer, ZahlungsMethode zahlungsMethode) {
         this.vorname = vorname;
         this.nachname = nachname;
         this.email = email;
@@ -51,6 +54,7 @@ public class Gast {
         this.plz = plz;
         this.ort = ort;
         this.telefonnummer = telefonnummer;
+        this.zahlungsMethode = zahlungsMethode;
     }
     // Getters and Setters//
     public Long getId() {
@@ -120,6 +124,13 @@ public class Gast {
     public void setErstelltAm(LocalDateTime erstelltAm) {
         this.erstelltAm = erstelltAm;
     }
+    public ZahlungsMethode getZahlungsMethode() {
+        return zahlungsMethode;
+    }
+    public void setZahlungsMethode(ZahlungsMethode zahlungsMethode) {
+        this.zahlungsMethode = zahlungsMethode;
+    }
+  
 
 
     

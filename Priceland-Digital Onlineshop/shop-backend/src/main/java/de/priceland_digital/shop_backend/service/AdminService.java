@@ -1,11 +1,14 @@
 package de.priceland_digital.shop_backend.service;
 
 
+import de.priceland_digital.shop_backend.persistence.BestellRepository;
 import de.priceland_digital.shop_backend.persistence.SoftwareHerstellerRepository;
 import de.priceland_digital.shop_backend.persistence.SoftwareRepository;
 import de.priceland_digital.shop_backend.status.KategorieListe;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import de.priceland_digital.shop_backend.entity.Bestellung;
 import de.priceland_digital.shop_backend.entity.ComputerSpiel;
 import de.priceland_digital.shop_backend.entity.LizenzSoftware;
 import de.priceland_digital.shop_backend.entity.SoftwareHersteller;
@@ -18,6 +21,7 @@ import de.priceland_digital.shop_backend.entity.Software;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -25,7 +29,8 @@ public class AdminService {
 
     @Autowired
     private SoftwareRepository softwareRepository;
-
+    @Autowired
+    private BestellRepository bestellRepo;
     @Autowired
     private SoftwareHerstellerRepository softwareHerstellerRepository;
 
@@ -126,4 +131,11 @@ public class AdminService {
     public void loescheSoftware(Long id) {
         softwareRepository.deleteById(id);
     }
+
+    @Transactional(readOnly = true)
+public List<Bestellung> findeAlleBestellungen() {
+    return bestellRepo.findAll().stream()
+            .sorted((a, b) -> b.getErstelltAm().compareTo(a.getErstelltAm()))
+            .toList();
+}
 }

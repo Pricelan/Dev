@@ -15,6 +15,8 @@ import de.priceland_digital.shop_backend.persistence.SoftwareRepository;
 import de.priceland_digital.shop_backend.persistence.WarenkorbRepository;
 import de.priceland_digital.shop_backend.service.dto.anfrage.PositionsAnfrage;
 import de.priceland_digital.shop_backend.status.BestellStatus;
+import de.priceland_digital.shop_backend.status.ZahlungsMethode;
+import de.priceland_digital.shop_backend.persistence.GastRepository;
 
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -35,14 +37,15 @@ public class BestellService {
     private final BestellRepository bestellRepo;
     private final KundenRepository kundenRepo;
     private final SoftwareRepository softwareRepo;
+    private final GastRepository gastRepo;
   
 
-    public BestellService(BestellRepository bestellRepo, KundenRepository kundenRepo, SoftwareRepository softwareRepo, WarenkorbRepository warenkorbRepo) {
+    public BestellService(BestellRepository bestellRepo, KundenRepository kundenRepo, SoftwareRepository softwareRepo, WarenkorbRepository warenkorbRepo, GastRepository gastRepo) {
         this.bestellRepo = bestellRepo;
         this.kundenRepo = kundenRepo;
         this.softwareRepo = softwareRepo;
         this.warenkorbRepo = warenkorbRepo;
-        
+        this.gastRepo = gastRepo;
     }
     
     public Bestellung erstelleBestellung(Long kundenId, List<PositionsAnfrage> positionen) {
@@ -111,7 +114,7 @@ public List<Bestellung> findeAlleBestellungen() {
 }
 
 @Transactional
-public Bestellung checkout(Warenkorb warenkorb, Kunde kunde) {
+public Bestellung checkout(Warenkorb warenkorb, Kunde kunde, ZahlungsMethode zahlungsMethode) {
     if (warenkorb == null || warenkorb.getPositionen().isEmpty()) {
         throw new IllegalStateException("Warenkorb ist leer");
     }
@@ -119,10 +122,31 @@ public Bestellung checkout(Warenkorb warenkorb, Kunde kunde) {
     // 1. Neue Bestellung anlegen
     Bestellung bestellung = new Bestellung();
     bestellung.setKunde(kunde);
+    bestellung.setGast(null); // Sicherstellen, dass Gast leer ist
     bestellung.setErstelltAm(LocalDateTime.now());
-    bestellung.setStatus(BestellStatus.IN_BEARBEITUNG);
+    
+    // Gesamtpreis festlegen (Wichtig für die Zahlung)
+    BigDecimal gesamtBetrag = warenkorb.getGesamtpreis();
+    bestellung.setGesamtpreis(gesamtBetrag);
 
-    // 2. Positionen übertragen
+    // 2. SOFORT-ZAHLUNG LOGIK
+    // Wenn PayPal oder Kreditkarte gewählt wurde, direkt auf BEZAHLT setzen
+    if (ZahlungsMethode.PAYPAL.equals(zahlungsMethode) || 
+        ZahlungsMethode.KREDITKARTE.equals(zahlungsMethode)) {
+
+        bestellung.setStatus(BestellStatus.BEZAHLT);
+        
+        Zahlung z = new Zahlung(gesamtBetrag);
+        z.setBestellung(bestellung);
+        z.bezahlen(); // Setzt den Status der Zahlung auf BEZAHLT
+        bestellung.setZahlung(z);
+        
+    } else {
+        // Bei Vorkasse bleibt es erstmal in Bearbeitung
+        bestellung.setStatus(BestellStatus.IN_BEARBEITUNG);
+    }
+
+    // 3. Positionen übertragen
     List<Bestellposition> neuePositionen = warenkorb.getPositionen().stream()
         .map(item -> {
             Bestellposition bp = new Bestellposition(
@@ -135,12 +159,11 @@ public Bestellung checkout(Warenkorb warenkorb, Kunde kunde) {
         }).toList();
 
     bestellung.setPositionen(neuePositionen);
-    bestellung.setGesamtpreis(bestellung.berechneGesamtpreis());
 
-    // 3. Speichern
+    // 4. Speichern
     Bestellung gespeicherteBestellung = bestellRepo.save(bestellung);
 
-    // 4. WICHTIG: Warenkorb leeren
+    // 5. Warenkorb leeren
     warenkorb.getPositionen().clear();
     warenkorbRepo.save(warenkorb);
 
@@ -148,34 +171,59 @@ public Bestellung checkout(Warenkorb warenkorb, Kunde kunde) {
 }
 
 @Transactional
-public Bestellung checkoutGast(Warenkorb warenkorb, Gast gast) {
-    if (gast == null) throw new IllegalArgumentException("Gast fehlt");
+public Bestellung checkoutGast(Warenkorb warenkorb, Gast gastDaten, ZahlungsMethode zahlungsMethode) {
+    if (gastDaten == null) throw new IllegalArgumentException("Gast fehlt");
+    List<Gast> bestehendeGaeste = gastRepo.findAllByEmail(gastDaten.getEmail());
+
+    Gast gast;
+    if (!bestehendeGaeste.isEmpty()) {
+        // Nimm den ersten, falls welche da sind
+        gast = bestehendeGaeste.get(0);
+    } else {
+        // Sonst neu speichern
+        gast = gastRepo.save(gastDaten);
+    }
 
     Bestellung bestellung = new Bestellung();
     bestellung.setGast(gast);
-    bestellung.setKunde(null); // Explizit Kunde auf null setzen
+    bestellung.setKunde(null);
     bestellung.setErstelltAm(LocalDateTime.now());
-    bestellung.setStatus(BestellStatus.IN_BEARBEITUNG);
 
+    // Wir nehmen den Preis direkt aus dem Warenkorb (BigDecimal)
+    BigDecimal gesamtBetrag = warenkorb.getGesamtpreis();
+    bestellung.setGesamtpreis(gesamtBetrag);
+    
+    // Zahlung und Status verknüpfen
+    if (ZahlungsMethode.PAYPAL.equals(zahlungsMethode) || 
+        ZahlungsMethode.KREDITKARTE.equals(zahlungsMethode)) {
+
+        bestellung.setStatus(BestellStatus.BEZAHLT);
+        Zahlung z = new Zahlung(gesamtBetrag);
+        z.setBestellung(bestellung);
+        z.bezahlen(); 
+        bestellung.setZahlung(z); // Das sorgt dafür, dass berechneGesamtUmsatz() greift
+        
+    } else {
+        bestellung.setStatus(BestellStatus.IN_BEARBEITUNG);
+    }
+
+    // Positionen vom Warenkorb in die Bestellung kopieren
     List<Bestellposition> positionen = new ArrayList<>();
-    double total = 0;
-
-    for (WarenkorbItem pos : warenkorb.getPositionen()) {
+    for (WarenkorbItem item : warenkorb.getPositionen()) {
         Bestellposition bp = new Bestellposition();
-        bp.setSoftware(pos.getSoftware());
-        bp.setMenge(pos.getMenge());
-        bp.setEinzelpreis(pos.getSoftware().getPreis());
+        bp.setSoftware(item.getSoftware());
+        bp.setMenge(item.getMenge());
+        bp.setEinzelpreis(item.getSoftware().getPreis());
         bp.setBestellung(bestellung);
         positionen.add(bp);
-        
-        total += pos.getMenge() * pos.getSoftware().getPreis().doubleValue();
     }
 
     bestellung.setPositionen(positionen);
-    bestellung.setGesamtpreis(BigDecimal.valueOf(total)); 
 
+    // Speichern der Bestellung (Cascading sorgt für Gast und Zahlung)
     Bestellung gespeicherteBestellung = bestellRepo.save(bestellung);
 
+    // Warenkorb leeren
     warenkorb.getPositionen().clear();
     warenkorbRepo.save(warenkorb);
 

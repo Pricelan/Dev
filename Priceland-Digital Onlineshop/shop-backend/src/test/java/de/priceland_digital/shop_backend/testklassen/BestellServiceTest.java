@@ -24,6 +24,7 @@ import static org.mockito.Mockito.*;
     private KundenRepository kundenRepo;
     private SoftwareRepository softwareRepo;
     private BestellService service;
+    private GastRepository gastRepo;
 
     @BeforeEach
     void setup() {
@@ -31,9 +32,10 @@ import static org.mockito.Mockito.*;
         kundenRepo = mock(KundenRepository.class);
         softwareRepo = mock(SoftwareRepository.class);
         WarenkorbRepository warenkorbRepo = mock(WarenkorbRepository.class);
+        gastRepo = mock(GastRepository.class);
      
 
-        service = new BestellService(bestellRepo, kundenRepo, softwareRepo, warenkorbRepo);
+        service = new BestellService(bestellRepo, kundenRepo, softwareRepo, warenkorbRepo, gastRepo);
     }
 
     @Test
