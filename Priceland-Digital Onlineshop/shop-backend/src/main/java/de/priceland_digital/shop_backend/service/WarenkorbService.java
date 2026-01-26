@@ -10,27 +10,27 @@ import de.priceland_digital.shop_backend.entity.Warenkorb;
 import de.priceland_digital.shop_backend.persistence.WarenkorbItemRepository;    
 import de.priceland_digital.shop_backend.entity.WarenkorbItem;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 
 @Service
+@RequiredArgsConstructor
+@Transactional
 public class WarenkorbService {
 
     private final WarenkorbRepository warenkorbRepository;
     private final WarenkorbItemRepository warenkorbPositionRepository;
-    public WarenkorbService(WarenkorbRepository warenkorbRepository, WarenkorbItemRepository warenkorbPositionRepository) {
-        this.warenkorbRepository = warenkorbRepository;
-        this.warenkorbPositionRepository = warenkorbPositionRepository;
-    }
+  
+    // Alle Warenkörbe abrufen
     public List<Warenkorb> getAllWarenkoerbe() {
         return warenkorbRepository.findAll();
     }
 
     // Gast-basierten Warenkorb holen oder erstellen
-
-   public Warenkorb getOrCreateForGast(String gastToken){
+    public Warenkorb getOrCreateForGast(String gastToken){
        List<Warenkorb> warenkoerbe = warenkorbRepository.findAll();
-       for(Warenkorb w : warenkoerbe){
-           if(w.getGastToken() != null && w.getGastToken().equals(gastToken)){
+            for(Warenkorb w : warenkoerbe){
+            if(w.getGastToken() != null && w.getGastToken().equals(gastToken)){
                return w;
            }
        }
@@ -40,7 +40,6 @@ public class WarenkorbService {
    }
 
    // Kunde-basierten Warenkorb holen oder erstellen
-
     public Warenkorb getOrCreateForKunde(Kunde kunde){
         List<Warenkorb> warenkoerbe = warenkorbRepository.findAll();
         for(Warenkorb w : warenkoerbe){
@@ -78,38 +77,38 @@ public class WarenkorbService {
     return warenkorbRepository.save(warenkorb);
 }
 
-public void removePosition(
-    Warenkorb warenkorb,
-    Long positionId
-){
-    WarenkorbItem zuEntfernendePosition = null;
-    for(WarenkorbItem position : warenkorb.getPositionen()){
-        if(position.getId().equals(positionId)){
+    // Position aus dem Warenkorb entfernen
+    public void removePosition(
+        Warenkorb warenkorb,
+        Long positionId
+    ){
+        WarenkorbItem zuEntfernendePosition = null;
+            for(WarenkorbItem position : warenkorb.getPositionen()){
+            if(position.getId().equals(positionId)){
             zuEntfernendePosition = position;
             break;
         }
-    }
-    if(zuEntfernendePosition != null){
+        }
+            if(zuEntfernendePosition != null){
         warenkorb.getPositionen().remove(zuEntfernendePosition);
         warenkorbPositionRepository.delete(zuEntfernendePosition);
     }
 }
-
-public void clear(Warenkorb warenkorb){
-    for(WarenkorbItem position : warenkorb.getPositionen()){
+    // Warenkorb leeren
+    public void clear(Warenkorb warenkorb){
+            for(WarenkorbItem position : warenkorb.getPositionen()){
         warenkorbPositionRepository.delete(position);
     }
-    warenkorb.getPositionen().clear();
+        warenkorb.getPositionen().clear();
 }
 
-// Warenkorb zusammenführen (Gast → Kunde)
-@Transactional
-public Warenkorb mergeGastIntoKunde(String gastToken, Kunde kunde) {
+    //Warenkorb zusammenführen (Gast → Kunde)
+    public Warenkorb mergeGastIntoKunde(String gastToken, Kunde kunde) {
 
-    Warenkorb gastWarenkorb =
+            Warenkorb gastWarenkorb =
             warenkorbRepository.findByGastToken(gastToken).orElse(null);
 
-    Warenkorb kundenWarenkorb =
+            Warenkorb kundenWarenkorb =
             warenkorbRepository.findByKunde(kunde)
                     .orElseGet(() -> {
                         Warenkorb w = new Warenkorb();
@@ -117,12 +116,12 @@ public Warenkorb mergeGastIntoKunde(String gastToken, Kunde kunde) {
                         return warenkorbRepository.save(w);
                     });
 
-    if (gastWarenkorb == null) {
-        return kundenWarenkorb;
+            if (gastWarenkorb == null) {
+            return kundenWarenkorb;
     }
 
-    for (WarenkorbItem pos : gastWarenkorb.getPositionen()) {
-        addSoftware(
+            for (WarenkorbItem pos : gastWarenkorb.getPositionen()) {
+                addSoftware(
                 kundenWarenkorb,
                 pos.getSoftware(),
                 pos.getMenge()
@@ -132,18 +131,20 @@ public Warenkorb mergeGastIntoKunde(String gastToken, Kunde kunde) {
     warenkorbRepository.delete(gastWarenkorb);
     return kundenWarenkorb;
 }
-@Transactional
-public void uebertrageWarenkorb(Warenkorb von, Warenkorb nach) {
-    for (WarenkorbItem item : von.getPositionen()) {
+
+    //Warenkorb übertragen (z.B. Gast → Kunde), ohne Löschen des Quell-Warenkorbs
+
+    public void uebertrageWarenkorb(Warenkorb von, Warenkorb nach) {
+        for (WarenkorbItem item : von.getPositionen()) {
         // Erstelle neue Items für den Ziel-Warenkorb
-        WarenkorbItem newItem = new WarenkorbItem();
-        newItem.setSoftware(item.getSoftware());
-        newItem.setMenge(item.getMenge());
-        newItem.setWarenkorb(nach);
-        nach.getPositionen().add(newItem);
+            WarenkorbItem newItem = new WarenkorbItem();
+            newItem.setSoftware(item.getSoftware());
+            newItem.setMenge(item.getMenge());
+            newItem.setWarenkorb(nach);
+            nach.getPositionen().add(newItem);
     }
     // Gast-Warenkorb danach leeren
-    von.getPositionen().clear();
+        von.getPositionen().clear();
 }
 
 

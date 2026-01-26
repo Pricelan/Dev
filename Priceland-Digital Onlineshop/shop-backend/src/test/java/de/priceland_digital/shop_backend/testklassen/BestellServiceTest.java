@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
     class BestellServiceTest {
@@ -95,19 +96,26 @@ import static org.mockito.Mockito.*;
         assertEquals(2, gespeicherte.getPositionen().get(0).getMenge());
     }
 
-    @Test
+   @Test
+   
     void testBerechnungDesGesamtpreises() {
+        // 1. Arrange (Vorbereitung)
         Kunde kunde = new Kunde();
         Software software = mock(Software.class);
         when(software.getPreis()).thenReturn(new BigDecimal("12.50"));
+    when(kundenRepo.findById(1L)).thenReturn(Optional.of(kunde));
+    when(softwareRepo.findById(10L)).thenReturn(Optional.of(software));
+    
+    // WICHTIG: Das Repository muss die Bestellung zurückgeben, sonst bleibt sie null!
+    when(bestellRepo.save(any(Bestellung.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        when(kundenRepo.findById(1L)).thenReturn(Optional.of(kunde));
-        when(softwareRepo.findById(10L)).thenReturn(Optional.of(software));
+    PositionsAnfrage req = new PositionsAnfrage(10L, 3); // 3 * 12.50 = 37.50
 
-        PositionsAnfrage req = new PositionsAnfrage(10L, 3); // 3 * 12.50 = 37.50
+    // 2. Act (Ausführung)
+    Bestellung bestellung = service.erstelleBestellung(1L, List.of(req));
 
-        Bestellung bestellung = service.erstelleBestellung(1L, List.of(req));
-
-        assertEquals(new BigDecimal("37.50"), bestellung.berechneGesamtpreis());
-    }
+    // 3. Assert (Prüfung)
+    assertNotNull(bestellung, "Die Bestellung sollte nicht null sein!");
+    assertEquals(new BigDecimal("37.50"), bestellung.berechneGesamtpreis());
+}
 }

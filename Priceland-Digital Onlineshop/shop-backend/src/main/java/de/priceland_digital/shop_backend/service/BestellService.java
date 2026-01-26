@@ -6,7 +6,6 @@ import de.priceland_digital.shop_backend.entity.Bestellung;
 import de.priceland_digital.shop_backend.entity.Kunde;
 import de.priceland_digital.shop_backend.entity.Gast;
 import de.priceland_digital.shop_backend.entity.Warenkorb;
-import de.priceland_digital.shop_backend.entity.WarenkorbItem;
 import de.priceland_digital.shop_backend.entity.Zahlung;
 import de.priceland_digital.shop_backend.exceptions.CustomerNotFoundException;
 import de.priceland_digital.shop_backend.persistence.BestellRepository;
@@ -27,7 +26,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -158,7 +156,9 @@ public Bestellung checkout(Warenkorb warenkorb, Kunde kunde, ZahlungsMethode zah
             return bp;
         }).toList();
 
-    bestellung.setPositionen(neuePositionen);
+    for (Bestellposition bp : neuePositionen) {
+        bestellung.addPosition(bp);
+    }
 
     // 4. Speichern
     Bestellung gespeicherteBestellung = bestellRepo.save(bestellung);
@@ -208,17 +208,20 @@ public Bestellung checkoutGast(Warenkorb warenkorb, Gast gastDaten, ZahlungsMeth
     }
 
     // Positionen vom Warenkorb in die Bestellung kopieren
-    List<Bestellposition> positionen = new ArrayList<>();
-    for (WarenkorbItem item : warenkorb.getPositionen()) {
-        Bestellposition bp = new Bestellposition();
-        bp.setSoftware(item.getSoftware());
-        bp.setMenge(item.getMenge());
-        bp.setEinzelpreis(item.getSoftware().getPreis());
-        bp.setBestellung(bestellung);
-        positionen.add(bp);
-    }
+     List<Bestellposition> neuePositionen = warenkorb.getPositionen().stream()
+        .map(item -> {
+            Bestellposition bp = new Bestellposition(
+                item.getSoftware(),
+                item.getMenge(),
+                item.getSoftware().getPreis()
+            );
+            bp.setBestellung(bestellung);
+            return bp;
+        }).toList();
 
-    bestellung.setPositionen(positionen);
+    for (Bestellposition bp : neuePositionen) {
+        bestellung.addPosition(bp);
+    }
 
     // Speichern der Bestellung (Cascading sorgt für Gast und Zahlung)
     Bestellung gespeicherteBestellung = bestellRepo.save(bestellung);
@@ -236,10 +239,7 @@ public List<Bestellung> findeBestellungenVonKunde(Long kundeId) {
 }
 
 public BigDecimal berechneGesamtUmsatz() {
-    return bestellRepo.findAll().stream()
-            .filter(b -> b.getZahlung() != null) // Zählt nur Bestellungen mit hinterlegter Zahlung
-            .map(Bestellung::getGesamtpreis)
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
+    return bestellRepo.summiereGesamtenUmsatz();
 }
 
 public Bestellung findById(Long id) {

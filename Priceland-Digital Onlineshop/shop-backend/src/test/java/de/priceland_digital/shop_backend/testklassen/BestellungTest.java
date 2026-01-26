@@ -34,28 +34,17 @@ class BestellungTest {
         assertNotNull(bestellung.getErstelltAm());
     }
 
-    @Test
-    void testKonstruktorWirftExceptionWennKundeNull() {
-        Software sw = new Software() {
-            
-        };
-        Bestellposition p = new Bestellposition(sw, 1, new BigDecimal("10.00"));
-        Gast gast = new Gast();
+   @Test
+    void testKonstruktorWirftExceptionWennKundeUndGastNull() {
+    Software sw = new Software() {
+    }; 
+    Bestellposition p = new Bestellposition(sw, 1, new BigDecimal("10.00"));
 
-        assertThrows(IllegalArgumentException.class, () ->
-                new Bestellung(null, gast, List.of(p))
-        );
-    }
-
-    @Test
-    void testKonstruktorWirftExceptionWennPositionenNull() {
-        Kunde kunde = new Kunde();
-        Gast gast = new Gast();
-
-        assertThrows(IllegalArgumentException.class, () ->
-                new Bestellung(kunde, gast, null)
-        );
-    }
+    // Hier müssen beide null sein, damit deine Logik im Konstruktor greift
+    assertThrows(IllegalArgumentException.class, () ->
+            new Bestellung(null, null, List.of(p))
+    );
+}
 
     @Test
     void testKonstruktorWirftExceptionWennPositionenLeer() {

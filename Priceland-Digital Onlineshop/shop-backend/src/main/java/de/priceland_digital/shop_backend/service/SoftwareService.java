@@ -17,20 +17,22 @@ import de.priceland_digital.shop_backend.exceptions.SoftwareNotFoundException;
 import de.priceland_digital.shop_backend.persistence.SoftwareRepository;
 import de.priceland_digital.shop_backend.status.KategorieListe;
 
-@RequiredArgsConstructor
+
 @Service
+@RequiredArgsConstructor
+@Transactional
 public class SoftwareService {
 
     private final SoftwareRepository softwareRepository;
     private final SoftwareHerstellerRepository softwareHerstellerRepository;
     
   
-
+    // Alle Software-Einträge abrufen
     public List<Software> findAll() {
         return softwareRepository.findAll();
     }
 
-    @Transactional
+    // Neue Software erstellen
     public Software erstelleSoftware(Map<String, Object> daten) {
         String typ = (String) daten.get("typ");
         Software neueSoftware;
@@ -63,6 +65,7 @@ public class SoftwareService {
                 throw new IllegalArgumentException("Ungültige Kategorie: " + daten.get("kategorieListe"));
             }
         }
+        // Hersteller setzen
         if (daten.get("herstellerId") != null) {
             Long hId = Long.valueOf(daten.get("herstellerId").toString());
             SoftwareHersteller hersteller = softwareHerstellerRepository.findById(hId).orElseThrow(() -> new HerstellerNotFoundException("Hersteller nicht gefunden"));
@@ -72,7 +75,7 @@ public class SoftwareService {
         return softwareRepository.save(neueSoftware);
     }
 
-    @Transactional
+    // Software aktualisieren
     public Software aktualisiereSoftware(Long id, Software neueDaten) {
         
         Software existing = softwareRepository.findById(id)
@@ -95,10 +98,13 @@ public class SoftwareService {
 
         return softwareRepository.save(existing);
     }
+
+    // Software nach ID suchen
     public Software findById(Long id) {
         return softwareRepository.findById(id).orElseThrow(() -> new SoftwareNotFoundException("Software nicht gefunden"));
     }
 
+    // Software löschen
     public void deleteById(Long id) {
         if (!softwareRepository.existsById(id)) throw new SoftwareNotFoundException("ID existiert nicht");
         softwareRepository.deleteById(id);

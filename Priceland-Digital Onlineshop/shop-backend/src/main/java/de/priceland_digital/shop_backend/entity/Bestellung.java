@@ -15,6 +15,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
+
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -81,14 +83,14 @@ public class Bestellung {
     }   
 
     public Bestellung(Kunde kunde,Gast gast,List<Bestellposition> positionen) throws IllegalArgumentException {
-        this.kunde = kunde;
-        this.gast = gast;
-          
+               
      if (kunde == null && gast == null) {
     throw new IllegalArgumentException("Bestellung braucht Kunde oder Gast");
-}
-        
-        this.positionen = positionen;
+        }   
+        this.kunde = kunde;
+        this.gast = gast;
+        this.erstelltAm = LocalDateTime.now();
+        this.positionen = new ArrayList<>(positionen);
         if(positionen == null || positionen.isEmpty()) {
             throw new IllegalArgumentException("Die Bestellung muss mindestens eine Bestellposition enthalten.");
         }
@@ -100,6 +102,13 @@ public class Bestellung {
     }   
     // Methoden //
 
+    @PrePersist
+    protected void onCreate() {
+        this.erstelltAm = LocalDateTime.now();
+        if (this.status == null) {
+            this.status = BestellStatus.IN_BEARBEITUNG;
+    }
+}
     public BigDecimal berechneGesamtpreis() {
         BigDecimal summe = BigDecimal.ZERO;
         for (Bestellposition position : positionen) {
@@ -118,14 +127,12 @@ public class Bestellung {
         this.zahlung = zahlung;
     }
             
-    public void naechsteStatus(){
-        ;
-            if(this.status == BestellStatus.IN_BEARBEITUNG){
-                  
-            if(zahlung == null)
-            throw new IllegalStateException("Bestellung noch nicht bezahlt");
-        }
-        BestellStatus next = status.next();
+    public void naechsteStatus() {
+    if (this.status == BestellStatus.IN_BEARBEITUNG && this.zahlung == null) {
+        throw new IllegalStateException("Bezahlung erforderlich für Statusänderung.");
+    }
+    
+    BestellStatus next = status.next();
         if(next==null){
             throw new IllegalStateException("Es gibt keinen weiteren Status");
         }
@@ -141,11 +148,12 @@ public class Bestellung {
         this.kunde = kunde;
     }
     public List<Bestellposition> getPositionen() {
-        return positionen;
+    return List.copyOf(positionen); // Gibt eine unveränderliche Kopie zurück
     }   
-    public void setPositionen(List<Bestellposition> positionen) {
-        this.positionen = positionen;
-    }    
+    public void addPosition(Bestellposition pos) {
+        pos.setBestellung(this);
+        this.positionen.add(pos);
+    }   
     public LocalDateTime getErstelltAm() {
         return erstelltAm;
     }
