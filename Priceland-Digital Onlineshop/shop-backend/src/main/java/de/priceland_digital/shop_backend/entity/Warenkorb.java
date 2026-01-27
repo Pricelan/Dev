@@ -15,11 +15,12 @@ import java.util.List;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
-
+// Entität für den Warenkorb im Onlineshop
 @Entity
 @Table(name = "warenkorb")
 public class Warenkorb {
 
+    //Validierung der Eingaben
     @Id
     @GeneratedValue
     @Column(name="warenkorb_id")
@@ -27,19 +28,21 @@ public class Warenkorb {
 
     private String gastToken; // falls kein Login
 
+    //Verknüpfung zum Kunden (optional)
     @ManyToOne
     @JoinColumn(name = "kunde_id")
     private Kunde kunde;
 
- 
+    //Verknüpfung zu den Warenkorb-Items
     @OneToMany(mappedBy = "warenkorb", cascade = CascadeType.ALL, orphanRemoval = true)
         private List<WarenkorbItem> positionen= new ArrayList<>();
     
+    // Konstruktor
     public Warenkorb() {
         this.positionen = new ArrayList<>();
     }
 
-    
+    // Getter und Setter
     public Long getId() {
         return id;
     }
@@ -65,21 +68,22 @@ public class Warenkorb {
         return gastToken;
     }
 
-    
-public BigDecimal getGesamtpreis() { // Parameter entfernt
+    // Berechnung des Gesamtpreises und der Gesamtmenge
+    public BigDecimal getGesamtpreis() { 
     BigDecimal gesamtpreis = BigDecimal.ZERO;
-    // Wir nutzen 'this', um auf die eigenen Positionen zuzugreifen
-    for (WarenkorbItem position : this.positionen) {
-        BigDecimal preis = position.getSoftware().getPreis();
-        BigDecimal menge = BigDecimal.valueOf(position.getMenge());
-        gesamtpreis = gesamtpreis.add(preis.multiply(menge));
+    // Ich nutze 'this', um auf die eigenen Positionen zuzugreifen
+        for (WarenkorbItem position : this.positionen) {
+            BigDecimal preis = position.getSoftware().getPreis();
+            BigDecimal menge = BigDecimal.valueOf(position.getMenge());
+            gesamtpreis = gesamtpreis.add(preis.multiply(menge));
     }
     return gesamtpreis;
 }
 
-public int getGesamtmenge() { // Parameter entfernt
-    int gesamtmenge = 0;
-    for (WarenkorbItem position : this.positionen) {
+    // Berechnung der Gesamtmenge
+    public int getGesamtmenge() { 
+        int gesamtmenge = 0;
+        for (WarenkorbItem position : this.positionen) {
         gesamtmenge += position.getMenge(); 
     }
     return gesamtmenge;

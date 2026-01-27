@@ -2,7 +2,9 @@ package de.priceland_digital.shop_backend.service.dto.antwort;
 
 import java.time.LocalDate;
 
+// Antwort DTO für einen Download
 public record DownloadAntwort (
+
     Long softwareId,
     String softwareName,
     String version,
@@ -10,6 +12,7 @@ public record DownloadAntwort (
     String downloadLink,
     LocalDate downloadDatum,
     String ipAdresse
-) {
     
-}
+) {}
+
+

@@ -6,9 +6,10 @@ import java.math.BigDecimal;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-
+// Anfrage DTO zum Erstellen einer Software
 public class ErstelleSoftwareAnfrage {
 
+    // Validierungen
     @NotBlank
     private String name;
 
@@ -22,19 +23,17 @@ public class ErstelleSoftwareAnfrage {
 
     @NotBlank
     private String softwareBeschreibung;
-
     
-    
-
     @NotNull
     private Long herstellerId;
 
     private KategorieListe kategorieListe;
 
+    // Standard-Konstruktor
     public ErstelleSoftwareAnfrage() {
     }
 
-    // Getter & Setter
+    // Getter und Setter
     public String getName() {
         return name;
     }

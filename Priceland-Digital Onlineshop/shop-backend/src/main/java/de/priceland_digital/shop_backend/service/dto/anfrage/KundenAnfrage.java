@@ -3,8 +3,10 @@ package de.priceland_digital.shop_backend.service.dto.anfrage;
 
 import jakarta.validation.constraints.NotBlank;
 
+// Anfrage DTO für Kunden-Daten
 public class KundenAnfrage {
 
+    //Validierungen
     @NotBlank
     private String vorname;
     @NotBlank
@@ -19,9 +21,11 @@ public class KundenAnfrage {
     private String ort;
     private String telefonnummer;
 
+    // Standard-Konstruktor
     public KundenAnfrage() {
     }
 
+    // Getter und Setter
     public String getEmail(){
         return email;
     }

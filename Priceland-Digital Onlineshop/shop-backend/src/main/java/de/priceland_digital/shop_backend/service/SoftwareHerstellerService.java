@@ -17,6 +17,7 @@ public class SoftwareHerstellerService {
 
     private final SoftwareHerstellerRepository repository;
    
+    // Neuer Hersteller anlegen
     public SoftwareHersteller create(SoftwareHerstellerAnfrage request) {
         SoftwareHersteller h = new SoftwareHersteller(
             request.getName(),
@@ -28,10 +29,12 @@ public class SoftwareHerstellerService {
         return repository.save(h);
     }
 
+    // Hersteller anhand der ID finden
     public SoftwareHersteller find(Long id) {
         return repository.findById(id)
             .orElseThrow(() -> new RuntimeException("Hersteller nicht gefunden"));
     }
+    // Alle Hersteller abrufen
     public List<SoftwareHersteller> findAll() {
         return repository.findAll();
     }

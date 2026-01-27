@@ -1,6 +1,8 @@
 package de.priceland_digital.shop_backend.service.dto.anfrage;
 
+// Anfrage DTO für Kunden-Registrierungsdaten
 public class KundenRegisterAnfrage {
+    
     public String vorname;
     public String nachname;
     public String email;
@@ -11,9 +13,11 @@ public class KundenRegisterAnfrage {
     public String ort;
     public String telefonnummer;
 
+    // Standard-Konstruktor    
     public KundenRegisterAnfrage() {
     }
 
+    // Getter und Setter
     public String getVorname() {
         return vorname;
     }

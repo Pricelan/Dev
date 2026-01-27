@@ -3,7 +3,8 @@ import java.util.Optional;
 
 import de.priceland_digital.shop_backend.exceptions.CustomerAlreadyExistsException;
 import de.priceland_digital.shop_backend.entity.Kunde;
-
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import de.priceland_digital.shop_backend.persistence.KundenRepository;
@@ -12,27 +13,28 @@ import java.util.List;
 
 
 @Service
-
+@RequiredArgsConstructor
+@Transactional
 public class KundenVerwaltung {
 
     private final KundenRepository repo;
+    // Passwort-Encoder für die Verschlüsselung
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
-        
-    public KundenVerwaltung(KundenRepository repo) {
-        this.repo = repo;
-    }
-
-   
-    public Kunde findeKundeById (Long kundenId) {
        
-        return repo.findById(kundenId).orElse(null);  
+   
+   
+    // Kunde anhand der ID finden
+    public Kunde findeKundeById (Long kundenId) {
+    return repo.findById(kundenId).orElse(null);  
     }   
+
+    // Kunde anhand der E-Mail finden
     public Kunde findeKundeByEmail (String email) {
         Optional<Kunde> kundeOpt = repo.findByEmail(email);
-
-        return kundeOpt.orElse(null);
+    return kundeOpt.orElse(null);
     }   
+
+    // Neuer Kunde registrieren
      public Kunde registrieren(String vorname, String nachname, String email, String strasse, String hausnummer, String plz, String ort, String telefonnummer, String passwort) throws CustomerAlreadyExistsException {
         
         // 1. Prüfen ob E-Mail existiert
@@ -48,6 +50,7 @@ public class KundenVerwaltung {
         
         return repo.save(neuerKunde);
     }
+    // Überladene Methode zur Registrierung mit KundenAnfrage
     public Kunde registrieren(KundenAnfrage request) {
     return registrieren(
         request.getVorname(),
@@ -60,13 +63,17 @@ public class KundenVerwaltung {
         request.getTelefonnummer(),
         request.getPasswort()
     );
-}
-public List<Kunde> findeAlleKunden() {
+    }
+
+    // Alle Kunden abrufen
+    public List<Kunde> findeAlleKunden() {
     return repo.findAll();
-}
-public boolean existsByEmail(String email) {
+    }
+
+    // Prüfen, ob ein Kunde mit der gegebenen E-Mail existiert
+    public boolean existsByEmail(String email) {
     return repo.existsByEmail(email);
-}
+    }
 
     
 

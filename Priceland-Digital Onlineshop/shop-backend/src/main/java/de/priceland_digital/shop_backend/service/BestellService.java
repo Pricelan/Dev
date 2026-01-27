@@ -15,6 +15,7 @@ import de.priceland_digital.shop_backend.persistence.WarenkorbRepository;
 import de.priceland_digital.shop_backend.service.dto.anfrage.PositionsAnfrage;
 import de.priceland_digital.shop_backend.status.BestellStatus;
 import de.priceland_digital.shop_backend.status.ZahlungsMethode;
+import lombok.RequiredArgsConstructor;
 import de.priceland_digital.shop_backend.persistence.GastRepository;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +30,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
+@Transactional
 public class BestellService {
 
     private final WarenkorbRepository warenkorbRepo;
@@ -37,20 +40,13 @@ public class BestellService {
     private final SoftwareRepository softwareRepo;
     private final GastRepository gastRepo;
   
-
-    public BestellService(BestellRepository bestellRepo, KundenRepository kundenRepo, SoftwareRepository softwareRepo, WarenkorbRepository warenkorbRepo, GastRepository gastRepo) {
-        this.bestellRepo = bestellRepo;
-        this.kundenRepo = kundenRepo;
-        this.softwareRepo = softwareRepo;
-        this.warenkorbRepo = warenkorbRepo;
-        this.gastRepo = gastRepo;
-    }
-    
+    // Bestellung erstellen    
     public Bestellung erstelleBestellung(Long kundenId, List<PositionsAnfrage> positionen) {
-
+    
+    // Kunde anhand der ID finden
     var kunde = kundenRepo.findById(kundenId)
             .orElseThrow(() -> new CustomerNotFoundException("Kunde mit ID " + kundenId + " existiert nicht."));
-
+    // Bestellpositionen erstellen
     var bestellpositionen = positionen.stream()
             .map(pos -> {
                 var software = softwareRepo.findById(pos.getSoftwareId())
@@ -66,15 +62,16 @@ public class BestellService {
                 
             })
             .toList();
-
+    // Bestellung erstellen
     var bestellung = new Bestellung(kunde, null, bestellpositionen);
        
-       
+    // Bestellung speichern   
     return bestellRepo.save(bestellung);
 
   
 }
 
+// Prüfen, ob eine Bestellung zu einem Kunden gehört
 public boolean pruefeObBestellungZuKundeGehoert(Long bestellId, Long sessionKundeId) {
         // 1. Suche die Bestellung in der Datenbank
         return bestellRepo.findById(bestellId)
@@ -86,7 +83,7 @@ public boolean pruefeObBestellungZuKundeGehoert(Long bestellId, Long sessionKund
             .orElse(false); // Falls Bestellung nicht existiert -> false
     }
 
-@Transactional
+// Bestellung bezahlen
 public Bestellung bezahleBestellung(Long id) {
     // 1. Bestellung laden
     Bestellung b = bestellRepo.findById(id).orElseThrow();
@@ -94,24 +91,25 @@ public Bestellung bezahleBestellung(Long id) {
     // 2. Zahlung erstellen
     Zahlung z = new Zahlung(b.getGesamtpreis());
     
-    // 3. WICHTIG: Beide Seiten verknüpfen!
-    z.setBestellung(b); // Damit die Zahlung weiß, zu welcher Bestellung sie gehört
-    b.setZahlung(z);    // Damit die Bestellung weiß, dass sie bezahlt ist
+    // 3. Verknüpfung herstellen
+    z.setBestellung(b); 
+    b.setZahlung(z);    
     
     // 4. Status setzen
     z.bezahlen();
     b.setStatus(BestellStatus.BEZAHLT);
     
-    // 5. Speichern (dank CascadeType.ALL an der Bestellung wird z mitgespeichert)
+    // 5. Bestellung speichern
     return bestellRepo.save(b);
 }
 
+// Alle Bestellungen abrufen
 @Transactional(readOnly = true)
 public List<Bestellung> findeAlleBestellungen() {
     return bestellRepo.findAll();
 }
 
-@Transactional
+// Checkout für angemeldeten Kunden
 public Bestellung checkout(Warenkorb warenkorb, Kunde kunde, ZahlungsMethode zahlungsMethode) {
     if (warenkorb == null || warenkorb.getPositionen().isEmpty()) {
         throw new IllegalStateException("Warenkorb ist leer");
@@ -123,12 +121,11 @@ public Bestellung checkout(Warenkorb warenkorb, Kunde kunde, ZahlungsMethode zah
     bestellung.setGast(null); // Sicherstellen, dass Gast leer ist
     bestellung.setErstelltAm(LocalDateTime.now());
     
-    // Gesamtpreis festlegen (Wichtig für die Zahlung)
+    // Gesamtpreis festlegen aus dem Warenkorb
     BigDecimal gesamtBetrag = warenkorb.getGesamtpreis();
     bestellung.setGesamtpreis(gesamtBetrag);
 
-    // 2. SOFORT-ZAHLUNG LOGIK
-    // Wenn PayPal oder Kreditkarte gewählt wurde, direkt auf BEZAHLT setzen
+    // 2. Zahlung und Bestellstatus festlegen
     if (ZahlungsMethode.PAYPAL.equals(zahlungsMethode) || 
         ZahlungsMethode.KREDITKARTE.equals(zahlungsMethode)) {
 
@@ -140,7 +137,7 @@ public Bestellung checkout(Warenkorb warenkorb, Kunde kunde, ZahlungsMethode zah
         bestellung.setZahlung(z);
         
     } else {
-        // Bei Vorkasse bleibt es erstmal in Bearbeitung
+        // Andere Zahlungsmethoden (z.B. Rechnung)
         bestellung.setStatus(BestellStatus.IN_BEARBEITUNG);
     }
 
@@ -170,14 +167,15 @@ public Bestellung checkout(Warenkorb warenkorb, Kunde kunde, ZahlungsMethode zah
     return gespeicherteBestellung;
 }
 
-@Transactional
+// Checkout für Gastkunden
 public Bestellung checkoutGast(Warenkorb warenkorb, Gast gastDaten, ZahlungsMethode zahlungsMethode) {
+    // Validierung
     if (gastDaten == null) throw new IllegalArgumentException("Gast fehlt");
     List<Gast> bestehendeGaeste = gastRepo.findAllByEmail(gastDaten.getEmail());
 
     Gast gast;
     if (!bestehendeGaeste.isEmpty()) {
-        // Nimm den ersten, falls welche da sind
+        // Wenn Gast mit der E-Mail bereits existiert, diesen verwenden
         gast = bestehendeGaeste.get(0);
     } else {
         // Sonst neu speichern
@@ -233,15 +231,19 @@ public Bestellung checkoutGast(Warenkorb warenkorb, Gast gastDaten, ZahlungsMeth
     return gespeicherteBestellung;
 }
 
+// Alle Bestellungen eines Kunden abrufen
 @Transactional(readOnly = true)
 public List<Bestellung> findeBestellungenVonKunde(Long kundeId) {
     return bestellRepo.findByKundeId(kundeId);
 }
 
+// Gesamten Umsatz berechnen
+@Transactional(readOnly = true)
 public BigDecimal berechneGesamtUmsatz() {
     return bestellRepo.summiereGesamtenUmsatz();
 }
 
+// Bestellung anhand der ID finden
 public Bestellung findById(Long id) {
         return bestellRepo.findById(id)
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Bestellung nicht gefunden"));

@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional // Transaktionale Methoden
 public class WarenkorbService {
 
     private final WarenkorbRepository warenkorbRepository;

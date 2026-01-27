@@ -5,8 +5,10 @@ import de.priceland_digital.shop_backend.persistence.BestellRepository;
 import de.priceland_digital.shop_backend.persistence.SoftwareHerstellerRepository;
 import de.priceland_digital.shop_backend.persistence.SoftwareRepository;
 import de.priceland_digital.shop_backend.status.KategorieListe;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+
 
 import de.priceland_digital.shop_backend.entity.Bestellung;
 import de.priceland_digital.shop_backend.entity.ComputerSpiel;
@@ -25,23 +27,22 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
+@Transactional
 public class AdminService {
 
-    @Autowired
-    private SoftwareRepository softwareRepository;
-    @Autowired
-    private BestellRepository bestellRepo;
-    @Autowired
-    private SoftwareHerstellerRepository softwareHerstellerRepository;
+    private final SoftwareRepository softwareRepository;
+    private final BestellRepository bestellRepo;
+    private final SoftwareHerstellerRepository softwareHerstellerRepository;
+    
 
-    @Transactional
+    // Neue Software erstellen
     public Software erstelleSoftware(Map<String, Object> daten) {
         // 1. Typ aus dem Frontend-JSON holen
         String typ = (String) daten.get("typ");
         Software neueSoftware;
 
         // 2. Entscheidung: Welche KONKRETE Klasse wird gebaut?
-        // Das löst das "Abstrakte Klasse"-Problem
         if (typ == null) {
             throw new IllegalArgumentException("Software-Typ fehlt!");
         }
@@ -65,33 +66,36 @@ public class AdminService {
         neueSoftware.setVersion((String) daten.get("version"));
         neueSoftware.setDownloadLink((String) daten.get("downloadLink"));
         neueSoftware.setSoftwareBeschreibung((String) daten.get("softwareBeschreibung"));
+        
+        // Kategorie setzen
         if (daten.get("kategorieListe") != null) {
         try {
             neueSoftware.setKategorieListe(KategorieListe.valueOf((String) daten.get("kategorieListe")));
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Ungültige Kategorie: " + daten.get("kategorieListe"));
         }
-    }
+    }   
         if (daten.get("herstellerId") != null) {
             Long hId = Long.valueOf(daten.get("herstellerId").toString());
             SoftwareHersteller hersteller = softwareHerstellerRepository.findById(hId)
                 .orElseThrow(() -> new HerstellerNotFoundException("Hersteller nicht gefunden!"));
             
-            neueSoftware.setHersteller(hersteller); // Verknüpfung setzen
+            neueSoftware.setHersteller(hersteller); 
         }
         
-        // Preis-Konvertierung (sicherstellen, dass es BigDecimal ist)
+        // Preis setzen
         if (daten.get("preis") != null) {
             neueSoftware.setPreis(new BigDecimal(daten.get("preis").toString()));
         }
 
-        // 4. Speichern (Hibernate schreibt den Discriminator automatisch)
+        // 4. Software speichern
         return softwareRepository.save(neueSoftware);
     }
 
-    @Transactional
+    // Software aktualisieren
     public Software aktualisiereSoftware(Long id, Map<String, Object> daten) {
        
+        // Bestehende Software laden
         Software existing = softwareRepository.findById(id)
                 .orElseThrow(() -> new SoftwareNotFoundException ("Software mit ID " + id + " nicht gefunden"));
 
@@ -123,19 +127,20 @@ public class AdminService {
             SoftwareHersteller hersteller = softwareHerstellerRepository.findById(hId).orElseThrow(() -> new HerstellerNotFoundException("Hersteller nicht gefunden!"));
             existing.setHersteller(hersteller);
         }
-
+        // Änderungen speichern
         return softwareRepository.save(existing);
     }
     
-    @Transactional
+    // Software löschen
     public void loescheSoftware(Long id) {
         softwareRepository.deleteById(id);
     }
 
+    // Alle Bestellungen abrufen
     @Transactional(readOnly = true)
-public List<Bestellung> findeAlleBestellungen() {
-    return bestellRepo.findAll().stream()
+    public List<Bestellung> findeAlleBestellungen() {
+        return bestellRepo.findAll().stream()
             .sorted((a, b) -> b.getErstelltAm().compareTo(a.getErstelltAm()))
             .toList();
-}
+    }
 }

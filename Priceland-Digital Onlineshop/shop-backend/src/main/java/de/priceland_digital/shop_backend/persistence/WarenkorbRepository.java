@@ -4,10 +4,13 @@ import de.priceland_digital.shop_backend.entity.Warenkorb;
 import de.priceland_digital.shop_backend.entity.Kunde;
 import java.util.Optional;
 
-public interface WarenkorbRepository
-        extends JpaRepository<Warenkorb, Long> {
+// Repository-Interface für Warenkorb-Entitäten
+public interface WarenkorbRepository extends JpaRepository<Warenkorb, Long> {
 
+    // Warenkorb anhand des Gast-Tokens finden
     Optional<Warenkorb> findByGastToken(String gastToken);
 
+    // Warenkorb anhand des Kunden finden
     Optional<Warenkorb> findByKunde(Kunde kunde);
+
 }

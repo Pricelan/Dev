@@ -7,14 +7,16 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
 
+// Entität für kostenlose Software im Onlineshop
 @Entity
 @DiscriminatorValue("SOFTWARE_KOSTENLOS")
 public class SoftwareKostenlos extends Software {
 
+    // Fester Preis für kostenlose Software von 0 EUR
     private static final BigDecimal preis = BigDecimal.ZERO;
     private String quelle;
 
-    //Konstructor//
+    // Konstruktoren
     public SoftwareKostenlos() {
         super();
     }
@@ -24,13 +26,13 @@ public class SoftwareKostenlos extends Software {
         this.quelle = quelle;
     }
 
-    // Getters and Setters//
+    // Getter und Setter
 
 public String getQuelle() {
         return quelle;
     }
 
-    public void setQuelle(String quelle) {
+public void setQuelle(String quelle) {
         this.quelle = quelle;
     }
 

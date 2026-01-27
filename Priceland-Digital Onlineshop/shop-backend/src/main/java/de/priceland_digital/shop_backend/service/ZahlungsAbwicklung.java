@@ -11,12 +11,13 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor // Generiert den Konstruktor für final Felder
+@Transactional
 public class ZahlungsAbwicklung {
 
     private final BestellRepository bestellRepo;
 
+    
     // Bestelung aufrufen, Zahlung erstellen, Zahlung verknüpfen, Bestellstatus aktualisieren
-    @Transactional
     public void bestellungBezahlen(Long bestellId, ZahlungsMethode zahlungsMethode) {
         var bestellung = bestellRepo.findById(bestellId)
             .orElseThrow(() -> new OrderNotFoundException("Bestellung mit ID " + bestellId + " existiert nicht."));

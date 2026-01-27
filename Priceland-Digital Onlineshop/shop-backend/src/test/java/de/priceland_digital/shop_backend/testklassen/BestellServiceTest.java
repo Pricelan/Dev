@@ -6,6 +6,7 @@ import de.priceland_digital.shop_backend.exceptions.CustomerNotFoundException;
 import de.priceland_digital.shop_backend.persistence.*;
 import de.priceland_digital.shop_backend.service.BestellService;
 import de.priceland_digital.shop_backend.service.dto.anfrage.PositionsAnfrage;
+import lombok.RequiredArgsConstructor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-
+    @RequiredArgsConstructor
     class BestellServiceTest {
 
     private BestellRepository bestellRepo;
@@ -36,7 +37,7 @@ import static org.mockito.Mockito.*;
         gastRepo = mock(GastRepository.class);
      
 
-        service = new BestellService(bestellRepo, kundenRepo, softwareRepo, warenkorbRepo, gastRepo);
+        service = new BestellService(warenkorbRepo, bestellRepo, kundenRepo, softwareRepo, gastRepo);
     }
 
     @Test

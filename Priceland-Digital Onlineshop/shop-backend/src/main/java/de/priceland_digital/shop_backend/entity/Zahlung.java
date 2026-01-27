@@ -14,11 +14,13 @@ import jakarta.persistence.GenerationType;
 import java.math.BigDecimal;
 
 import java.time.LocalDateTime;
+
+// Entität für Zahlungen im Onlineshop
 @Entity
 @Table(name = "zahlungen")
-
 public class Zahlung {
 
+//Validierung der Eingaben
 @Id 
 @GeneratedValue (strategy = GenerationType.IDENTITY)
 @Column(name="zahlung_id")
@@ -30,14 +32,15 @@ private ZahlungsStatus status;
 private ZahlungsMethode zahlungsMethode;
 private BigDecimal betrag;
 
+//Verknüpfung zur Bestellung
 @ManyToOne
 private Bestellung bestellung;
 
-
+// Konstruktoren
 public Zahlung(){   
     }
 
-public Zahlung(BigDecimal betrag) {
+    public Zahlung(BigDecimal betrag) {
     if (betrag == null || betrag.compareTo(BigDecimal.ZERO)<= 0){
         throw new IllegalArgumentException("Betrag muss größer 0 sein");
     }
@@ -46,41 +49,43 @@ public Zahlung(BigDecimal betrag) {
         this.betrag = betrag;
     }
   
+// Getter und Setter
 
-
-    public LocalDateTime getZeitpunkt() {
+public LocalDateTime getZeitpunkt() {
         return zeitpunkt;
     }
 
-    public ZahlungsStatus getStatus() {
+public ZahlungsStatus getStatus() {
         return status;
     }
 
  
-    public ZahlungsMethode getZahlungsMethode() {
+public ZahlungsMethode getZahlungsMethode() {
         return zahlungsMethode;
     }
-    public void setBestellung(Bestellung bestellung) {
+
+public void setBestellung(Bestellung bestellung) {
     this.bestellung = bestellung;
 }
 
-    public BigDecimal getBetrag() {
+public BigDecimal getBetrag() {
         return betrag;
     }
 
-    public void bezahlen(){
-        if (this.status != ZahlungsStatus.OFFEN){
-         throw new IllegalStateException ("Die Zahlung kann nicht erneut durchgeführt werden");
+// Methode zum Durchführen der Zahlung
+public void bezahlen(){
+    if (this.status != ZahlungsStatus.OFFEN){
+     throw new IllegalStateException ("Die Zahlung kann nicht erneut durchgeführt werden");
         }
-        this.status=ZahlungsStatus.BEZAHLT;
+    this.status=ZahlungsStatus.BEZAHLT;
      
     }
-
-    public void setZahlungsMethode(ZahlungsMethode methode){
-        if(this.zahlungsMethode != null){
-            throw new IllegalStateException("Zahlungsmethode bereits gesetzt");
+// Methode zum Setzen der Zahlungsmethode
+public void setZahlungsMethode(ZahlungsMethode methode){
+    if(this.zahlungsMethode != null){
+     throw new IllegalStateException("Zahlungsmethode bereits gesetzt");
         }
 
-        this.zahlungsMethode=methode;
+    this.zahlungsMethode=methode;
     }
 }

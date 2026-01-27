@@ -1,5 +1,6 @@
 package de.priceland_digital.shop_backend.exceptions;
 
+// Ausnahme für den Fall, dass ein Kunde nicht gefunden wird
 public class CustomerNotFoundException extends RuntimeException {
     
     public CustomerNotFoundException(String message) {

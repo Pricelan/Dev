@@ -9,25 +9,28 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
-
+// Entität für ein Item im Warenkorb
 @Entity
 @Table(name = "warenkorb_item")
 public class WarenkorbItem {
+
+    //Validierung der Eingaben
     @Id
     @GeneratedValue
     private Long id;
+    private int menge;
 
+    //Verknüpfung zum Warenkorb und zur Software
     @ManyToOne
     @JoinColumn(name = "warenkorb_id", nullable = false)
     private Warenkorb warenkorb;
 
+    //Verknüpfung zur Software
     @ManyToOne
     @JoinColumn(name = "software_id", nullable = false)
     private Software software;
-
-    private int menge;
-    
-
+  
+    // Getter und Setter 
     public Long getId() {
         return id;
     }
@@ -47,8 +50,7 @@ public class WarenkorbItem {
     public int getMenge() {
         return menge;
     }
-   
-    
+       
     public void setWarenkorb(Warenkorb warenkorb) {
         this.warenkorb = warenkorb;
     }

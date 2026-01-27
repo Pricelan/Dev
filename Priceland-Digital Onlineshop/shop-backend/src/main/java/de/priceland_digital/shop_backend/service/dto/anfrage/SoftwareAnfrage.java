@@ -4,7 +4,7 @@ import de.priceland_digital.shop_backend.entity.SoftwareHersteller;
 import java.math.BigDecimal;
 
 
-
+// Anfrage DTO für eine Software
 public class SoftwareAnfrage {
 
     private BigDecimal preis;
@@ -15,10 +15,11 @@ public class SoftwareAnfrage {
     private SoftwareHersteller hersteller;
     private Long herstellerId;
 
+    // Standard-Konstruktor
     public SoftwareAnfrage() {
     }
 
-    // Getters and Setters //
+    // Getter and Setter //
 
     public String getName() {
         return name;

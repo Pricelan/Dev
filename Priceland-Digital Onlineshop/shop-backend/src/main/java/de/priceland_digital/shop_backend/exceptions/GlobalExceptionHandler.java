@@ -9,10 +9,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 
+// Globaler Ausnahme-Handler für die Anwendung
 @RestControllerAdvice
-
 public class GlobalExceptionHandler  {
 
+    // Hilfsmethode zum Erstellen einer standardisierten Antwort
     private ResponseEntity<Map<String, Object>> buildResponse(HttpStatus status, String message) {
     Map<String, Object> body = new HashMap<>();
     body.put("timestamp", LocalDateTime.now());
@@ -23,6 +24,7 @@ public class GlobalExceptionHandler  {
     return new ResponseEntity<>(body, status);
     }
     
+    // Ausnahme-Handler-Methoden für verschiedene Ausnahmetypen
     @ExceptionHandler
      public ResponseEntity<Map<String, Object>> handleSoftwareNotFoundException(SoftwareNotFoundException ex) {
          return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());

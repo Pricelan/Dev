@@ -4,9 +4,10 @@ import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
+// Anfrage DTO für einen Software-Hersteller
 public class SoftwareHerstellerAnfrage {
     
-    
+    //Validierungen
     @NotBlank
     private String name;
     @NotBlank
@@ -15,22 +16,37 @@ public class SoftwareHerstellerAnfrage {
     @Email
     @Column(unique = true)
     private String email;
-
     private String webseite;
 
+    // Standard-Konstruktor
     public SoftwareHerstellerAnfrage() {
     }
 
-    // Getter
-    public String getName() { return name; }
-    public String getWebseite() { return webseite; }
-    public String getAdresse() { return adresse; }
-    public String getEmail() { return email; }
-    // Setter
-    public void setName(String name) { this.name = name; }
-    public void setWebseite(String webseite) { this.webseite = webseite; }
-    public void setAdresse(String adresse) { this.adresse = adresse; }
-    public void setEmail(String email) { this.email = email; }
+    // Getter und Setter
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public String getAdresse() {
+        return adresse;
+    }
+    public void setAdresse(String adresse) {
+        this.adresse = adresse;
+    }
+    public String getEmail() {
+        return email;
+    }
+    public void setEmail(String email) {
+        this.email = email;
+    }
+    public String getWebseite() {
+        return webseite;
+    }
+    public void setWebseite(String webseite) {
+        this.webseite = webseite;
+    }
     
 }
     

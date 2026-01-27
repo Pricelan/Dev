@@ -6,13 +6,16 @@ import java.math.BigDecimal;
 import de.priceland_digital.shop_backend.status.ZahlungsMethode;
 import de.priceland_digital.shop_backend.status.ZahlungsStatus;
 
+// Antwort DTO für eine Zahlung
 public record ZahlungsAntwort(
+
         BigDecimal betrag,
         ZahlungsStatus status,
         ZahlungsMethode methode,
-        LocalDateTime zeitpunkt)
+        LocalDateTime zeitpunkt
+
+) {}
 
 
 
-{   
-}
+

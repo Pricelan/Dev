@@ -1,7 +1,7 @@
 package de.priceland_digital.shop_backend.service.dto.antwort;
 
 
-
+// Antwort DTO für einen Kunden
 public record KundenAntwort(
         
     Long id,
@@ -14,8 +14,6 @@ public record KundenAntwort(
     String ort,
     String telefonnummer
     
+) {}
 
-)
-{
-    
-}
+

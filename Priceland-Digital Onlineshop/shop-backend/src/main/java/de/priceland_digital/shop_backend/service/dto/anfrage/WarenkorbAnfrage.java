@@ -1,5 +1,6 @@
 package de.priceland_digital.shop_backend.service.dto.anfrage;
 
+// Anfrage DTO für ein Warenkorb-Item
 public class WarenkorbAnfrage {
 
     private Long softwareId;
@@ -7,9 +8,11 @@ public class WarenkorbAnfrage {
     private String gastToken;
     private Long kundeId;
 
+    // Standard-Konstruktor
     public WarenkorbAnfrage() {
     }
 
+    // Getter und Setter
     public Long getSoftwareId() {
         return softwareId;
     }

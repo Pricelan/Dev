@@ -2,6 +2,7 @@ package de.priceland_digital.shop_backend.service.dto.antwort;
 
 import java.math.BigDecimal;
 
+// Antwort DTO für eine Software in Kurzform
 public class SoftwareKurzAntwort {
 
     private Long id;

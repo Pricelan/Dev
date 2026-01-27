@@ -10,7 +10,9 @@ import java.time.LocalDateTime;
 
 import java.util.List;
 
+// Antwort DTO für eine Bestellung
 public record BestellAntwort(
+
         Long id,
         String käuferName,
         BigDecimal gesamtpreis,
@@ -18,8 +20,9 @@ public record BestellAntwort(
         LocalDateTime erstelltAm,
         ZahlungsAntwort zahlung,
         List<BestellPositionAntwort> positionen
-) {
+
+) {}
 
     
 
-}
+

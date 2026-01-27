@@ -1,6 +1,7 @@
 package de.priceland_digital.shop_backend.service.dto.anfrage;
 import de.priceland_digital.shop_backend.status.ZahlungsMethode;
 
+// Anfrage DTO für Gast-Daten
 public class GastAnfrage {
 
     private String vorname;
@@ -13,10 +14,11 @@ public class GastAnfrage {
     private String telefonnummer;
     private ZahlungsMethode zahlungsMethode;
 
+    // Standard-Konstruktor
     public GastAnfrage() {
     }
 
-    // Getters and Setters //
+    // Getter und Setter
 
     public String getVorname() {
         return vorname;

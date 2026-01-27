@@ -57,18 +57,18 @@ public String getIpAdresse(){
     return ipAdresse;
 }
 
-public void SetSoftware(Software software){
+public void setSoftware(Software software){
     this.software = software;
 }
 
-public void SetZeitpunkt(LocalDateTime zeitpunkt) {
+public void setZeitpunkt(LocalDateTime zeitpunkt) {
         this.zeitpunkt = zeitpunkt; 
 }
 
-public void SetIpAdresse(String ipAdresse){
+public void setIpAdresse(String ipAdresse){
     this.ipAdresse = ipAdresse;
 }
-public void SetKunde(Kunde kunde){
+public void setKunde(Kunde kunde){
     this.kunde = kunde;
 }
 public Kunde getKunde(){

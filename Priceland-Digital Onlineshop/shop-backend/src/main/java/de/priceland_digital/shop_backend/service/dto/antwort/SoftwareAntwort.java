@@ -5,7 +5,7 @@ import de.priceland_digital.shop_backend.status.KategorieListe;
 import java.math.BigDecimal;
 
 
-
+// Antwort DTO für eine Software
 public record SoftwareAntwort (
 
     Long softwareId,
@@ -16,7 +16,8 @@ public record SoftwareAntwort (
     String downloadLink,
     KategorieListe kategorieListe,
     String herstellerName
-)
-{ 
-}
+    
+) {}
+
+
  
