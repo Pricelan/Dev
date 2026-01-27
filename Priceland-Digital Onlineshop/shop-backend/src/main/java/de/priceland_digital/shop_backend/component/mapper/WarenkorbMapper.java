@@ -1,17 +1,17 @@
 package de.priceland_digital.shop_backend.component.mapper;
 
 import de.priceland_digital.shop_backend.entity.Warenkorb;
-import de.priceland_digital.shop_backend.entity.WarenkorbItem;
 import de.priceland_digital.shop_backend.service.dto.antwort.*;
-
 import java.util.List;
 
+// Mapper-Klasse für Warenkorb-Entitäten und DTOs
 public class WarenkorbMapper {
 
+    // Warenkorb-Entität in Warenkorb-Antwort-DTO umwandeln    
     public static WarenkorbAntwort toAntwort(Warenkorb warenkorb) {
         List<WarenkorbItemAntwort> positionen =
                 warenkorb.getPositionen().stream()
-                        .map(WarenkorbMapper::toItemAntwort)
+                        .map(WarenkorbItemMapper::toAntwort) 
                         .toList();
 
         int gesamtMenge = positionen.stream()
@@ -30,12 +30,5 @@ public class WarenkorbMapper {
                 gesamtPreis
         );
     }
-
-    private static WarenkorbItemAntwort toItemAntwort(WarenkorbItem item) {
-        return new WarenkorbItemAntwort(
-                item.getId(),
-                SoftwareMapper.toAntwort(item.getSoftware()),
-                item.getMenge()
-        );
-    }
+   
 }

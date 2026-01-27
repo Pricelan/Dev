@@ -15,29 +15,20 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 
-
-@RestController
-@RequestMapping("/api/kunden/profil")
+// Controller für Kundenprofil-Operationen im Onlineshop
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/kunden/profil")
 public class KundenProfilController {
 
     private final BestellRepository bestellRepository;
     private final KundenRepository kundenRepository;
     private final KundenMapper kundenMapper;
-   
-
-    public KundenProfilController(
-            BestellRepository bestellRepository, 
-            KundenRepository kundenRepository,
-            KundenMapper kundenMapper
-            ) {
-        this.bestellRepository = bestellRepository;
-        this.kundenRepository = kundenRepository;
-        this.kundenMapper = kundenMapper;
-        
-    }
-
+      
+    // Kundenprofil abrufen
     @GetMapping
     public KundenAntwort profil(HttpSession session) {
         Long id = (Long) session.getAttribute("kundeId"); 
@@ -48,6 +39,7 @@ public class KundenProfilController {
         return kundenMapper.toAntwort(kunde); // Nutzt dein Record ohne Passwort
     }
 
+    // Bestellungen des Kunden abrufen    
     @GetMapping("/bestellungen")
     public List<BestellAntwort> bestellungen(HttpSession session) {
         Long id = (Long) session.getAttribute("kundeId"); 
@@ -60,16 +52,18 @@ public class KundenProfilController {
                 .map(BestellMapper::toAntwort)
                 .toList();
     }
-@GetMapping("/me")
-public KundenAntwort getAktuellerKunde(HttpSession session) {
+
+    // Aktuellen Kunden abrufen    
+    @GetMapping("/me")
+    public KundenAntwort getAktuellerKunde(HttpSession session) {
     // WICHTIG: Nutze exakt "kundeId", wie du es im KundenController beim Login vergibst
-    Long id = (Long) session.getAttribute("kundeId"); 
+        Long id = (Long) session.getAttribute("kundeId"); 
     
-    if (id == null) {
-        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Nicht eingeloggt");
+        if (id == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Nicht eingeloggt");
     }
     
-    return kundenRepository.findById(id)
+        return kundenRepository.findById(id)
             .map(kundenMapper::toAntwort)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 }

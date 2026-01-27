@@ -1,3 +1,4 @@
+// Definition des Download-Typs im Onlineshop
 export type Download = {
   id: number;
   software: {

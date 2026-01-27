@@ -1,38 +1,34 @@
 package de.priceland_digital.shop_backend.controller;
 
 import de.priceland_digital.shop_backend.service.dto.anfrage.LoginAdminAnfrage;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.web.bind.annotation.*;
-
 import java.util.Map;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
+// Controller für Admin-Authentifizierung im Onlineshop
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 @RestController
 @RequestMapping("/api/admin/auth")
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class AdminAuthController {
 
-    // 1. Check-Admin (Damit der Admin im Dashboard bleibt)
-    // Erreichbar unter: GET http://localhost:8080/api/admin/auth/check-admin
+    // Check Admin-Status
     @GetMapping("/check-admin")
     public ResponseEntity<Boolean> checkAdmin(HttpSession session) {
         Object adminId = session.getAttribute("ADMIN_ID");
         return ResponseEntity.ok(adminId != null);
     }
 
-    // 2. Login (Prüft hart auf admin/admin)
-    // Erreichbar unter: POST http://localhost:8080/api/admin/auth/login
+
+    // Login
     @PostMapping("/login")
-public ResponseEntity<?> login(@RequestBody LoginAdminAnfrage request, HttpServletRequest httpRequest) {
+    public ResponseEntity<?> login(@RequestBody LoginAdminAnfrage request, HttpServletRequest httpRequest) {
     
-    if ("admin".equals(request.getUsername()) && "admin".equals(request.getPasswort())) {
+        if ("admin".equals(request.getUsername()) && "admin".equals(request.getPasswort())) {
         
-        // 1. Alte Session holen und löschen (falls vorhanden)
+        // 1. Alte Session holen und löschen (sofern vorhanden)
         HttpSession oldSession = httpRequest.getSession(false);
         if (oldSession != null) {
             oldSession.invalidate();
@@ -51,7 +47,7 @@ public ResponseEntity<?> login(@RequestBody LoginAdminAnfrage request, HttpServl
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                          .body(Map.of("error", "Falsche Admin-Daten"));
 }
-    // 3. Logout
+    // Logout
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpSession session) {
         if (session != null) {
@@ -60,7 +56,7 @@ public ResponseEntity<?> login(@RequestBody LoginAdminAnfrage request, HttpServl
         return ResponseEntity.ok().body(Map.of("message", "Session vernichtet"));
     }
 
-    // 4. Me (Info über den Admin)
+    // Admin-Details abrufen
     @GetMapping("/me")
     public ResponseEntity<?> me(HttpSession session) {
         if (session.getAttribute("ADMIN_ID") == null) {

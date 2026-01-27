@@ -16,35 +16,28 @@ import de.priceland_digital.shop_backend.service.AdminService;
 import de.priceland_digital.shop_backend.service.BestellService;
 import de.priceland_digital.shop_backend.component.mapper.SoftwareMapper;
 import de.priceland_digital.shop_backend.service.dto.antwort.SoftwareAntwort;
-
 import de.priceland_digital.shop_backend.service.dto.antwort.BestellAntwort;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.*;
-
+import lombok.RequiredArgsConstructor;
 import de.priceland_digital.shop_backend.entity.Kunde;
 import de.priceland_digital.shop_backend.entity.Software;
 import de.priceland_digital.shop_backend.entity.SoftwareHersteller;
-
 import org.springframework.web.bind.annotation.CrossOrigin;
 import de.priceland_digital.shop_backend.persistence.BestellRepository;
 import de.priceland_digital.shop_backend.persistence.KundenRepository;
 import de.priceland_digital.shop_backend.persistence.SoftwareHerstellerRepository;
 import de.priceland_digital.shop_backend.persistence.SoftwareRepository;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-
 import de.priceland_digital.shop_backend.component.mapper.BestellMapper;
 
 
-
-
-@CrossOrigin(
-    origins = "http://localhost:3000",
-    allowCredentials = "true"
-)
+// Controller für Admin-Operationen im Onlineshop
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/admin")
 public class AdminController {
 
@@ -54,30 +47,21 @@ public class AdminController {
     private final SoftwareRepository softwareRepo;
     private final KundenRepository kundenRepo;
     private final SoftwareHerstellerRepository herstellerRepo;
-     
-          
-    public AdminController(AdminService adminService, BestellService bestellService, BestellRepository bestellRepo, SoftwareRepository softwareRepo, KundenRepository kundenRepo, SoftwareHerstellerRepository herstellerRepo) {
-        this.adminService = adminService;
-        this.bestellService = bestellService;
-        this.bestellRepo = bestellRepo;
-        this.softwareRepo = softwareRepo;
-        this.kundenRepo = kundenRepo;
-        this.herstellerRepo = herstellerRepo;
-    }
-
+        
+    // Admin-Prüfung
     private void requireAdmin(HttpSession session) {
     if (session.getAttribute("ADMIN_ID") == null)
         throw new ResponseStatusException(401, "Nicht eingeloggt", null);
 }
 
-
-
+    // Admin-Session prüfen
     @GetMapping("/me")
     public ResponseEntity<Void> me(HttpSession session) {
         requireAdmin(session);
         return ResponseEntity.ok().build();
     }
 
+    // Software erstellen
    @PostMapping("/software")
      public ResponseEntity<Software> erstelleSoftware(@RequestBody @Valid Map<String, Object> request, HttpSession session) {
     requireAdmin(session);
@@ -85,22 +69,24 @@ public class AdminController {
     return ResponseEntity.status(201).body(created);
     }
   
+    // Software löschen
     @DeleteMapping("/software/löschen/{id}")
     public ResponseEntity<Void> löscheSoftware(@PathVariable Long id, HttpSession session) {
     requireAdmin(session);
         adminService.loescheSoftware(id);
         return ResponseEntity.noContent().build();
 }
+    // Alle Bestellungen abrufen (Admin)
    @GetMapping("/bestellungen")
-public List<BestellAntwort> alleBestellungen(HttpSession session) {
+    public List<BestellAntwort> alleBestellungen(HttpSession session) {
     requireAdmin(session);
-    // Nutze den Mapper, um das JSON-Chaos zu vermeiden!
     return bestellRepo.findAll()
             .stream()
             .map(BestellMapper::toAntwort)
             .toList();
 }
 
+    // Alle Bestellungen als Antworten abrufen (Admin)
     @GetMapping("/bestellungen/antwort")
     public List<BestellAntwort> alleBestellungenAntwort(HttpSession session) {
     requireAdmin(session);
@@ -109,6 +95,7 @@ public List<BestellAntwort> alleBestellungen(HttpSession session) {
             .map(BestellMapper::toAntwort)
             .toList();
 }
+    // Software Details abrufen (Admin)
     @GetMapping("/software/details/{id}")
     public ResponseEntity<Software> getSoftwareById(@PathVariable Long id, HttpSession session) {
     requireAdmin(session);
@@ -117,14 +104,14 @@ public List<BestellAntwort> alleBestellungen(HttpSession session) {
             .orElse(ResponseEntity.notFound().build());
 }
 
-
+    // Software bearbeiten (Admin)
     @PutMapping("/software/details/{id}") 
     public ResponseEntity<Software> bearbeiteSoftware(@PathVariable Long id, @RequestBody Map<String, Object> neueDaten, HttpSession session) {
     requireAdmin(session);
         Software updated = adminService.aktualisiereSoftware(id, neueDaten);
         return ResponseEntity.ok(updated);
 }
-   
+    // Alle Software abrufen (Admin)
     @GetMapping("/software/liste")
     public List<SoftwareAntwort> getAlleSoftware(HttpSession session) {
         requireAdmin(session);
@@ -132,19 +119,21 @@ public List<BestellAntwort> alleBestellungen(HttpSession session) {
         .map(SoftwareMapper::toAntwort)
         .toList();
 }
-
+    // Alle Kunden abrufen (Admin)
     @GetMapping("/kunden")
     public List<Kunde> alleKunden(HttpSession session) {
         requireAdmin(session);
         return kundenRepo.findAll();
     }
 
+    // Alle Hersteller abrufen (Admin)
     @GetMapping("/hersteller")
     public List<SoftwareHersteller> alleHersteller(HttpSession session) {
         requireAdmin(session);
         return herstellerRepo.findAll();
     }
 
+    // Neuen Hersteller erstellen (Admin)
     @PostMapping("/hersteller/add")
     public ResponseEntity<SoftwareHersteller> erstelleHersteller(
         @RequestBody Map<String, String> request, 
@@ -153,7 +142,7 @@ public List<BestellAntwort> alleBestellungen(HttpSession session) {
     // 1. Sicherheit prüfen
     requireAdmin(session);
     
-    // 2. Name aus dem JSON extrahieren
+    // 2. Validieren
     String name = request.get("name");
     if (name == null || name.trim().isEmpty()) {
         return ResponseEntity.badRequest().build();
@@ -167,6 +156,7 @@ public List<BestellAntwort> alleBestellungen(HttpSession session) {
     return ResponseEntity.status(201).body(gespeichert);
 }
 
+    // Gesamtumsatz abrufen (Admin)
     @GetMapping("/admin/umsatz")
     public BigDecimal getUmsatz(HttpSession session) {
     // Sicherheit: Nur Admins dürfen den Umsatz sehen
@@ -175,9 +165,6 @@ public List<BestellAntwort> alleBestellungen(HttpSession session) {
     }
     return bestellService.berechneGesamtUmsatz();
 }
-
-
-
 
 
 }

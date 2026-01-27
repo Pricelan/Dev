@@ -7,14 +7,13 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
 
+// Entität für Lizenz-Software im Onlineshop
 @Entity
 @DiscriminatorValue("LIZENZ_SOFTWARE")
-
 public class LizenzSoftware  extends Software {
     private String aktivierungsLink;
 
-    //Konstructor//
-
+    // Konstruktoren
     public LizenzSoftware() {
         super();
     }   
@@ -24,7 +23,7 @@ public class LizenzSoftware  extends Software {
         this.aktivierungsLink = aktivierungsLink;
     }
 
-    // Getters and Setters//
+    // Getter und Setter
     public String getAktivierungsLink() {
         return aktivierungsLink;
     }

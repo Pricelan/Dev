@@ -1,3 +1,4 @@
+// Definition der Typen für den Warenkorb im Onlineshop
 export type WarenkorbItem = {
   itemId: number;
   menge: number;
@@ -8,7 +9,7 @@ export type WarenkorbItem = {
   };
 };
 
-
+// Gesamtstruktur des Warenkorbs
 export type Warenkorb = {
   warenkorbId: number;
   positionen: WarenkorbItem[];

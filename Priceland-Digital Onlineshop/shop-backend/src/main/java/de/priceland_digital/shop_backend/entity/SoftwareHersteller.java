@@ -13,10 +13,12 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.persistence.Table;
 
+// Entität für Software-Hersteller im Onlineshop
 @Entity
 @Table(name = "softwarehersteller")
 public class SoftwareHersteller {
 
+// Validierungen und Attribute
 @Id
 @GeneratedValue(strategy = GenerationType.IDENTITY)
 @Column(name="hersteller_id")
@@ -33,10 +35,11 @@ private String adresse;
 private String email;
 private String webseite;
 
-
+// Beziehung zu Software-Entitäten
 @OneToMany(mappedBy = "hersteller")
     private List<Software> softwareListe = new ArrayList<>();
 
+// Konstruktoren
 public SoftwareHersteller(){
 
 }
@@ -49,6 +52,7 @@ public SoftwareHersteller (String name, String adresse, String email, String web
     
 }
 
+// Getter und Setter
 public String getName(){
     return name;
 }

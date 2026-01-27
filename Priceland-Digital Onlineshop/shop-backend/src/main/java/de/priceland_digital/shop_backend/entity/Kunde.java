@@ -18,22 +18,29 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.time.LocalDateTime;
 
+// Entität für Kunden im Onlineshop
 @Entity
 @Table(name = "kunden")
 public class Kunde {
 
+    // Validierungen und Attrtibute
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="kunde_id")
     private Long id;
+
     @NotBlank
     private String vorname;
+
     @NotBlank
     private String nachname;
+
+    // E-Mail Adresse muss eindeutig sein
     @NotBlank
     @Email
     @Column(unique = true)
     private String email;
+
     private String strasse;
     private String hausnummer;
     private String plz;
@@ -43,13 +50,15 @@ public class Kunde {
     private String rolle = "KUNDE";
     private boolean aktiviert = true;
     private LocalDateTime registrierungsdatum = LocalDateTime.now();
+    // Beziehung zu Bestellungen
     @OneToMany(mappedBy = "kunde", cascade = CascadeType.ALL)
+    // JsonIgnore um Endlosschleifen bei der Serialisierung zu vermeiden
     @JsonIgnore
     private List<Bestellung> bestellungen= new ArrayList<>();
     
     
-    //Konstructor//
-
+    
+    // Konstruktoren
     public Kunde() {
     }
 
@@ -67,7 +76,7 @@ public class Kunde {
         this.aktiviert = aktiviert;
 
     }
-    // Getters and Setters//
+    // Getter und Setter 
 
     public Long getId() {
             return id;
@@ -146,16 +155,16 @@ public class Kunde {
     public void setPasswort(String passwort) {
         this.passwort = passwort;
     }
-   
-  
-    // Bestellungen verwalten //    
-    public void addBestellung(Bestellung bestellung) {
-        this.bestellungen.add(bestellung);
-    }
     public List<Bestellung> getBestellungen() {
         return bestellungen;
     }
-
+  
+    // Methoden zur Verwaltung der Bestellungen  
+    public void addBestellung(Bestellung bestellung) {
+        this.bestellungen.add(bestellung);
+    }
+    
+    
    
 
           

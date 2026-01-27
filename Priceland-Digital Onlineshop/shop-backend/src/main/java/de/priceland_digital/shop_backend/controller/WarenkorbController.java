@@ -23,21 +23,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 
 
-@RequiredArgsConstructor
-@CrossOrigin(
-    origins = "http://localhost:3000",
-    allowCredentials = "true"
-)
+// Controller für Warenkorb-Operationen im Onlineshop
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/warenkorb")
 public class WarenkorbController {
 
     private final SoftwareService softwareService;
     private final KundenVerwaltung kundenVerwaltung;
     private final WarenkorbService warenkorbService;
-
-   
-   
 
     // 1️ Warenkorb holen (Gast ODER Kunde)
     @GetMapping
@@ -118,7 +113,6 @@ public WarenkorbAntwort addToCart(@RequestBody WarenkorbAnfrage request) {
 
 
     // 5️ Warenkorb zusammenführen (Gast → Kunde)
-
     @PostMapping("/merge")
     public WarenkorbAntwort mergeCart(
         @RequestParam String gastToken,

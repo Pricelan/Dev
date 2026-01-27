@@ -11,10 +11,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+// Entität für Administratoren im Onlineshop
 @Entity
 @Table(name = "administrator")
 public class Administrator {
-    
+ 
+// Validierungen und Attribute
 @Id
 @GeneratedValue(strategy = GenerationType.IDENTITY)
 @Column(name="admin_id")
@@ -23,10 +25,13 @@ private Long id;
 @Column(unique = true)
 private String username;
 
+
 @NotBlank
+// JsonIgnore um das Passwort nicht in API-Antworten zu senden
 @JsonIgnore
 private String passwort;
 
+// Konstruktoren
 public Administrator(){
 
 }
@@ -36,8 +41,8 @@ public Administrator(String username, String passwort){
     this.passwort=passwort;
 }
 
-// Getter & Setter Methoden
 
+// Getter und Setter
 public Long getAdminId(){
     return id;
 }

@@ -23,11 +23,13 @@ import jakarta.persistence.InheritanceType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+// Abstrakte Entität für Software im Onlineshop
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE) 
 @DiscriminatorColumn(name = "software_typ") 
 public abstract class Software {
 
+    // Validierungen und Attribute   
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="software_id")
@@ -43,23 +45,25 @@ public abstract class Software {
     @Column(columnDefinition = "TEXT")
     private String softwareBeschreibung;
     
-
+    // Beziehung zu SoftwareHersteller
     @ManyToOne
     @JoinColumn(name = "hersteller_id", nullable = false)
     private SoftwareHersteller hersteller;
 
-     //Beziehungen//
+    // Beziehung zu Bestellposition und Download
     @OneToMany(mappedBy = "software")
     private List<Bestellposition> bestellpositionen;
 
+    // Beziehung zu Download
     @OneToMany(mappedBy = "software", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Download> downloads = new ArrayList<>();
 
+    // Kategorie als Enum
     @Enumerated(EnumType.STRING)
     private KategorieListe kategorieListe;
    
 
-    //Konstructor//
+    // Konstruktoren
 
     public Software() {
     }
@@ -76,7 +80,7 @@ public abstract class Software {
     }
 
            
-    // Getters and Setters//
+    // Getter und Setter
 
     public Long getId() {
         return id;
@@ -135,7 +139,7 @@ public abstract class Software {
         return hersteller;
     }
     
-
+    // Methode zur Anzeige von Software-Informationen
     public String zeigeInfo() {
         return "Software [id=" + id + ", name=" + name + ", version=" + version + ", preis=" + preis
                 + ", downloadLink=" + downloadLink + ", softwareBeschreibung=" + softwareBeschreibung + "]" + "softwarehersteller=" + hersteller;

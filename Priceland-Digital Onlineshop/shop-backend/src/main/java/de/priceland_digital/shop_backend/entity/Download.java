@@ -11,12 +11,13 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.JoinColumn;
 
-
+// Entität für Downloads im Onlineshop
 @Entity
 @Table(name = "download")
 public class Download {
 
- @Id
+// Validierungen und Attribute
+@Id
 @GeneratedValue(strategy = GenerationType.IDENTITY)
 @Column(name="dowload_id")
 private Long id;
@@ -25,14 +26,17 @@ private String ipAdresse;
 private String lizenzKey;
 private String downloadLink;
 
+// Beziehung zu Software
 @ManyToOne(optional = false)
 @JoinColumn(name = "software_id", nullable = false)
 private Software software;
 
+// Beziehung zu Kunde
 @ManyToOne(optional = false)
 @JoinColumn(name = "kunde_id", nullable = false)
 private Kunde kunde;
 
+// Konstruktoren
 public Download(){
 
 }
@@ -46,6 +50,7 @@ public Download(String ipAdresse, Kunde kunde, Software software, String lizenzK
     this.downloadLink = downloadLink;
 }
 
+// Getter und Setter
 public Long getId(){
 return id;
 }

@@ -1,5 +1,5 @@
 export type CheckoutBody = {
-     kundenId: number | null;
+    kundeId: number | null;
     gastToken: string;
     vorname?: string;
     nachname?: string;
@@ -9,4 +9,5 @@ export type CheckoutBody = {
     plz?: string;
     ort?: string;
     telefonnummer?: string;
+    zahlungsMethode: string;
   };

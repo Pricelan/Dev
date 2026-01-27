@@ -3,6 +3,8 @@ import java.time.LocalDateTime;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,20 +15,17 @@ import de.priceland_digital.shop_backend.persistence.KundenRepository;
 import de.priceland_digital.shop_backend.service.dto.anfrage.KundenRegisterAnfrage;
 import de.priceland_digital.shop_backend.service.dto.anfrage.LoginAnfrage;
 
-
-@RestController
-@RequestMapping("/api/kunden/auth")
+// Controller für Kunden-Authentifizierungs-Operationen im Onlineshop
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/kunden/auth")
 public class KundenAuthController {
 
     private final KundenRepository kundenRepository;
     private final PasswordEncoder passwordEncoder;
-
-    public KundenAuthController(KundenRepository kundenRepository, PasswordEncoder passwordEncoder) {
-        this.kundenRepository = kundenRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
-
+   
+    // Neuer Kunde registrieren
     @PostMapping("/register")
     public Kunde register(@RequestBody KundenRegisterAnfrage req) {
 
@@ -50,20 +49,19 @@ public class KundenAuthController {
         return kundenRepository.save(k);
     }
 
-  
+    // Kunde einloggen
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginAnfrage login, HttpServletRequest request) {
         // 1. Session-Sicherheit
         HttpSession session = request.getSession(false);
         if (session != null) session.invalidate();
 
-        // 2. Kurt in der DB suchen
+        // 2. Kunde in der DB suchen
         Kunde kunde = kundenRepository.findByEmail(login.getEmail()).orElse(null);
         
        if (kunde != null && passwordEncoder.matches(login.getPasswort(), kunde.getPasswort())) {
         HttpSession newSession = request.getSession(true);
     
-    // Wir nutzen deinen Wunsch-Namen: "kunde_id"
     newSession.setAttribute("kunde_id", kunde.getId()); 
     
     return ResponseEntity.ok(kunde);
@@ -72,9 +70,9 @@ public class KundenAuthController {
         return ResponseEntity.status(401).body(java.util.Map.of("error", "Ungültige Anmeldedaten"));
     }
 
+    // Aktuellen Kunden abrufen
     @GetMapping("/me")
     public ResponseEntity<Kunde> me(HttpSession session) {
-        // HIER WAR DER FEHLER: Muss "kunde_id" sein!
         Long id = (Long) session.getAttribute("kunde_id");
         
         if (id == null) {
@@ -86,6 +84,7 @@ public class KundenAuthController {
                 .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
     }
 
+    // Kunde ausloggen
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpSession session) {
         if (session != null) {
@@ -93,6 +92,5 @@ public class KundenAuthController {
         }
         return ResponseEntity.ok().body(java.util.Map.of("message", "Abgemeldet"));
     }
-    
-    // ... register bleibt gleich ...
+       
 }

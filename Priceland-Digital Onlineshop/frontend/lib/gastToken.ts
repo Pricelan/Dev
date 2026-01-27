@@ -1,3 +1,4 @@
+// Funktion zum Abrufen oder Erstellen eines Gast-Tokens
 export function getGastToken(): string {
   if (typeof window === "undefined") return "";
 

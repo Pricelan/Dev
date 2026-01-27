@@ -1,3 +1,4 @@
+ // Definition des Kundentyps im Onlineshop 
 export type Kunde = {
   id: number;   
     vorname: string;

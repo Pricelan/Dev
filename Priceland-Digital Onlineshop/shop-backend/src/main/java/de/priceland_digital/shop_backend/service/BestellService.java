@@ -126,20 +126,20 @@ public Bestellung checkout(Warenkorb warenkorb, Kunde kunde, ZahlungsMethode zah
     bestellung.setGesamtpreis(gesamtBetrag);
 
     // 2. Zahlung und Bestellstatus festlegen
-    if (ZahlungsMethode.PAYPAL.equals(zahlungsMethode) || 
-        ZahlungsMethode.KREDITKARTE.equals(zahlungsMethode)) {
+    if (gesamtBetrag.compareTo(BigDecimal.ZERO) == 0 || 
+    ZahlungsMethode.PAYPAL.equals(zahlungsMethode) || 
+    ZahlungsMethode.KREDITKARTE.equals(zahlungsMethode)) {
 
-        bestellung.setStatus(BestellStatus.BEZAHLT);
-        
-        Zahlung z = new Zahlung(gesamtBetrag);
-        z.setBestellung(bestellung);
-        z.bezahlen(); // Setzt den Status der Zahlung auf BEZAHLT
-        bestellung.setZahlung(z);
-        
-    } else {
-        // Andere Zahlungsmethoden (z.B. Rechnung)
-        bestellung.setStatus(BestellStatus.IN_BEARBEITUNG);
-    }
+    bestellung.setStatus(BestellStatus.BEZAHLT);
+    
+    // Auch für 0 € eine Zahlung erstellen, damit die Historie stimmt
+    Zahlung z = new Zahlung(gesamtBetrag);
+    z.setBestellung(bestellung);
+    z.bezahlen(); 
+    bestellung.setZahlung(z);
+} else {
+    bestellung.setStatus(BestellStatus.IN_BEARBEITUNG);
+}
 
     // 3. Positionen übertragen
     List<Bestellposition> neuePositionen = warenkorb.getPositionen().stream()
@@ -192,17 +192,19 @@ public Bestellung checkoutGast(Warenkorb warenkorb, Gast gastDaten, ZahlungsMeth
     bestellung.setGesamtpreis(gesamtBetrag);
     
     // Zahlung und Status verknüpfen
-    if (ZahlungsMethode.PAYPAL.equals(zahlungsMethode) || 
-        ZahlungsMethode.KREDITKARTE.equals(zahlungsMethode)) {
+    if (gesamtBetrag.compareTo(BigDecimal.ZERO) == 0 || 
+    ZahlungsMethode.PAYPAL.equals(zahlungsMethode) || 
+    ZahlungsMethode.KREDITKARTE.equals(zahlungsMethode)) {
 
-        bestellung.setStatus(BestellStatus.BEZAHLT);
-        Zahlung z = new Zahlung(gesamtBetrag);
-        z.setBestellung(bestellung);
-        z.bezahlen(); 
-        bestellung.setZahlung(z); // Das sorgt dafür, dass berechneGesamtUmsatz() greift
-        
+    bestellung.setStatus(BestellStatus.BEZAHLT);
+    
+    // Auch für 0 € eine Zahlung erstellen, damit die Historie stimmt
+    Zahlung z = new Zahlung(gesamtBetrag);
+    z.setBestellung(bestellung);
+    z.bezahlen(); 
+    bestellung.setZahlung(z);
     } else {
-        bestellung.setStatus(BestellStatus.IN_BEARBEITUNG);
+    bestellung.setStatus(BestellStatus.IN_BEARBEITUNG);
     }
 
     // Positionen vom Warenkorb in die Bestellung kopieren

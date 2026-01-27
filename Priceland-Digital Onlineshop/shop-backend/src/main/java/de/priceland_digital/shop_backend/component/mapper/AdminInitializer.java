@@ -4,22 +4,18 @@ import de.priceland_digital.shop_backend.persistence.AdministratorRepository;
 import de.priceland_digital.shop_backend.entity.Administrator;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 
+// Initialisiert einen Standard-Administrator bei Anwendungstart
 @Component
+@RequiredArgsConstructor
 public class AdminInitializer {
 
     private final AdministratorRepository repo;
     private final PasswordEncoder encoder;
     
-
-    public AdminInitializer(AdministratorRepository repo, PasswordEncoder encoder) {
-        this.repo = repo;
-        this.encoder = encoder;
-    }
-
-    
+    // Initialisierungsmethode, die einen Admin-Benutzer anlegt, falls keiner existiert
    @PostConstruct
     public void init() {
     if (repo.findByUsername("admin").isEmpty()) {

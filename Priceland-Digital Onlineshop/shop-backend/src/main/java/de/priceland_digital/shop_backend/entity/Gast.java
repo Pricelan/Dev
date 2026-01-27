@@ -16,21 +16,29 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
+// Entität für Gäste im Onlineshop
 @Entity
 @Table(name = "gast")
 public class Gast {
- @Id
+
+    // Validierungen und Attribute
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="gast_id")
     private Long id;
+
     @NotBlank
     private String vorname;
+
     @NotBlank
     private String nachname;
+
+    // E-Mail Adresse kann mehrfach vorkommen
     @NotBlank
     @Email
     @Column(unique = false)
     private String email;
+
     private String strasse;
     private String hausnummer;
     private String plz;
@@ -38,11 +46,13 @@ public class Gast {
     private String telefonnummer;
     private LocalDateTime erstelltAm = LocalDateTime.now();
     private ZahlungsMethode zahlungsMethode;
+
+    // Beziehung zu Bestellungen
    @OneToMany(mappedBy = "gast", cascade = CascadeType.ALL)
     private List<Bestellung> bestellungen = new ArrayList<>();
     private String rolle = "GAST";
 
-    //Konstructor//
+    // Konstruktoren
     public Gast() {
     }
     public Gast(String vorname, String nachname, String email, String strasse, String hausnummer, String plz, String ort, String telefonnummer, ZahlungsMethode zahlungsMethode) {
@@ -56,7 +66,7 @@ public class Gast {
         this.telefonnummer = telefonnummer;
         this.zahlungsMethode = zahlungsMethode;
     }
-    // Getters and Setters//
+    // Getter und Setter
     public Long getId() {
         return id;
     }       
@@ -105,7 +115,6 @@ public class Gast {
     public void setOrt(String ort) {
         this.ort = ort;
     }
- 
     public String getTelefonnummer() {
         return telefonnummer;
     }

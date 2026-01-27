@@ -1,7 +1,9 @@
 "use client";
+
 import { createContext, ReactNode, useState, useContext, useEffect } from "react";
 import { Kunde } from "@/types/kunde";
 
+// Definition des Typs für den Kunden-Kontext
 type KundeContextType = {
   kunde: Kunde | null;
   setKunde: React.Dispatch<React.SetStateAction<Kunde | null>>;
@@ -9,26 +11,28 @@ type KundeContextType = {
   loading: boolean; 
 };
 
+// Erstellung des Kunden-Kontexts
 export const KundeContext = createContext<KundeContextType | undefined>(undefined);
 
+// Kunden-Provider-Komponente zur Bereitstellung des Kunden-Kontexts
 export function KundeProvider({ children }: { children: ReactNode }) {
   const [kunde, setKunde] = useState<Kunde | null>(null);
   const [loading, setLoading] = useState(true);
 
+// Überprüfung des angemeldeten Kunden beim Laden der Komponente
 useEffect(() => {
   const checkUser = async () => {
-    // Wenn die URL "/admin" enthält, brechen wir den Kunden-Check ab
+   // Admin-Bereich überspringen
     if (window.location.pathname.startsWith('/admin')) {
       setLoading(false);
       return;
     }
-
+    
     try {
       const res = await fetch("http://localhost:8080/api/kunden/auth/me", { 
         credentials: "include" 
       });
-
-      if (res.ok) {
+        if (res.ok) {
         const data = await res.json();
         setKunde(data);
       } else {
@@ -43,9 +47,10 @@ useEffect(() => {
   checkUser();
 }, []);
 
+  // Funktion zum Ausloggen des Kunden
   const logout = async () => {
     try {
-      // Wichtig: Wir rufen den Logout-Endpunkt auf
+      // Anfrage an das Backend zum Ausloggen
       await fetch("http://localhost:8080/api/auth/logout", { 
         credentials: "include", 
         method: "POST" 
@@ -53,13 +58,14 @@ useEffect(() => {
     } catch (err) {
       console.error("Logout fehlgeschlagen", err);
     } finally {
-      // Egal ob Erfolg oder Fehler: Lokal alles löschen
+      // Kundenstatus zurücksetzen
       setKunde(null);
-      // Hard Redirect vernichtet alle Reste im State
+      // Weiterleitung zur Startseite
       window.location.href = "/";
     }
   };
 
+  // Bereitstellung des Kunden-Kontexts für die Kindkomponenten
   return (
     <KundeContext.Provider value={{ kunde, setKunde, logout, loading }}>
       {children}
@@ -67,6 +73,7 @@ useEffect(() => {
   );
 }
 
+// Custom Hook zum Zugriff auf den Kunden-Kontext
 export function useKunde() {
   const context = useContext(KundeContext);
   if (context === undefined) {

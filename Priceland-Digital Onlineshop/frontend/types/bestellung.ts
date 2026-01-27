@@ -1,17 +1,19 @@
+// Definition des Bestelltyps im Onlineshop
 export type Bestellung = {
     id: number;
-    käuferName: string; // Entspricht deiner Variable im BestellMapper
+    // Name des Käufers (Kunde oder Gast)
+    käuferName: string; 
     gesamtpreis: number;
     status: string;
-    erstelltAm: string; // Entspricht bestellung.getErstelltAm()
+    erstelltAm: string; 
     zahlung?: {
         betrag: number;
         status: string;
         zahlungsMethode: string;
         zeitpunkt: string;
     };
+    // Detaillierte Positionen der Bestellung
     positionen: {
-        // Hier ggf. BestellPositionMapper Struktur nutzen
         software: {
             name: string;
             preis: number;

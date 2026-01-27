@@ -6,18 +6,17 @@ import de.priceland_digital.shop_backend.status.KategorieListe;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
-
+// Entität für Computer-Spiele im Onlineshop
 @Entity
 @DiscriminatorValue("COMPUTER_SPIEL")
-
 public class ComputerSpiel extends Software {
     private String genre;
     private String plattform;
     private String altersEinstufung;
 
-    //Konstructor//
     
-
+    
+    // Konstruktoren
     public ComputerSpiel() {
         super();
     }
@@ -29,8 +28,8 @@ public class ComputerSpiel extends Software {
         this.altersEinstufung = altersEinstufung;
     }
 
-    // Getters and Setters//
-
+    
+    // Getter und Setter
     public String getGenre() {
         return genre;
     }
@@ -49,10 +48,12 @@ public class ComputerSpiel extends Software {
 
     public String zeigeInfo() {
         return super.zeigeInfo() + ", Genre: " + genre + ", Plattform: " + plattform;
-    }   
+    }
+
     public String getAltersEinstufung() {
         return altersEinstufung;
     }
+    
     public void setAltersEinstufung(String altersEinstufung) {
         this.altersEinstufung = altersEinstufung;
     }

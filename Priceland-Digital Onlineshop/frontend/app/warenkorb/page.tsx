@@ -3,11 +3,13 @@
 import { useEffect, useState } from "react";
 import { getGastToken } from "@/lib/gastToken";
 import { Warenkorb } from "@/types/warenkorb";
+import { CheckoutBody } from "@/types/checkoutBody";
 import { useRouter } from "next/navigation";
 import { useKunde } from "@/context/kundeContext";
+import Link from "next/link";
 
 export default function WarenkorbPage() {
-  const { kunde } = useKunde();
+  const { kunde, loading: kundeLoading } = useKunde();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [zahlungsMethode, setZahlungsMethode] = useState("PAYPAL");
@@ -19,12 +21,16 @@ export default function WarenkorbPage() {
   });
 
   const gesamtpreis = warenkorb?.gesamtpreis ?? 0;
+  // Hilfsvariable für die Prüfung auf kostenlose Software
+  const istKostenlos = gesamtpreis === 0;
 
-  // Hilfsfunktion zum Laden des Warenkorbs (damit wir sie wiederverwenden können)
   const fetchWarenkorb = () => {
     const token = getGastToken();
     fetch(`http://localhost:8080/api/warenkorb?gastToken=${token}`)
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error("Nicht gefunden");
+        return res.json();
+      })
       .then(data => {
         setWarenkorb(data);
         setLoading(false);
@@ -39,29 +45,31 @@ export default function WarenkorbPage() {
     fetchWarenkorb();
   }, []);
 
-  // Funktionen MÜSSEN innerhalb der WarenkorbPage Komponente bleiben
   function removePosition(positionId: number) {
     const token = getGastToken();
     fetch(`http://localhost:8080/api/warenkorb/position/${positionId}?gastToken=${token}`, {
       method: "DELETE",
     })
-    .then(() => {
-      // Besser: Warenkorb neu vom Server laden, damit Preis & Menge stimmen
-      fetchWarenkorb();
-    });
+    .then(() => fetchWarenkorb());
   }
 
   async function checkout() {
     const token = getGastToken();
-    let body;
+    let body: CheckoutBody;
 
     if (kunde) {
-      body = { gastToken: token, kundeId: kunde.id, zahlungsMethode };
+      body = { 
+        kundeId: kunde.id, 
+        gastToken: token,
+        // Wenn kostenlos, schicken wir einen neutralen Wert mit
+        zahlungsMethode: istKostenlos ? "VORKASSE" : zahlungsMethode 
+      };
     } else {
       const gastData = JSON.parse(localStorage.getItem("gastCheckout") || "{}");
       body = {
+        kundeId: null,
         gastToken: token,
-        ...gastData // Spread-Operator übernimmt alle Felder (vorname, nachname, etc.)
+        ...gastData 
       };
     }
 
@@ -87,71 +95,108 @@ export default function WarenkorbPage() {
     }
   }
 
-  // --- RENDERING ---
-  if (loading) return <div className="p-10 text-center">Lade Warenkorb...</div>;
-  
+  if (loading || kundeLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
   if (!warenkorb || warenkorb.positionen.length === 0) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center">
-        <h1 className="text-2xl font-bold">Dein Warenkorb ist leer.</h1>
-        <button onClick={() => router.push("/")} className="mt-4 text-blue-500 underline">
-          Zurück zum Shop
-        </button>
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6 text-center">
+        <div className="bg-white p-10 rounded-2xl shadow-sm border border-gray-100">
+          <span className="text-5xl mb-4 block">🛒</span>
+          <h1 className="text-2xl font-black text-slate-800 tracking-tight">Dein Warenkorb ist leer</h1>
+          <p className="text-slate-500 mt-2 mb-6">Such dir erst ein paar tolle Software-Angebote aus!</p>
+          <Link href="/" className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:scale-105 transition-transform inline-block">
+            Zum Shop
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-[#f8fafc] py-12 px-4 sm:px-6">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Warenkorb</h1>
-
-        <div className="space-y-4">
-          {warenkorb.positionen.map(pos => (
-            <div key={pos.itemId} className="bg-white rounded-lg border p-4 flex justify-between items-center shadow-sm">
-              <div>
-                <p className="font-semibold text-lg">{pos.software.name}</p>
-                <p className="text-sm text-gray-500">Menge: {pos.menge}</p>
-              </div>
-              <div className="text-right">
-                <p className="font-bold">{(pos.software.preis * pos.menge).toFixed(2)} €</p>
-                <button onClick={() => removePosition(pos.itemId)} className="text-sm text-red-500 hover:text-red-700 mt-1">
-                  Entfernen
-                </button>
-              </div>
-            </div>
-          ))}
+        <div className="flex items-center justify-between mb-10">
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Dein Warenkorb</h1>
+          <span className="bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-full uppercase">
+            {warenkorb.positionen.length} Artikel
+          </span>
         </div>
 
-        <div className="mt-8 bg-white border rounded-lg p-6 shadow-md">
-
-         {/* BEZAHLMETHODE AUSWAHL (Nur für eingeloggte Kunden relevant) */}
-          {kunde && (
-            <div className="mb-6 p-4 bg-blue-50 rounded-xl border border-blue-100">
-              <label className="block text-sm font-bold text-blue-800 mb-2">Bezahlmethode wählen:</label>
-              <select 
-                value={zahlungsMethode} 
-                onChange={(e) => setZahlungsMethode(e.target.value)}
-                className="w-full border p-2 rounded bg-white font-medium focus:ring-2 focus:ring-blue-500 outline-none"
-              >
-                <option value="PAYPAL">PayPal (Sofort-Download)</option>
-                <option value="KREDITKARTE">Kreditkarte</option>
-                <option value="VORKASSE">Vorkasse (Manuelle Freischaltung)</option>
-              </select>
-            </div>
-          )}
-          
-          <div className="flex justify-between mb-6">
-            <span className="text-xl font-semibold">Gesamtsumme</span>
-            <span className="text-xl font-bold text-green-700">{gesamtpreis.toFixed(2)} €</span>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-4">
+            {warenkorb.positionen.map((pos) => (
+              <div key={pos.itemId} className="bg-white rounded-2xl border border-slate-200 p-5 flex items-center justify-between shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex flex-col">
+                  <span className="text-lg font-bold text-slate-800">{pos.software.name}</span>
+                  <span className="text-sm text-slate-500 font-medium">Menge: {pos.menge}</span>
+                </div>
+                <div className="flex flex-col items-end">
+                  <span className="text-xl font-black text-slate-900">{(pos.software.preis * pos.menge).toFixed(2)} €</span>
+                  <button 
+                    onClick={() => removePosition(pos.itemId)}
+                    className="mt-2 text-xs font-bold text-red-500 hover:text-red-700 transition-colors py-1 px-2 hover:bg-red-50 rounded"
+                  >
+                    Entfernen
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
 
-          <button
-            onClick={() => kunde ? checkout() : router.push("/gastcheckout")}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition-colors"
-          >
-            {kunde ? "Kostenpflichtig bestellen" : "Weiter zum Gast-Checkout"}
-          </button>
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xl sticky top-6">
+              <h2 className="text-lg font-bold text-slate-900 mb-6 border-b pb-4">Bestellübersicht</h2>
+              
+              {/* ZAHLUNGSMETHODE NUR ANZEIGEN WENN PREIS > 0 */}
+              {!istKostenlos && kunde && (
+                <div className="mb-6 animate-in fade-in duration-500">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Bezahlmethode</label>
+                  <select 
+                    value={zahlungsMethode}
+                    onChange={(e) => setZahlungsMethode(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="PAYPAL">PayPal</option>
+                    <option value="KREDITKARTE">Kreditkarte</option>
+                    <option value="VORKASSE">Vorkasse</option>
+                  </select>
+                </div>
+              )}
+
+              {istKostenlos && (
+                 <div className="mb-6 p-4 bg-green-50 border border-green-100 rounded-xl text-green-700 text-xs font-bold flex items-center gap-2 shadow-sm animate-pulse">
+                   <span>✨</span> Kostenlose Software - Keine Zahlung nötig
+                 </div>
+              )}
+
+              <div className="flex justify-between items-center mb-8">
+                <span className="text-slate-500 font-medium">Gesamtsumme</span>
+                <span className="text-2xl font-black text-blue-600">
+                    {istKostenlos ? "Gratis" : `${gesamtpreis.toFixed(2)} €`}
+                </span>
+              </div>
+
+              <button
+                onClick={() => (kunde ? checkout() : router.push("/gastcheckout"))}
+                className={`w-full ${istKostenlos ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'} text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-[0.98] flex items-center justify-center gap-2`}
+              >
+                {istKostenlos 
+                  ? "Kostenlos aktivieren" 
+                  : (kunde ? "Jetzt bestellen" : "Weiter zum Gast-Checkout")}
+                <span>→</span>
+              </button>
+              
+              <p className="text-[10px] text-slate-400 text-center mt-4 uppercase font-bold tracking-tighter">
+                Sichere SSL-Verschlüsselung
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

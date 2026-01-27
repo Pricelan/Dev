@@ -14,11 +14,12 @@ import jakarta.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
-
-@Entity
-@Table(name = "bestellpositionen")
-public class Bestellposition {
+    // Entität für Bestellpositionen im Onlineshop
+    @Entity
+    @Table(name = "bestellpositionen")
+    public class Bestellposition {
     
+    // Validierungen und Attribute
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="bestellposition_id")
@@ -26,21 +27,20 @@ public class Bestellposition {
     private int menge;
     private BigDecimal einzelpreis;
 
+    // Verknüpfung zur Software
     @ManyToOne (optional = false)
     @JoinColumn(name ="software_id")
     private Software software;
 
+    // Verknüpfung zur Bestellung
     @ManyToOne
     @JoinColumn(name ="bestell_id")
-   @JsonBackReference
+    @JsonBackReference
     private Bestellung bestellung;
 
-    public void setBestellung(Bestellung bestellung) {
-        this.bestellung = bestellung;
-    }
-    
-        // Konstruktor //
-
+ 
+        
+    // Konstruktoren
     public Bestellposition() {
     }
 
@@ -59,6 +59,7 @@ public class Bestellposition {
         }
     }
 
+    // Getter und Setter 
     public Long getId() {
         return id;
     }   
@@ -81,6 +82,10 @@ public class Bestellposition {
         this.software = software;
      }
 
+    public void setBestellung(Bestellung bestellung) {
+        this.bestellung = bestellung;
+    }
+
     public Bestellung getBestellung() {
         return bestellung;
     }
@@ -90,9 +95,4 @@ public class Bestellposition {
     }
      
      
-
-   
-  
-
-    
 }

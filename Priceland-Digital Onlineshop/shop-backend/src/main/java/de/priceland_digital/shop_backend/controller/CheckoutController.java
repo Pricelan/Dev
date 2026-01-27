@@ -10,10 +10,9 @@ import de.priceland_digital.shop_backend.service.KundenVerwaltung;
 import de.priceland_digital.shop_backend.service.WarenkorbService;
 import de.priceland_digital.shop_backend.service.dto.antwort.BestellAntwort;
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 import de.priceland_digital.shop_backend.component.mapper.BestellMapper;
 import de.priceland_digital.shop_backend.service.dto.anfrage.CheckoutAnfrage;
-
-
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,11 +21,11 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-          
-
-@RestController
-@RequestMapping("/api/checkout")
+// Controller für Checkout-Operationen im Onlineshop          
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/checkout")
 public class CheckoutController {
 
     private final WarenkorbService warenkorbService;
@@ -34,34 +33,29 @@ public class CheckoutController {
     private final KundenVerwaltung kundenVerwaltung;
     private final GastRepository gastRepository;
 
-    public CheckoutController(WarenkorbService warenkorbService, BestellService bestellService, 
-                              KundenVerwaltung kundenVerwaltung, GastRepository gastRepository) {
-        this.warenkorbService = warenkorbService;
-        this.bestellService = bestellService;
-        this.kundenVerwaltung = kundenVerwaltung;
-        this.gastRepository = gastRepository;
-    }
+// Bestellung (Checkout) durchführen   
 @PostMapping("/checkout")
 public BestellAntwort checkout(HttpSession session, @RequestBody CheckoutAnfrage request) {
-    // 1. Priorität: Login-Session (Kurt)
+    // 1. Priorität: Login-Session (Kunde)
     Long kundeId = (Long) session.getAttribute("kundeId");
     
-    // Fallback: Falls die ID im Request-Body mitkommt
+   // Falls kein Login, dann aus Anfrage übernehmen
     if (kundeId == null) {
         kundeId = request.getKundeId();
     }
 
-    // --- PFAD A: Registrierter Kunde (Kurt) ---
+    // --- PFAD A: Registrierter Kunde ---
     if (kundeId != null) {
     Kunde kunde = kundenVerwaltung.findeKundeById(kundeId);
     
     // 1. Hole den (vollen) Gast-Warenkorb
     Warenkorb gastWk = warenkorbService.getOrCreateForGast(request.getGastToken());
     
-    // 2. Hole oder erstelle Kurts (leeren) Kunden-Warenkorb
+    // 2. Hole oder erstelle Kundens (leeren) Kunden-Warenkorb
     Warenkorb kundenWk = warenkorbService.getOrCreateForKunde(kunde);
     
-    // 3. WICHTIG: Übertrage die Positionen vom Gast zu Kurt, falls der Kunden-WK leer ist
+    // 3. Falls der Kunden-Warenkorb leer ist, aber der Gast-Warenkorb gefüllt ist,
+    //    übertrage die Positionen vom Gast-Warenkorb in den Kunden-Warenkorb
     if (kundenWk.getPositionen().isEmpty() && !gastWk.getPositionen().isEmpty()) {
         warenkorbService.uebertrageWarenkorb(gastWk, kundenWk);
     }
@@ -71,7 +65,7 @@ public BestellAntwort checkout(HttpSession session, @RequestBody CheckoutAnfrage
     return BestellMapper.toAntwort(b);
 }
     // --- PFAD B: Gast-Checkout ---
-    // Hier prüfen wir die flachen Felder deiner CheckoutAnfrage direkt
+    // Validierung der Gast-Daten
     if (request.getEmail() == null || request.getEmail().isBlank()) {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Gast-Daten (Email) fehlen");
     }
@@ -90,7 +84,7 @@ public BestellAntwort checkout(HttpSession session, @RequestBody CheckoutAnfrage
     neuerGast.setTelefonnummer(request.getTelefonnummer());
     neuerGast.setZahlungsMethode(request.getZahlungsMethode());
 
-    // Jetzt speichern (da Felder befüllt sind, gibt es keine ValidationException mehr)
+    // Gast in der DB speichern
     neuerGast = gastRepository.save(neuerGast);
 
     Bestellung b = bestellService.checkoutGast(wk, neuerGast, request.getZahlungsMethode());

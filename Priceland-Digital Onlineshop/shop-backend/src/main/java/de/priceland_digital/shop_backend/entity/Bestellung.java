@@ -27,37 +27,40 @@ import de.priceland_digital.shop_backend.status.BestellStatus;
 
 import java.util.ArrayList;
 
-
-@Entity
-@Table(name = "bestellungen")
-
-public class Bestellung {
+    // Entität für Bestellungen im Onlineshop
+    @Entity
+    @Table(name = "bestellungen")
+    public class Bestellung {
     
+    // Validierungen und Attribute
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="bestell_id")
     private Long id;
     private LocalDateTime erstelltAm;
     private BigDecimal gesamtpreis;
-   @OneToOne(cascade = CascadeType.ALL) // Füge das hier hinzu
+
+    //Verknüpfung zur Zahlung
+   @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "zahlung_id")      
     private Zahlung zahlung;
+
+    // Bestellstatus
     @Enumerated(EnumType.STRING)
     private BestellStatus status;
-   
-        
-
-     // Beziehungen //
-        
+       
+     //Verknüpfung zu den Bestellpositionen   
     @OneToMany (mappedBy = "bestellung", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<Bestellposition> positionen = new ArrayList<>();
 
+    // Verknüpfung zum Kunden (optional)
     @ManyToOne(optional = true)
     @JoinColumn(name = "kunde_id")
     @JsonIgnoreProperties({"bestellungen", "passwort"})
     private Kunde kunde;
 
+    // Verknüpfung zum Gast (optional)
     @ManyToOne(optional = true)
     @JoinColumn(name = "gast_id")
     @JsonIgnoreProperties("bestellungen")
@@ -66,8 +69,7 @@ public class Bestellung {
     
        
 
-    // Konstruktor
-
+    // Konstruktoren
     public Bestellung() {
     }
 
@@ -83,7 +85,7 @@ public class Bestellung {
     }   
 
     public Bestellung(Kunde kunde,Gast gast,List<Bestellposition> positionen) throws IllegalArgumentException {
-               
+    // Validierung der Eingaben         
      if (kunde == null && gast == null) {
     throw new IllegalArgumentException("Bestellung braucht Kunde oder Gast");
         }   
@@ -100,8 +102,8 @@ public class Bestellung {
         }
         this.status = BestellStatus.IN_BEARBEITUNG;
     }   
-    // Methoden //
-
+   
+    // Zeitpunkt vor dem Speichern setzen
     @PrePersist
     protected void onCreate() {
         this.erstelltAm = LocalDateTime.now();
@@ -109,6 +111,7 @@ public class Bestellung {
             this.status = BestellStatus.IN_BEARBEITUNG;
     }
 }
+    // Methode zur Berechnung des Gesamtpreises
     public BigDecimal berechneGesamtpreis() {
         BigDecimal summe = BigDecimal.ZERO;
         for (Bestellposition position : positionen) {
@@ -117,6 +120,7 @@ public class Bestellung {
         return summe;
     }
 
+    // Methode zur Verknüpfung einer Zahlung mit der Bestellung
     public void verknuepfeZahlung(Zahlung zahlung) {
         if (zahlung == null) {
             throw new IllegalArgumentException("Die Zahlung darf nicht null sein.");
@@ -126,7 +130,8 @@ public class Bestellung {
         }
         this.zahlung = zahlung;
     }
-            
+    
+    // Methode zum Fortschreiten des Bestellstatus
     public void naechsteStatus() {
     if (this.status == BestellStatus.IN_BEARBEITUNG && this.zahlung == null) {
         throw new IllegalStateException("Bezahlung erforderlich für Statusänderung.");
@@ -139,8 +144,7 @@ public class Bestellung {
         this.status=next;
     }
 
-    // Getter und Setter //
-
+    // Getter und Setter
     public Kunde getKunde() {
         return kunde;
     }

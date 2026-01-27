@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 @Table(name = "zahlungen")
 public class Zahlung {
 
-//Validierung der Eingaben
+//Validierung und Attribute
 @Id 
 @GeneratedValue (strategy = GenerationType.IDENTITY)
 @Column(name="zahlung_id")
@@ -41,13 +41,13 @@ public Zahlung(){
     }
 
     public Zahlung(BigDecimal betrag) {
-    if (betrag == null || betrag.compareTo(BigDecimal.ZERO)<= 0){
-        throw new IllegalArgumentException("Betrag muss größer 0 sein");
+    if (betrag == null || betrag.compareTo(BigDecimal.ZERO) < 0){
+        throw new IllegalArgumentException("Betrag darf nicht negativ sein");
     }
-        this.status = ZahlungsStatus.OFFEN;
-        this.zeitpunkt = LocalDateTime.now();
-        this.betrag = betrag;
-    }
+    this.status = ZahlungsStatus.OFFEN;
+    this.zeitpunkt = LocalDateTime.now();
+    this.betrag = betrag;
+}
   
 // Getter und Setter
 
