@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import de.priceland_digital.shop_backend.service.AdminService;
 import de.priceland_digital.shop_backend.service.BestellService;
+import de.priceland_digital.shop_backend.service.SoftwareHerstellerService;
 import de.priceland_digital.shop_backend.component.mapper.SoftwareMapper;
 import de.priceland_digital.shop_backend.service.dto.antwort.SoftwareAntwort;
+import de.priceland_digital.shop_backend.service.dto.anfrage.SoftwareHerstellerAnfrage;
 import de.priceland_digital.shop_backend.service.dto.antwort.BestellAntwort;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.*;
@@ -47,6 +49,7 @@ public class AdminController {
     private final SoftwareRepository softwareRepo;
     private final KundenRepository kundenRepo;
     private final SoftwareHerstellerRepository herstellerRepo;
+    private final SoftwareHerstellerService herstellerService;
         
     // Admin-Prüfung
     private void requireAdmin(HttpSession session) {
@@ -63,7 +66,7 @@ public class AdminController {
 
     // Software erstellen
    @PostMapping("/software")
-     public ResponseEntity<Software> erstelleSoftware(@RequestBody @Valid Map<String, Object> request, HttpSession session) {
+     public ResponseEntity<Software> erstelleSoftware(@RequestBody Map<String, Object> request, HttpSession session) {
     requireAdmin(session);
     Software created = adminService.erstelleSoftware(request);
     return ResponseEntity.status(201).body(created);
@@ -136,25 +139,17 @@ public class AdminController {
     // Neuen Hersteller erstellen (Admin)
     @PostMapping("/hersteller/add")
     public ResponseEntity<SoftwareHersteller> erstelleHersteller(
-        @RequestBody Map<String, String> request, 
-        HttpSession session) {
-    
-    // 1. Sicherheit prüfen
-    requireAdmin(session);
-    
-    // 2. Validieren
-    String name = request.get("name");
-    if (name == null || name.trim().isEmpty()) {
-        return ResponseEntity.badRequest().build();
+            @RequestBody @Valid SoftwareHerstellerAnfrage request, 
+            HttpSession session) {
+        
+        // 1. Sicherheit prüfen
+        requireAdmin(session);
+
+        // 2. Hersteller erstellen
+        SoftwareHersteller neuerHersteller = herstellerService.create(request);
+
+        return ResponseEntity.status(201).body(neuerHersteller);
     }
-    
-    // 3. Speichern
-    SoftwareHersteller neuerHersteller = new SoftwareHersteller();
-    neuerHersteller.setName(name);
-    SoftwareHersteller gespeichert = herstellerRepo.save(neuerHersteller);
-    
-    return ResponseEntity.status(201).body(gespeichert);
-}
 
     // Gesamtumsatz abrufen (Admin)
     @GetMapping("/admin/umsatz")

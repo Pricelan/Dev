@@ -7,7 +7,7 @@ export interface Software {
   softwareBeschreibung?: string;
   downloadLink?: string;
   // Kategorisierung der Software
-   kategorie: "SOFTWARE" | "GAMES" | "FREEWARE"; 
+   kategorie:  "LIZENZIERTE_SOFTWARE" | "KOSTENLOSE_SOFTWARE" | "COMPUTER_SPIELE";
   hersteller?: {
     id: number;
     name: string;

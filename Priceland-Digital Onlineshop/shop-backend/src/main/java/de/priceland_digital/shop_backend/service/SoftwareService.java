@@ -15,7 +15,7 @@ import de.priceland_digital.shop_backend.exceptions.HerstellerNotFoundException;
 import de.priceland_digital.shop_backend.exceptions.SoftwareNotFoundException;
 
 import de.priceland_digital.shop_backend.persistence.SoftwareRepository;
-import de.priceland_digital.shop_backend.status.KategorieListe;
+import de.priceland_digital.shop_backend.status.Kategorie;
 
 
 @Service
@@ -60,7 +60,7 @@ public class SoftwareService {
         neueSoftware.setSoftwareBeschreibung((String) daten.get("softwareBeschreibung"));
         if (daten.get("kategorieListe") != null) {
             try {
-                neueSoftware.setKategorieListe(KategorieListe.valueOf((String) daten.get("kategorieListe")));
+                neueSoftware.setKategorie(Kategorie.valueOf((String) daten.get("kategorieListe")));
             } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException("Ungültige Kategorie: " + daten.get("kategorieListe"));
             }
@@ -88,8 +88,8 @@ public class SoftwareService {
         if (neueDaten.getDownloadLink() != null) existing.setDownloadLink(neueDaten.getDownloadLink());
         if (neueDaten.getSoftwareBeschreibung() != null) existing.setSoftwareBeschreibung(neueDaten.getSoftwareBeschreibung());
         
-        if (neueDaten.getKategorieListe() != null) {
-            existing.setKategorieListe(neueDaten.getKategorieListe());
+        if (neueDaten.getKategorie() != null) {
+            existing.setKategorie(neueDaten.getKategorie());
         }
 
         if (neueDaten.getHersteller() != null) {

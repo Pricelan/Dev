@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.priceland_digital.shop_backend.status.KategorieListe;
+import de.priceland_digital.shop_backend.status.Kategorie;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
@@ -60,7 +60,7 @@ public abstract class Software {
 
     // Kategorie als Enum
     @Enumerated(EnumType.STRING)
-    private KategorieListe kategorieListe;
+    private Kategorie kategorie;
    
 
     // Konstruktoren
@@ -68,14 +68,14 @@ public abstract class Software {
     public Software() {
     }
 
-    public Software(Long id, String name, String version, BigDecimal preis, String downloadLink, String softwareBeschreibung, KategorieListe kategorieListe, SoftwareHersteller hersteller) {
+    public Software(Long id, String name, String version, BigDecimal preis, String downloadLink, String softwareBeschreibung, Kategorie kategorie, SoftwareHersteller hersteller) {
         this.id = id;
         this.name = name;
         this.version = version;
         this.preis = preis;
         this.downloadLink = downloadLink;
         this.softwareBeschreibung = softwareBeschreibung;
-        this.kategorieListe = kategorieListe;
+        this.kategorie = kategorie;
         this.hersteller = hersteller;
     }
 
@@ -126,11 +126,11 @@ public abstract class Software {
     public void setHersteller(SoftwareHersteller hersteller) {
         this.hersteller = hersteller;
     }
-    public KategorieListe getKategorieListe() {
-        return kategorieListe;
+    public Kategorie getKategorie() {
+        return kategorie;
     }
-    public void setKategorieListe(KategorieListe kategorieListe) {
-        this.kategorieListe = kategorieListe;
+    public void setKategorie(Kategorie kategorie) {
+        this.kategorie = kategorie;
     }
     public void setSoftwareHersteller(SoftwareHersteller hersteller) {
         this.hersteller = hersteller;

@@ -2,7 +2,7 @@ package de.priceland_digital.shop_backend.entity;
 
 import java.math.BigDecimal;
 
-import de.priceland_digital.shop_backend.status.KategorieListe;
+import de.priceland_digital.shop_backend.status.Kategorie;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
@@ -21,7 +21,7 @@ public class ComputerSpiel extends Software {
         super();
     }
 
-    public ComputerSpiel(Long id, String name, String version, BigDecimal preis, String downloadLink, String softwareBeschreibung, String genre, String plattform, String altersEinstufung, KategorieListe kategorieListe, SoftwareHersteller hersteller) {
+    public ComputerSpiel(Long id, String name, String version, BigDecimal preis, String downloadLink, String softwareBeschreibung, String genre, String plattform, String altersEinstufung, Kategorie kategorieListe, SoftwareHersteller hersteller) {
         super(id, name, version, preis, downloadLink, softwareBeschreibung, kategorieListe, hersteller);
         this.genre = genre;
         this.plattform = plattform;

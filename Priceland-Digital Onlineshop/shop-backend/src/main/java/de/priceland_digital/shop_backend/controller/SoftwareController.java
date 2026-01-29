@@ -2,6 +2,8 @@ package de.priceland_digital.shop_backend.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import de.priceland_digital.shop_backend.persistence.HerstellerRepository;
 import de.priceland_digital.shop_backend.persistence.SoftwareRepository;
 
 import java.math.BigDecimal;
@@ -11,9 +13,10 @@ import java.util.Map;
 import de.priceland_digital.shop_backend.entity.ComputerSpiel;
 import de.priceland_digital.shop_backend.entity.LizenzSoftware;
 import de.priceland_digital.shop_backend.entity.Software;
+import de.priceland_digital.shop_backend.entity.SoftwareHersteller;
 import de.priceland_digital.shop_backend.entity.SoftwareKostenlos;
 import de.priceland_digital.shop_backend.service.SoftwareService;
-
+import de.priceland_digital.shop_backend.status.Kategorie;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +29,7 @@ public class SoftwareController {
 
     private final SoftwareService softwareService;
     private final SoftwareRepository softwareRepository;
+    private final HerstellerRepository herstellerRepository;
   
     // Admin-Rechte prüfen
     private void requireAdmin(HttpSession session) {
@@ -41,31 +45,37 @@ public class SoftwareController {
 
     // Neue Software erstellen
    @PostMapping("/erstellen")
-    public Software erstelleSoftware(@RequestBody Map<String, Object> payload, HttpSession session) {
+public Software erstelleSoftware(@RequestBody Map<String, Object> payload, HttpSession session) {
     requireAdmin(session);
     
-        String typ = (String) payload.get("typ"); 
-        Software neueSoftware;
+    String typ = (String) payload.get("typ"); 
+    Software neueSoftware;
 
-        if ("SPIEL".equals(typ)) {
+    // 1. Richtige Unterklasse wählen
+    if ("COMPUTER_SPIELE".equals(typ)) {
         neueSoftware = new ComputerSpiel();
-        // WICHTIG: Das Enum für den Frontend-Filter setzen!
-        neueSoftware.setKategorieListe(de.priceland_digital.shop_backend.status.KategorieListe.GAMES);
-    }   else if ("KOSTENLOS".equals(typ)) {
+        neueSoftware.setKategorie(Kategorie.COMPUTER_SPIELE);
+    } else if ("KOSTENLOSE_SOFTWARE".equals(typ)) {
         neueSoftware = new SoftwareKostenlos();
-        neueSoftware.setKategorieListe(de.priceland_digital.shop_backend.status.KategorieListe.FREEWARE);
-    }   else {
+        neueSoftware.setKategorie(Kategorie.KOSTENLOSE_SOFTWARE);
+    } else {
         neueSoftware = new LizenzSoftware();
-        neueSoftware.setKategorieListe(de.priceland_digital.shop_backend.status.KategorieListe.SOFTWARE);
+        neueSoftware.setKategorie(Kategorie.LIZENZIERTE_SOFTWARE);
     }
 
-        neueSoftware.setName((String) payload.get("name"));
-        neueSoftware.setPreis(new BigDecimal(payload.get("preis").toString()));
-        neueSoftware.setVersion((String) payload.get("version"));
-        neueSoftware.setDownloadLink((String) payload.get("downloadLink"));
-        neueSoftware.setSoftwareBeschreibung((String) payload.get("softwareBeschreibung"));
-        
+    // 2. Felder setzen
+    neueSoftware.setName((String) payload.get("name"));
+    neueSoftware.setPreis(new BigDecimal(payload.get("preis").toString()));
+    neueSoftware.setVersion((String) payload.get("version"));
+    neueSoftware.setSoftwareBeschreibung((String) payload.get("softwareBeschreibung"));
     
+    // WICHTIG: Hersteller setzen! 
+    // Hier musst du eine herstellerId aus dem Frontend mitschicken
+    Long herstellerId = Long.valueOf(payload.get("herstellerId").toString());
+    SoftwareHersteller hersteller = herstellerRepository.findById(herstellerId)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Hersteller nicht gefunden"));
+    neueSoftware.setHersteller(hersteller);
+
     return softwareRepository.save(neueSoftware);
 }
     // Software löschen

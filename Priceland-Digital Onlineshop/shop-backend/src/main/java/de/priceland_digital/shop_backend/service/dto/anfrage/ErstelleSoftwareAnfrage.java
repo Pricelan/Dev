@@ -1,5 +1,5 @@
 package de.priceland_digital.shop_backend.service.dto.anfrage;
-import de.priceland_digital.shop_backend.status.KategorieListe;
+import de.priceland_digital.shop_backend.status.Kategorie;
 
 import java.math.BigDecimal;
 
@@ -27,7 +27,7 @@ public class ErstelleSoftwareAnfrage {
     @NotNull
     private Long herstellerId;
 
-    private KategorieListe kategorieListe;
+    private Kategorie kategorieListe;
 
     // Standard-Konstruktor
     public ErstelleSoftwareAnfrage() {
@@ -72,7 +72,7 @@ public class ErstelleSoftwareAnfrage {
     public void setHerstellerId(Long herstellerId) {
         this.herstellerId = herstellerId;
     }
-    public KategorieListe getKategorieListe() {
+    public Kategorie getKategorieListe() {
         return kategorieListe;
     }
 

@@ -4,7 +4,7 @@ package de.priceland_digital.shop_backend.service;
 import de.priceland_digital.shop_backend.persistence.BestellRepository;
 import de.priceland_digital.shop_backend.persistence.SoftwareHerstellerRepository;
 import de.priceland_digital.shop_backend.persistence.SoftwareRepository;
-import de.priceland_digital.shop_backend.status.KategorieListe;
+import de.priceland_digital.shop_backend.status.Kategorie;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -48,13 +48,13 @@ public class AdminService {
         }
 
         switch (typ.toUpperCase()) {
-            case "SPIEL":
+            case "COMPUTER_SPIELE":
                 neueSoftware = new ComputerSpiel();
                 break;
-            case "KOSTENLOS":
+            case "KOSTENLOSE_SOFTWARE":
                 neueSoftware = new SoftwareKostenlos();
                 break;
-            case "LIZENZ":
+            case "LIZENZIERTE_SOFTWARE":
                 neueSoftware = new LizenzSoftware();
                 break;
             default:
@@ -68,11 +68,11 @@ public class AdminService {
         neueSoftware.setSoftwareBeschreibung((String) daten.get("softwareBeschreibung"));
         
         // Kategorie setzen
-        if (daten.get("kategorieListe") != null) {
+        if (daten.get("kategorie") != null) {
         try {
-            neueSoftware.setKategorieListe(KategorieListe.valueOf((String) daten.get("kategorieListe")));
+            neueSoftware.setKategorie(Kategorie.valueOf((String) daten.get("kategorie")));
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Ungültige Kategorie: " + daten.get("kategorieListe"));
+            throw new IllegalArgumentException("Ungültige Kategorie: " + daten.get("kategorie"));
         }
     }   
         if (daten.get("herstellerId") != null) {
@@ -84,9 +84,11 @@ public class AdminService {
         }
         
         // Preis setzen
-        if (daten.get("preis") != null) {
-            neueSoftware.setPreis(new BigDecimal(daten.get("preis").toString()));
-        }
+       if (daten.get("preis") != null && !daten.get("preis").toString().isEmpty()) {
+         neueSoftware.setPreis(new BigDecimal(daten.get("preis").toString()));
+    } else {
+         neueSoftware.setPreis(BigDecimal.ZERO); // Standardwert, falls Preis leer ist
+    }
 
         // 4. Software speichern
         return softwareRepository.save(neueSoftware);
@@ -115,11 +117,11 @@ public class AdminService {
         if (daten.containsKey("softwareBeschreibung")) {
             existing.setSoftwareBeschreibung((String) daten.get("softwareBeschreibung"));
         }
-        if (daten.containsKey("kategorieListe")) {
+        if (daten.containsKey("kategorie")) {
             try {
-                existing.setKategorieListe(KategorieListe.valueOf((String) daten.get("kategorieListe")));
+                existing.setKategorie(Kategorie.valueOf((String) daten.get("kategorie")));
             } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("Ungültige Kategorie: " + daten.get("kategorieListe"));
+                throw new IllegalArgumentException("Ungültige Kategorie: " + daten.get("kategorie"));
             }
         }
         if (daten.get("herstellerId") != null) {

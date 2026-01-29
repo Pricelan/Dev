@@ -1,21 +1,15 @@
 import React from "react";
 import Link from "next/link";
+import { Software } from "@/types/software";
 
-// Definition der Props für die SoftwareCard-Komponente
 interface SoftwareCardProps {
-  software: {
-    id: number;
-    name: string;
-    version: string;
-    preis: number;
-    hersteller?: { name: string };
-    softwareBeschreibung?: string;
-  };
+  software: Software;
   onAddToCart: (id: number) => void; // Funktion für den Warenkorb
 }
 
 // SoftwareCard-Komponente zur Anzeige von Software-Informationen
 export default function SoftwareCard({ software, onAddToCart }: SoftwareCardProps) {
+  if (!software) return null;
 return (
     <div className="bg-white p-6 rounded-[--radius-card] shadow-[--shadow-card] border border-white hover:border-blue-100 flex flex-col justify-between transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl relative overflow-hidden group">
       

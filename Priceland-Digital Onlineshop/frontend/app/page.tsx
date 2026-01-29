@@ -1,66 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import SoftwareCard from "@/app/components/SoftwareCard";
-import { useWarenkorb } from "../context/warenkorbContext"; 
-import { getGastToken } from "@/lib/gastToken";
-import { Software } from '@/types/software';
-
+import { Button } from "./ui/button";
+import "@/app/ui/grid.css";
 
 export default function Startseite() {
-  const { refresh } = useWarenkorb();
-  const [softwareListe, setSoftwareListe] = useState<Software[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // Filterung findet erst statt, wenn Daten da sind
-  const softwareLizenzen = softwareListe.filter(s => s.kategorie === "SOFTWARE");
-  const freeware = softwareListe.filter(s => s.kategorie === "FREEWARE");
-  const games = softwareListe.filter(s => s.kategorie === "GAMES");
-
-  // Fetch-Funktion im useEffect
-  useEffect(() => {
-    fetch("http://localhost:8080/api/software")
-      .then(res => {
-        if (!res.ok) throw new Error("Backend Antwortfehler: " + res.status);
-        return res.json();
-      })
-      .then(data => {
-        setSoftwareListe(Array.isArray(data) ? data : []);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error("Fetch Fehler:", err);
-        setError("Verbindung zum Server fehlgeschlagen.");
-        setLoading(false);
-      });
-  }, []);
-
-  // Funktion zum Hinzufügen eines Software-Artikels zum Warenkorb
-  async function handleAddToCart(id: number) {
-    const token = getGastToken();
-    try {
-      const res = await fetch("http://localhost:8080/api/warenkorb/add", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ softwareId: id, menge: 1, gastToken: token })
-      });
-
-      if (res.ok) {
-        await refresh();
-        alert("Erfolgreich hinzugefügt!");
-      }
-    } catch (err) {
-      console.error("Warenkorb Fehler:", err);
-    }
-  }
-
-  if (loading) return <p style={{ textAlign: "center", padding: "50px" }}>Daten werden geladen...</p>;
-  if (error) return <p style={{ textAlign: "center", color: "red", padding: "50px" }}>{error}</p>;
  
-return (
+  return (
     <main className="min-h-screen bg-white">
       {/* HEADER BEREICH */}
       <header className="text-center py-20 px-5 bg-[#0A6CFF] text-white mb-10">
@@ -84,67 +30,61 @@ return (
       </div>
 
       {/* KATEGORIEN GRID */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-5 px-5 md:px-16">
-        {/* Kategorie 1 */}
-        <div className="bg-gray-100 p-5 rounded-xl shadow-sm">
-          <h2 className="text-xl font-bold mb-4">Softwarelizenzen</h2>
-          <div className="space-y-4 mb-4">
-            {softwareLizenzen.map(s => (
-              <SoftwareCard key={s.id} software={s} onAddToCart={() => handleAddToCart(s.id)} />
-            ))}
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-6 px-5 md:px-16">
+        
+        {/* Kategorie 1: Softwarelizenzen */}
+        <div className="software-card card-tools">
+          <h2 className="software-name">Softwarelizenzen</h2>
+          <div className="content-section">
+            <span className="category-subtitle">Professionelle Tools</span>
+            <div className="space-y-4 mb-4">
+              
+            </div>
+            <ul className="feature-list">
+              <li>Office 365</li>
+              <li>Adobe Produkte</li>
+              <li>Windows 11 Pro</li>
+            </ul>
           </div>
-          <p className="font-semibold text-gray-700">Professionelle Tools</p>
-          <ul className="list-disc list-inside text-sm text-gray-600 mb-4">
-            <li>Office 365</li>
-            <li>Adobe Produkte</li>
-            <li>Windows 11 Pro</li>
-          </ul>
-          <Link href="/software/lizenzen">
-            <button className="bg-[#0A6CFF] text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">
-              Kategorie anzeigen
-            </button>
+          <Link href="/software/lizenzen" className="mt-auto">
+            <Button variant="blue" style={{ width: "100%" }}>Kategorie anzeigen</Button>
           </Link>
         </div>
 
-        {/* Kategorie 2 */}
-        <div className="bg-gray-100 p-5 rounded-xl shadow-sm">
-          <h2 className="text-xl font-bold mb-4">Kostenlose Software</h2>
-          <p className="text-gray-500 mb-4">Gratis & Open Source</p>
-          <div className="space-y-4 mb-4">
-            {freeware.map(s => (
-              <SoftwareCard key={s.id} software={s} onAddToCart={() => handleAddToCart(s.id)} />
-            ))}
+        {/* Kategorie 2: Kostenlose Software */}
+        <div className="software-card card-gratis">
+          <h2 className="software-name">Kostenlose Software</h2>
+          <div className="content-section">
+            <span className="category-subtitle">Gratis & Open Source</span>
+            <div className="space-y-4 mb-4">
+              </div>
+            <ul className="feature-list">
+              <li>LibreOffice</li>
+              <li>VLC Media Player</li>
+              <li>7-Zip Archivierer</li>
+            </ul>
           </div>
-          <ul className="list-disc list-inside text-sm text-gray-600 mb-4">
-            <li>LibreOffice</li>
-            <li>VLC Media Player</li>
-            <li>7-Zip Archivierer</li>
-          </ul>
-          <Link href="/software/kostenlos">
-            <button className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition">
-              Gratis entdecken
-            </button>
+          <Link href="/software/kostenlos" className="mt-auto">
+            <Button variant="green" style={{ width: "100%" }}>Gratis entdecken</Button>
           </Link>
         </div>
 
-        {/* Kategorie 3 */}
-        <div className="bg-gray-100 p-5 rounded-xl shadow-sm">
-          <h2 className="text-xl font-bold mb-4">Games</h2>
-          <p className="text-gray-500 mb-4">Abo oder Lizenz</p>
-          <div className="space-y-4 mb-4">
-            {games.map(s => (
-              <SoftwareCard key={s.id} software={s} onAddToCart={() => handleAddToCart(s.id)} />
-            ))}
+        {/* Kategorie 3: Games */}
+        <div className="software-card card-games">
+          <h2 className="software-name">Games</h2>
+          <div className="content-section">
+            <span className="category-subtitle">Abo oder Lizenz</span>
+            <div className="space-y-4 mb-4">
+              
+            </div>
+            <ul className="feature-list">
+              <li>Steam Keys</li>
+              <li>Indie Games</li>
+              <li>Triple AAA Games</li>
+            </ul>
           </div>
-          <ul className="list-disc list-inside text-sm text-gray-600 mb-4">
-            <li>Steam Keys</li>
-            <li>Indie Games</li>
-            <li>Triple AAA Games</li>
-          </ul>
-          <Link href="/software/games">
-            <button className="bg-purple-700 text-white px-4 py-2 rounded-md hover:bg-purple-800 transition">
-              Games durchsuchen
-            </button>
+          <Link href="/software/games" className="mt-auto">
+            <Button variant="purple" style={{ width: "100%" }}>Games durchsuchen</Button>
           </Link>
         </div>
       </section>
@@ -156,40 +96,40 @@ return (
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto px-5">
           {/* Basic */}
-          <div className="bg-white p-8 rounded-2xl shadow-md border border-gray-100">
+          <div className="bg-white p-8 rounded-2xl shadow-md border border-gray-100 flex flex-col">
             <h3 className="text-lg font-bold">Basic</h3>
             <p className="text-gray-500">Für Einsteiger</p>
             <h2 className="text-2xl font-bold my-4">€9,99 / Monat</h2>
-            <ul className="space-y-2 mb-6 text-gray-600">
+            <ul className="space-y-2 mb-6 text-gray-600 grow">
               <li>✔ 5 Software Lizenzen</li>
               <li>✔ Zugriff auf Free Software</li>
             </ul>
-            <button onClick={() => alert("Abo simuliert")} className="w-full bg-[#0A6CFF] text-white py-2 rounded-lg font-semibold">Wählen</button>
+            <Button variant="blue" onClick={() => alert("Abo simuliert")} style={{ width: "100%" }}>Wählen</Button>
           </div>
 
           {/* Pro */}
-          <div className="bg-[#0A6CFF] p-8 rounded-2xl shadow-xl text-white transform scale-105">
+          <div className="bg-[#0A6CFF] p-8 rounded-2xl shadow-xl text-white transform scale-105 flex flex-col">
             <h3 className="text-lg font-bold">Pro</h3>
             <p className="opacity-80">Für Profis</p>
             <h2 className="text-2xl font-bold my-4">€19,99 / Monat</h2>
-            <ul className="space-y-2 mb-6">
+            <ul className="space-y-2 mb-6 grow">
               <li>✔ Unlimitierte Software</li>
               <li>✔ Zugriff auf Games</li>
               <li>✔ Priority Support</li>
             </ul>
-            <button onClick={() => alert("Abo simuliert")} className="w-full bg-white text-[#0A6CFF] py-2 rounded-lg font-bold">Wählen</button>
+            <Button variant="outline" onClick={() => alert("Abo simuliert")} style={{ background: "white", color: "#0A6CFF", width: "100%" }}>Wählen</Button>
           </div>
 
           {/* Enterprise */}
-          <div className="bg-white p-8 rounded-2xl shadow-md border border-gray-100">
+          <div className="bg-white p-8 rounded-2xl shadow-md border border-gray-100 flex flex-col">
             <h3 className="text-lg font-bold">Enterprise</h3>
             <p className="text-gray-500">Für Teams</p>
             <h2 className="text-2xl font-bold my-4">€49,99 / Monat</h2>
-            <ul className="space-y-2 mb-6 text-gray-600">
+            <ul className="space-y-2 mb-6 text-gray-600 grow">
               <li>✔ Teamverwaltung</li>
               <li>✔ Account Manager</li>
             </ul>
-            <button onClick={() => alert("Abo simuliert")} className="w-full bg-green-600 text-white py-2 rounded-lg font-semibold">Wählen</button>
+            <Button variant="green" onClick={() => alert("Abo simuliert")} style={{ width: "100%" }}>Wählen</Button>
           </div>
         </div>
       </section>
@@ -200,7 +140,7 @@ return (
         <p className="text-gray-600 mb-6">Erhalten Sie aktuelle Software-Angebote & Updates</p>
         <div className="flex flex-col md:flex-row justify-center gap-3">
           <input type="email" placeholder="Ihre E-Mail Adresse" className="p-3 border rounded-lg md:w-80 outline-none focus:ring-2 focus:ring-blue-500" />
-          <button onClick={() => alert("Newsletter simuliert")} className="bg-[#0A6CFF] text-white px-6 py-3 rounded-lg font-bold">Abonnieren</button>
+          <Button variant="blue" onClick={() => alert("Newsletter simuliert")}>Abonnieren</Button>
         </div>
       </section>
     </main>

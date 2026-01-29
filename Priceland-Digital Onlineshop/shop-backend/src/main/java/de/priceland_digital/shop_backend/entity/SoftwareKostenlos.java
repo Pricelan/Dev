@@ -2,7 +2,7 @@ package de.priceland_digital.shop_backend.entity;
 
 import java.math.BigDecimal;
 
-import de.priceland_digital.shop_backend.status.KategorieListe;
+import de.priceland_digital.shop_backend.status.Kategorie;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
@@ -21,7 +21,7 @@ public class SoftwareKostenlos extends Software {
         super();
     }
 
-    public SoftwareKostenlos(Long id, String name, String version, String downloadLink, String softwareBeschreibung, String quelle, KategorieListe kategorieListe, SoftwareHersteller hersteller) {
+    public SoftwareKostenlos(Long id, String name, String version, String downloadLink, String softwareBeschreibung, String quelle, Kategorie kategorieListe, SoftwareHersteller hersteller) {
         super(id, name, version,BigDecimal.ZERO , downloadLink, softwareBeschreibung, kategorieListe, hersteller);
         this.quelle = quelle;
     }

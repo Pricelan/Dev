@@ -1,11 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-
-type Software = {
-  id: number;
-  name: string;
-  preis: number;
-};
+import { Software } from "@/types/software";
 
 export default function SoftwareVerwaltung() {
   // WICHTIG: Immer mit [] initialisieren

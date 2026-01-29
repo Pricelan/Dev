@@ -1,0 +1,86 @@
+/* Container */
+.software-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+/* Karten-Stil */
+.software-card {
+  background: #ffffff;
+  border-radius: 1.25rem;
+  padding: 2rem;
+  border: 1px solid #edf2f7;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); 
+  transition: all 0.3s ease;
+}
+
+.software-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Titel */
+.software-name {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1a202c;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.025em;
+}
+
+/* UNTERTITEL */
+.category-subtitle {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #4a5568; 
+  margin-bottom: 1.5rem;
+}
+
+/* Listen-Stil */
+.feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2rem 0;
+  flex-grow: 1; 
+}
+
+.feature-list li {
+  font-size: 0.95rem;
+  color: #718096;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+}
+
+.feature-list li::before {
+  content: "✓";
+  color: #3182ce;
+  font-weight: bold;
+  margin-right: 0.75rem;
+}
+
+/* Buttons */
+.action-btn {
+  width: 100%;
+  padding: 0.875rem;
+  border-radius: 0.75rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.1s active;
+}
+
+.card-tools .action-btn { background: #0A6CFF; color: white; }
+.card-gratis .action-btn { background: #10b981; color: white; }
+.card-games .action-btn { background: #8b5cf6; color: white; }
+
+.action-btn:hover { filter: brightness(1.1); }

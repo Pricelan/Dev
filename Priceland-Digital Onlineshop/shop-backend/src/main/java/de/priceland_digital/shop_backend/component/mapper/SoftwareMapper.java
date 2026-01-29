@@ -15,7 +15,7 @@ public class SoftwareMapper {
                 software.getPreis(),
                 software.getSoftwareBeschreibung(),
                 software.getDownloadLink(),
-                software.getKategorieListe(),
+                software.getKategorie(),
                 software.getHersteller().getName()
         );
     }
