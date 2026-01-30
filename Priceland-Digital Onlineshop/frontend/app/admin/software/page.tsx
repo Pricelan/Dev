@@ -5,234 +5,97 @@ import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import { Hersteller } from '../../../types/hersteller';
 
-
 interface SoftwareItem {
   id: number;
   name: string;
   version: string;
   preis: number;
   hersteller?: Hersteller;
-         
-  };
-
-
- 
-
-export default function AdminSoftwareList() {
- 
-  const [software, setSoftware] = useState<SoftwareItem[]>([]);
-  const [loading, setLoading] = useState(false);
-  
-
- const handleDelete = async (id: number) => {
-  if (!confirm("Möchtest du dieses Produkt wirklich löschen?")) return;
-
-  try {
-    // Volle URL zum Backend angeben!
-    const res = await fetch(`http://localhost:8080/api/admin/software/löschen/${id}`, {
-      method: "DELETE",
-      credentials: "include"
-    });
-
-    if (!res.ok) {
-      alert("Fehler beim Löschen. Status: " + res.status);
-      return;
-    }
-
-    setSoftware(prev => prev.filter(s => s.id !== id));
-  } catch {
-    alert("Server nicht erreichbar.");
-  }
-};
-
-
-useEffect(() => {
-    apiFetch("/software") 
-        .then(data => {
-            console.log("Daten erhalten:", data); // Zum Debuggen
-            setSoftware(data);
-        })
-        .catch(err => {
-            console.error("Laden fehlgeschlagen:", err);
-            // Hier passiert die Umleitung, falls nicht eingeloggt
-            window.location.href = "/admin/login";
-        })
-        .finally(() => setLoading(false));
-}, []);
-
- 
-
-  if (loading) return <p>Lade Softwaredaten…</p>;
-
-  return (
-    <>
-      {/* HEADER */}
-      <section
-        style={{
-          background: "linear-gradient(180deg,#1f6bff,#0049c7)",
-          color: "white",
-          padding: "3.5rem 2rem 3rem",
-          textAlign: "center",
-          borderBottom: "4px solid #133c96"
-        }}
-      >
-            <Link href="/admin" className="text-white-600 hover:text-white-800 flex items-center gap-2 font-medium">
-        ← Zurück zum Dashboard
-      </Link>
-
-    
-        
-       
-        <h1 style={{ fontSize: "2.2rem", marginBottom: ".5rem" }}>
-          Admin – Softwareverwaltung
-        </h1>
-     
-        <p style={{ opacity: 0.9, fontSize: "0.95rem" }}>
-          Produkte verwalten, Preise anpassen & Kategorien organisieren
-        </p>
-        
-
-        <div style={{ marginTop: "1.8rem" }}>
-          <button
-            style={{
-              padding: "0.75rem 1.6rem",
-              borderRadius: "10px",
-              border: "none",
-              background: "#ffffff",
-              color: "#1f6bff",
-              cursor: "pointer",
-              fontWeight: 700,
-              boxShadow:
-                "0 6px 22px rgba(0,0,0,.18), inset 0 0 0 2px rgba(0,0,0,.06)"
-            }}
-          >
-  <Link href="/admin/software/new">
-  + Neue Software hinzufügen
-  </Link>
-</button>
-        </div>
-      </section>
-
-    
-
-      {/* CONTENT */}
-      <main style={{ padding: "2.5rem" }}>
-        <h2 style={{ marginBottom: "1rem" }}>Alle Softwareprodukte</h2>
-
-        {/* GRID */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-            gap: "1.8rem"
-          }}
-        >
-          {software.map(item => (
-            <div
-              key={item.id}
-              style={{
-                background: "linear-gradient(180deg, #ffffff, #f6f6f6)",
-                borderRadius: "16px",
-                padding: "1.6rem",
-                boxShadow:
-                  "0 14px 28px rgba(0,0,0,.12), inset 0 0 0 1px rgba(0,0,0,.06)",
-                transition: "transform .15s ease, box-shadow .15s ease",
-                cursor: "pointer"
-              }}
-              onMouseEnter={e =>
-                (e.currentTarget.style.transform = "translateY(-4px)")
-              }
-              onMouseLeave={e =>
-                (e.currentTarget.style.transform = "translateY(0)")
-              }
-              
-            >
-             {/* TITLE */}
-          <h3 style={{ marginTop: 0 }}>
-           {item.name}
-           <span style={{ opacity: 0.6 }}> ({item.version})</span>
-            </h3>
-
-          {/* NEU: HERSTELLER INFO */}
-          <div style={{ marginBottom: "0.5rem", fontSize: "0.85rem", color: "#666" }}>
-           <strong>Hersteller:</strong> {item.hersteller?.name || "Nicht zugewiesen"}
-            </div>
-
-              {/* BADGES */}
-              <div style={{ marginTop: ".5rem", marginBottom: ".8rem" }}>
-                <span
-                  style={{
-                    background: "#e9f0ff",
-                    color: "#1f56d8",
-                    padding: ".35rem .7rem",
-                    borderRadius: "20px",
-                    fontSize: ".8rem",
-                    marginRight: ".5rem"
-                  }}
-                >
-                  ID {item.id}
-                </span>
-
-                <span
-                  style={{
-                    background: "#e6ffee",
-                    color: "#1f9a3c",
-                    padding: ".35rem .7rem",
-                    borderRadius: "20px",
-                    fontSize: ".8rem"
-                  }}
-                >
-                  {item.preis != null
-                  ? item.preis.toFixed(2) + " €" : "— €"}
-                </span>
-              </div>
-
-              {/* ACTION BAR */}
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  marginTop: "1.2rem"
-                }}
-              >
-                <Link href={`/admin/software/bearbeiten/${item.id}`}>
-                  <button
-                    style={{
-                      padding: ".5rem .9rem",
-                      borderRadius: "8px",
-                      border: "none",
-                      background: "#1f6bff",
-                      color: "white",
-                      cursor: "pointer",
-                      fontWeight: 600
-                    }}
-                  >
-                    Bearbeiten
-                  </button>
-                </Link>
-
-                <button
-                  style={{
-                    padding: ".5rem .9rem",
-                    borderRadius: "8px",
-                    border: "none",
-                    background: "#ff4d4d",
-                    color: "white",
-                    cursor: "pointer",
-                    fontWeight: 600
-                  }}
-                  onClick={() => handleDelete(item.id)}
-                >
-                  Löschen
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </main>
-    </>
-  );
 }
 
+export default function AdminSoftwareList() {
+  const [software, setSoftware] = useState<SoftwareItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
+  const handleDelete = async (id: number) => {
+    if (!confirm("Möchtest du dieses Produkt wirklich löschen?")) return;
+    try {
+      // Nutze apiFetch für Konsistenz (Credentials sind dort meist integriert)
+      await apiFetch(`/admin/software/löschen/${id}`, { method: "DELETE" });
+      setSoftware(prev => prev.filter(s => s.id !== id));
+    } catch {
+      alert("Fehler beim Löschen.");
+    }
+  };
 
+  useEffect(() => {
+    apiFetch("/software") 
+      .then(data => setSoftware(data))
+      .catch(() => { /* Optional: Fehler-Handling */ })
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return (
+    <div className="flex justify-center py-20">
+      <div className="animate-spin rounded-2xl h-10 w-10 border-4 border-blue-600 border-t-transparent"></div>
+    </div>
+  );
+
+  return (
+    <div className="space-y-8 pt-10">
+      {/* GRID - Kompakter für die Dashboard-Ansicht */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {software.map(item => (
+          <div key={item.id} className="bg-white/80 backdrop-blur-md border border-white rounded-[2.5rem] p-6 shadow-sm flex flex-col justify-between hover:shadow-xl hover:-translate-y-1 transition-all group">
+            
+            <div>
+              <div className="flex justify-between items-start mb-4">
+                <div className="max-w-[70%]">
+                  <h3 className="text-lg font-black text-slate-900 leading-tight group-hover:text-blue-600 transition-colors truncate">
+                    {item.name}
+                  </h3>
+                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">V. {item.version}</span>
+                </div>
+                <span className="bg-slate-100 text-slate-500 text-[8px] font-black px-2 py-1 rounded-lg uppercase">ID {item.id}</span>
+              </div>
+
+              {/* KOMPAKTE HERSTELLER BOX */}
+              <div className="bg-slate-50/50 rounded-xl p-3 mb-4 border border-slate-100">
+                 <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Brand</p>
+                 <p className="text-sm font-bold text-slate-700">{item.hersteller?.name || "Standard"}</p>
+              </div>
+
+              <div className="mb-6">
+                <p className="text-2xl font-black text-slate-900">{item.preis?.toFixed(2)} €</p>
+              </div>
+            </div>
+
+            {/* KOMPAKTE BUTTONS */}
+            <div className="flex gap-2">
+              <Link 
+                href={`/admin/software/bearbeiten/${item.id}`} 
+                className="flex-1 bg-slate-900 text-white text-center py-3 rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-blue-600 transition-all shadow-md active:scale-95"
+              >
+                Edit
+              </Link>
+              
+              <button 
+                onClick={() => handleDelete(item.id)}
+                className="px-4 bg-red-50 text-red-500 rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all active:scale-95 border border-red-100"
+              >
+                🗑️
+              </button>
+            </div>
+
+          </div>
+        ))}
+
+        {/* QUICK ADD CARD */}
+        <Link href="/admin/software/new" className="border-2 border-dashed border-slate-200 rounded-[2.5rem] p-6 flex flex-col items-center justify-center text-slate-400 hover:border-blue-400 hover:text-blue-600 transition-all group min-h-[200px]">
+          <span className="text-3xl mb-2 group-hover:scale-125 transition-transform">➕</span>
+          <span className="font-black text-[10px] uppercase tracking-widest">Software hinzufügen</span>
+        </Link>
+      </div>
+    </div>
+  );
+}

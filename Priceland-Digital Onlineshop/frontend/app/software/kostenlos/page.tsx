@@ -7,100 +7,86 @@ import { useWarenkorb } from "@/context/warenkorbContext";
 import SoftwareCard from "@/app/components/SoftwareCard";
 import Link from "next/link";
 
-export default function SoftwareShopPage() {
+export default function SoftwareFreePage() {
   const [software, setSoftware] = useState<Software[]>([]);
-  const [loading, setLoading] = useState(true); // Neu: Lade-Status
+  const [loading, setLoading] = useState(true); 
   const { refresh } = useWarenkorb();
 
   useEffect(() => {
     setLoading(true);
-    // Stelle sicher, dass die URL exakt so im Backend existiert
     fetch("http://localhost:8080/api/software")
       .then((res) => res.json())
       .then((data) => {
-        // FILTER: Nutzt das neue Enum-Feld 'kategorie'
-        // Für andere Seiten hier "SOFTWARE" oder "GAMES" einsetzen
-        const filtered = data.filter((s: Software) => s.kategorie === "KOSTENLOSE_SOFTWARE");
+        const dataArray = Array.isArray(data) ? data : (data.content || []);
+        const filtered = dataArray.filter((s: Software) => s.kategorie === "KOSTENLOSE_SOFTWARE");
         setSoftware(filtered);
       })
-      .catch((err) => {
-        console.error("Fehler beim Laden der Software", err);
-      })
-      .finally(() => {
-        setLoading(false); // Laden beendet
-      });
+      .catch((err) => console.error(err))
+      .finally(() => setLoading(false));
   }, []);
 
-  async function addToCart(softwareId: number) {
+  async function addToCart(softwareId: string | number) {
     const token = getGastToken();
+    const idNum = typeof softwareId === "string" ? parseInt(softwareId, 10) : softwareId;
 
     try {
       const res = await fetch("http://localhost:8080/api/warenkorb/add", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          softwareId: softwareId,
-          menge: 1,
-          gastToken: token,
-        }),
+        body: JSON.stringify({ softwareId: idNum, menge: 1, gastToken: token }),
       });
-
-      const text = await res.text();
-
-      if (!res.ok) {
-        throw new Error(text || "Fehler beim Hinzufügen");
-      }
-
-      // Warenkorb im Header aktualisieren
+      if (!res.ok) throw new Error();
       await refresh();
-      alert("Produkt wurde dem Warenkorb hinzugefügt");
-    } catch (err: unknown) {
-      console.error("ADD ERROR:", err);
-      if (err instanceof Error) {
-        alert("Fehler: " + err.message);
-      } else {
-        alert("Ein unbekannter Fehler ist aufgetreten.");
-      }
+      alert("In den Warenkorb gelegt!");
+    } catch {
+      alert("Fehler beim Hinzufügen");
     }
   }
 
+  return (
+    <div className="min-h-screen bg-[#f8fafc] relative overflow-hidden">
+      {/* Subtile Farbakzente für den Gratis-Bereich */}
+      <div className="absolute top-0 right-1/4 w-96 h-96 bg-emerald-100/30 rounded-full blur-[120px] -z-10" />
+      <div className="absolute bottom-10 left-10 w-64 h-64 bg-blue-100/20 rounded-full blur-[100px] -z-10" />
 
-
-return (
-    <div className="p-6 max-w-5xl mx-auto min-h-screen">
-      <Link href="/" className="text-blue-600 hover:underline mb-4 inline-block font-medium">
-        ← Zurück zur Startseite
-      </Link>
-
-      <div className="max-w-5xl mx-auto">
-        <h1 className="text-3xl font-bold mb-2 text-gray-900">Kostenlose Software</h1>
-        <p className="text-gray-600 mb-8">
-          Wähle eine kostenlose Software aus und lege sie direkt in den Warenkorb.
-        </p>
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        {/* Navigations-Header */}
+        <header className="mb-16">
+          <Link href="/" className="group flex items-center gap-2 text-slate-400 hover:text-emerald-600 transition-colors mb-8 no-underline w-fit">
+            <span className="bg-white p-2 rounded-xl shadow-sm group-hover:shadow-md group-hover:bg-emerald-50 transition-all">←</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em]">Zurück zur Startseite</span>
+          </Link>
+          
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div>
+              <span className="text-emerald-600 font-black text-[10px] uppercase tracking-[0.4em] mb-2 block">Open Source & Free</span>
+              <h1 className="text-5xl font-black text-slate-900 tracking-tight">Kostenlose Software</h1>
+            </div>
+            <p className="max-w-md text-slate-500 font-medium leading-relaxed">
+              Entdecke leistungsstarke Open-Source-Tools und kostenlose Vollversionen für deinen digitalen Workflow.
+            </p>
+          </div>
+        </header>
 
         {loading ? (
-          /* Moderne Lade-Animation */
-          <div className="flex flex-col items-center justify-center py-20">
-            <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-            <p className="text-gray-400 font-medium">Kostenlose Software wird geladen...</p>
+          <div className="flex flex-col items-center justify-center py-32">
+            <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-4xl animate-spin mb-6" />
+            <p className="text-slate-400 font-black text-[10px] uppercase tracking-widest">Katalog wird geladen</p>
           </div>
         ) : (
-          <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             {software.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {software.map((s) => (
-                  <SoftwareCard 
-                    key={s.id} 
-                    software={s} 
-                    onAddToCart={addToCart} 
-                  />
-                ))}
-              </div>
+              software.map((s) => (
+                <SoftwareCard key={s.id} software={s} onAddToCart={addToCart} />
+              ))
             ) : (
-              <p className="text-gray-500">Keine kostenlose Software gefunden.</p>
+              <div className="col-span-full bg-white/50 backdrop-blur-md border-2 border-dashed border-slate-200 rounded-[3rem] py-32 text-center">
+                <div className="text-4xl mb-4">🌱</div>
+                <p className="text-slate-400 font-bold uppercase tracking-widest text-sm">Aktuell keine Freeware im Katalog</p>
+              </div>
             )}
-          </>
+          </div>
         )}
       </div>
     </div>

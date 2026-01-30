@@ -1,59 +1,83 @@
-import React from "react";
-import Link from "next/link";
+"use client";
+
+import React, { useState } from "react";
+import Link from "next/link"; 
 import { Software } from "@/types/software";
 
 interface SoftwareCardProps {
   software: Software;
-  onAddToCart: (id: number) => void; // Funktion für den Warenkorb
+  onAddToCart: (id: string | number) => void;
 }
 
-// SoftwareCard-Komponente zur Anzeige von Software-Informationen
 export default function SoftwareCard({ software, onAddToCart }: SoftwareCardProps) {
-  if (!software) return null;
-return (
-    <div className="bg-white p-6 rounded-[--radius-card] shadow-[--shadow-card] border border-white hover:border-blue-100 flex flex-col justify-between transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl relative overflow-hidden group">
-      
-     
-      <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-blue-500 to-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+  const [added, setAdded] = useState(false);
 
+  if (!software) return null;
+
+  const handleBtnClick = (e: React.MouseEvent) => {
+    e.preventDefault();   
+    e.stopPropagation();  
+    
+    console.log("Button geklickt für:", software.name);
+    
+    onAddToCart(software.id);
+    setAdded(true);
+
+    setTimeout(() => setAdded(false), 2000);
+  };
+
+  return (
+    <div className="bg-white/70 backdrop-blur-2xl p-8 rounded-[2.5rem] border border-white shadow-[0_20px_50px_rgba(0,0,0,0.04)] flex flex-col justify-between transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_30px_60px_rgba(59,130,246,0.1)] group relative">
+      
+      {/* Software Info Bereich */}
       <div>
-        <div className="flex justify-between items-start mb-3">
-          <Link href={`/software/${software.id}`} className="no-underline">
-            <h3 className="text-lg font-extrabold text-slate-800 group-hover:text-[--color-primary] transition-colors leading-tight">
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-2">
+             <span className="bg-blue-600 w-2 h-2 rounded-full animate-pulse" />
+             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Verfügbar</span>
+          </div>
+          
+          <Link href={`/software/${software.id}`} className="block relative z-10">
+            <h3 className="text-2xl font-black text-slate-900 leading-tight tracking-tight group-hover:text-blue-600 transition-colors italic">
               {software.name}
             </h3>
           </Link>
-          <span className="bg-slate-100 text-slate-500 text-[10px] px-2 py-1 rounded-md font-bold uppercase tracking-tighter">
-            {software.version}
+
+          <span className="inline-block mt-2 bg-slate-100 text-slate-500 text-[9px] px-3 py-1 rounded-lg font-black uppercase tracking-widest">
+            V. {software.version}
           </span>
         </div>
 
-      <p className="text-slate-500 text-sm leading-relaxed mb-6 line-clamp-3">
-          {software.softwareBeschreibung ? (
-            software.softwareBeschreibung
-          ) : (
-            <span className="text-slate-300 italic">Keine Beschreibung im System hinterlegt</span>
-          )}
+        <p className="text-slate-500 text-sm leading-relaxed mb-10 line-clamp-3 font-medium">
+          {software.softwareBeschreibung || "Professionelle Lösung für höchste Ansprüche."}
         </p>
       </div>
 
-      <div className="flex items-center justify-between pt-4 border-t border-slate-50">
+      <div className="flex items-end justify-between pt-6 border-t border-slate-50 relative">
         <div className="flex flex-col">
-          <span className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Preis</span>
-          <span className="text-xl font-black text-slate-900">
+          <span className="text-[10px] text-slate-400 uppercase font-black tracking-widest mb-1">Preis</span>
+          <span className="text-3xl font-black text-slate-900 tracking-tighter">
             {software.preis === 0 ? (
               <span className="text-emerald-500">Gratis</span>
             ) : (
-              `${software.preis.toFixed(2)} €`
+              <>{software.preis.toFixed(2)} <span className="text-blue-600 text-lg">€</span></>
             )}
           </span>
         </div>
 
+        {/* Warenkorb-Button */}
         <button
-          onClick={() => onAddToCart(software.id)}
-          className="bg-[--color-primary] hover:bg-[--color-primary-dark] text-white p-3 rounded-[--radius-btn] shadow-lg shadow-blue-100 transition-all active:scale-90 flex items-center justify-center"
+          type="button"
+          onClick={handleBtnClick}
+          className={`relative z-50 w-14 h-14 rounded-2xl shadow-xl transition-all active:scale-90 flex items-center justify-center border-2 ${
+            added 
+            ? "bg-emerald-500 border-emerald-400 text-white" 
+            : "bg-slate-900 border-slate-900 hover:bg-blue-600 hover:border-blue-500 text-white"
+          }`}
         >
-          <span className="text-lg">🛒</span>
+          <span className="text-xl pointer-events-none">
+            {added ? "✅" : "🛒"}
+          </span>
         </button>
       </div>
     </div>

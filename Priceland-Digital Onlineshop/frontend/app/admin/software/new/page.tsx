@@ -22,10 +22,7 @@ export default function NewSoftwareForm() {
     fetch("http://localhost:8080/api/hersteller/all", {
       credentials: "include"
     })
-      .then(res => {
-        if (!res.ok) throw new Error("Fehler beim Laden der Hersteller");
-        return res.json();
-      })
+      .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) setHerstellerListe(data);
       })
@@ -34,13 +31,8 @@ export default function NewSoftwareForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!herstellerId) return alert("Bitte einen Hersteller auswählen");
 
-    if (!herstellerId) {
-      alert("Bitte einen Hersteller auswählen");
-      return;
-    }
-
-  
     const body = {
       name,
       version,
@@ -48,12 +40,9 @@ export default function NewSoftwareForm() {
       downloadLink: downloadLink || "",
       softwareBeschreibung: beschreibung || "",
       herstellerId: Number(herstellerId),
-      kategorie: kategorie, 
-      typ: kategorie === "COMPUTER_SPIELE" ? "COMPUTER_SPIELE" : 
-       kategorie === "KOSTENLOSE_SOFTWARE" ? "KOSTENLOSE_SOFTWARE" : 
-       "LIZENZIERTE_SOFTWARE" 
-};
-
+      kategorie: kategorie,
+      typ: kategorie
+    };
 
     try {
       const res = await fetch("http://localhost:8080/api/admin/software", {
@@ -63,70 +52,116 @@ export default function NewSoftwareForm() {
         body: JSON.stringify(body),
       });
 
-      const text = await res.text();
-      if (!res.ok) {
-        alert("Fehler beim Speichern:\n\n" + text);
-        return;
-      }
-
+      if (!res.ok) throw new Error(await res.text());
       window.location.href = "/admin/software";
     } catch {
-      alert("Netzwerkfehler zum Backend.");
+      alert("Fehler beim Speichern.");
     }
   };
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen flex justify-center">
-      <form onSubmit={handleSubmit} className="bg-white p-8 shadow-xl rounded-2xl max-w-3xl w-full border border-gray-100">
+    <div className="min-h-screen py-12 px-4 flex justify-center items-start">
+      <main className="max-w-4xl w-full relative">
         
-        <Link href="/admin" className="text-blue-600 hover:underline mb-4 inline-block text-sm font-medium">
-          ← Zurück zum Dashboard
-        </Link>
+        {/* Hintergrund-Deko */}
+        <div className="absolute top-[-10%] right-[-10%] w-64 h-64 bg-blue-200/20 rounded-full blur-3xl -z-10"></div>
         
-        <h2 className="text-3xl font-extrabold mb-8 text-gray-900">Neue Software anlegen</h2>
+        <form onSubmit={handleSubmit} className="bg-white/70 backdrop-blur-2xl border border-white p-10 md:p-16 rounded-[3rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)]">
+          
+          <header className="mb-12">
+            <Link href="/admin/software" className="text-blue-600 font-black text-[10px] uppercase tracking-[0.3em] mb-4 inline-block hover:underline">
+              ← Zurück zur Übersicht
+            </Link>
+            <h2 className="text-4xl font-black text-slate-900 tracking-tight">Software anlegen</h2>
+            <p className="text-slate-500 font-medium mt-2">Fülle die Details aus, um ein neues Produkt zu veröffentlichen.</p>
+          </header>
 
-        <div className="mb-6">
-          <label className="block text-sm font-semibold text-gray-600 mb-1">Kategorie wählen</label>
-          <select 
-            value={kategorie} 
-            onChange={e => setKategorie(e.target.value)} 
-            className="w-full border-2 border-gray-200 p-3 rounded-xl focus:border-blue-500 outline-none transition bg-white"
-          >
+          <div className="space-y-8">
             
-            <option value="LIZENZIERTE_SOFTWARE">Software (Lizenz)</option>
-            <option value="COMPUTER_SPIELE">Computerspiele</option>
-            <option value="KOSTENLOSE_SOFTWARE">Kostenlose Software</option>
-          </select>
-        </div>
+            {/* Sektion 1: Kategorie */}
+            <div className="bg-slate-50/50 p-6 rounded-4xl border border-slate-100">
+              <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-2">Kategorie</label>
+              <select 
+                value={kategorie} 
+                onChange={e => setKategorie(e.target.value)} 
+                className="w-full bg-white border border-slate-200 p-4 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-bold text-slate-700 appearance-none"
+              >
+                <option value="LIZENZIERTE_SOFTWARE">💻 Lizenzierte Software</option>
+                <option value="COMPUTER_SPIELE">🎮 Computerspiel</option>
+                <option value="KOSTENLOSE_SOFTWARE">🎁 Kostenlose Software</option>
+              </select>
+            </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <input placeholder="Name der Software" value={name} onChange={e => setName(e.target.value)} className="w-full border-2 border-gray-200 p-3 rounded-xl focus:border-blue-500 outline-none transition" required />
-          <input placeholder="Version (z.B. v1.0)" value={version} onChange={e => setVersion(e.target.value)} className="w-full border-2 border-gray-200 p-3 rounded-xl focus:border-blue-500 outline-none transition" required />
-        </div>
+            {/* Sektion 2: Stammdaten */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Produktname</label>
+                <input 
+                  placeholder="z.B. Microsoft Office" 
+                  value={name} onChange={e => setName(e.target.value)} 
+                  className="w-full bg-white border border-slate-200 p-4 rounded-2xl focus:border-blue-500 outline-none transition-all" required 
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Version</label>
+                <input 
+                  placeholder="z.B. 2024 (v1.2)" 
+                  value={version} onChange={e => setVersion(e.target.value)} 
+                  className="w-full bg-white border border-slate-200 p-4 rounded-2xl focus:border-blue-500 outline-none transition-all" required 
+                />
+              </div>
+            </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <input type="number" step="0.01" placeholder="Preis (€)" value={preis} onChange={e => setPreis(e.target.value)} className="w-full border-2 border-gray-200 p-3 rounded-xl focus:border-blue-500 outline-none transition" />
-          <select 
-            value={herstellerId ?? ""} 
-            onChange={e => setHerstellerId(Number(e.target.value))} 
-            className="w-full border-2 border-gray-200 p-3 rounded-xl focus:border-blue-500 outline-none transition" 
-            required
-          >
-            <option value="">Hersteller wählen...</option>
-            {herstellerListe.map(h => <option key={h.id} value={h.id}>{h.name}</option>)}
-          </select>
-        </div>
+            {/* Sektion 3: Preis & Hersteller */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Listenpreis (€)</label>
+                <input 
+                  type="number" step="0.01" placeholder="0.00" 
+                  value={preis} onChange={e => setPreis(e.target.value)} 
+                  className="w-full bg-white border border-slate-200 p-4 rounded-2xl focus:border-blue-500 outline-none transition-all font-black text-blue-600" 
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Hersteller</label>
+                <select 
+                  value={herstellerId ?? ""} 
+                  onChange={e => setHerstellerId(Number(e.target.value))} 
+                  className="w-full bg-white border border-slate-200 p-4 rounded-2xl focus:border-blue-500 outline-none transition-all font-bold" 
+                  required
+                >
+                  <option value="">Wählen...</option>
+                  {herstellerListe.map(h => <option key={h.id} value={h.id}>{h.name}</option>)}
+                </select>
+              </div>
+            </div>
 
-        <div className="mb-6">
-          <input type="url" placeholder="Download Link (Optional)" value={downloadLink} onChange={e => setDownloadLink(e.target.value)} className="w-full border-2 border-gray-100 p-3 rounded-xl bg-gray-50 focus:border-blue-400 outline-none transition" />
-        </div>
+            {/* Sektion 4: Links & Beschreibung */}
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Download-URL (Optional)</label>
+                <input 
+                  type="url" placeholder="https://download.priceland.com/..." 
+                  value={downloadLink} onChange={e => setDownloadLink(e.target.value)} 
+                  className="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl focus:bg-white focus:border-blue-500 outline-none transition-all text-sm font-mono" 
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Beschreibung</label>
+                <textarea 
+                  placeholder="Detaillierte Produktinformationen..." 
+                  value={beschreibung} onChange={e => setBeschreibung(e.target.value)} 
+                  className="w-full bg-white border border-slate-200 p-4 rounded-4xl h-40 focus:border-blue-500 outline-none transition-all resize-none" 
+                />
+              </div>
+            </div>
 
-        <textarea placeholder="Beschreibung der Software..." value={beschreibung} onChange={e => setBeschreibung(e.target.value)} className="w-full border-2 border-gray-200 p-3 rounded-xl h-32 mb-8 focus:border-blue-500 outline-none transition" />
-
-        <button className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-700 shadow-lg transition-all">
-          Software Speichern
-        </button>
-      </form>
+            <button className="w-full bg-slate-900 text-white py-6 rounded-4xl font-black text-sm uppercase tracking-[0.2em] hover:bg-blue-600 transition-all shadow-2xl shadow-slate-200 active:scale-[0.98] mt-4">
+              Produkt veröffentlichen
+            </button>
+          </div>
+        </form>
+      </main>
     </div>
   );
 }

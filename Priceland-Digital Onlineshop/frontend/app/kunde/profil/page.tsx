@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { useKunde } from "@/context/kundeContext";
 import { Bestellung } from "@/types/bestellung";
@@ -8,6 +9,7 @@ export default function KundenProfil() {
   const [bestellungen, setBestellungen] = useState<Bestellung[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Bestellung | null>(null);
 
+  // --- DEINE LOGIK ---
   useEffect(() => {
     if (!kunde?.id) return;
 
@@ -29,52 +31,59 @@ export default function KundenProfil() {
 
   if (!kunde) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 text-gray-400 font-medium">
-        Lade Kundendaten...
+      <div className="min-h-screen flex items-center justify-center bg-[#f1f5f9] text-slate-400 font-bold uppercase tracking-widest text-xs">
+        <div className="animate-pulse">Lade Kundendaten...</div>
       </div>
     );
   }
 
+  // --- DEIN DESIGN (JETZT MODERNISIERT) ---
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-[#f1f5f9] relative overflow-hidden py-12 px-4 md:px-8">
+      
+      {/* Hintergrund-Deko passend zum Shop */}
+      <div className="absolute top-[-10%] left-[-5%] w-160 h-160 bg-blue-100/40 rounded-full blur-[120px]"></div>
+      <div className="absolute bottom-0 right-[-5%] w-120 h-120 bg-indigo-100/40 rounded-full blur-[100px]"></div>
+
+      <div className="max-w-7xl mx-auto relative z-10">
         
-        <header className="mb-8">
-          <h1 className="text-3xl font-extrabold text-gray-900">Mein Konto</h1>
-          <p className="text-gray-500 font-medium">Willkommen zurück, {kunde.vorname}!</p>
+        <header className="mb-12">
+          <span className="text-blue-600 font-black text-[10px] uppercase tracking-[0.3em] mb-3 block">Dashboard</span>
+          <h1 className="text-5xl font-black text-slate-900 tracking-tight">Mein Konto</h1>
+          <p className="text-slate-500 font-medium mt-2 text-lg">Willkommen zurück, {kunde.vorname}!</p>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
-          {/* Linke Spalte: Profil-Info */}
-          <div className="md:col-span-1 space-y-6">
-            <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold shadow-inner">
+          {/* LINK: Profil-Card */}
+          <div className="lg:col-span-1 space-y-6">
+            <section className="bg-slate-50/70 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-white/60">
+              <div className="flex flex-col items-center text-center mb-8">
+                <div className="w-24 h-24 bg-linear-to-br from-blue-600 to-indigo-700 text-white rounded-3xl flex items-center justify-center text-3xl font-black shadow-xl shadow-blue-200 mb-4">
                   {kunde.vorname[0]}{kunde.nachname[0]}
                 </div>
-                <div>
-                  <h2 className="font-bold text-lg text-gray-800">{kunde.vorname} {kunde.nachname}</h2>
-                  <p className="text-sm text-gray-500">{kunde.email}</p>
-                </div>
+                <h2 className="font-black text-2xl text-slate-800">{kunde.vorname} {kunde.nachname}</h2>
+                <p className="text-slate-400 font-medium">{kunde.email}</p>
               </div>
               
-              <div className="space-y-4 border-t pt-4">
+              <div className="space-y-6 border-t border-slate-200/50 pt-8">
                 <div>
-                  <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Rechnungsadresse</label>
-                  <p className="text-gray-700 mt-1 font-medium">{kunde.strasse} {kunde.hausnummer}</p>
-                  <p className="text-gray-700 font-medium">{kunde.plz} {kunde.ort}</p>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Rechnungsadresse</label>
+                  <div className="bg-slate-100/50 p-5 rounded-2xl border border-slate-200/30">
+                    <p className="text-slate-700 font-bold">{kunde.strasse} {kunde.hausnummer}</p>
+                    <p className="text-slate-600 font-medium">{kunde.plz} {kunde.ort}</p>
+                  </div>
                 </div>
               </div>
             </section>
           </div>
 
-          {/* Rechte Spalte: Bestellhistorie */}
-          <div className="md:col-span-2">
-            <section className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-white">
-                <h3 className="font-bold text-xl text-gray-800">Meine Bestellungen</h3>
-                <span className="bg-blue-50 text-blue-600 text-xs font-bold px-3 py-1 rounded-full border border-blue-100">
+          {/* RECHTS: Bestellhistorie */}
+          <div className="lg:col-span-2">
+            <section className="bg-slate-50/70 backdrop-blur-xl rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-white/60 overflow-hidden">
+              <div className="p-8 border-b border-slate-200/50 flex justify-between items-center bg-white/40">
+                <h3 className="font-black text-2xl text-slate-800 tracking-tight">Bestellungen</h3>
+                <span className="bg-blue-600 text-white text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest shadow-lg shadow-blue-100">
                   {bestellungen.length} Einträge
                 </span>
               </div>
@@ -82,34 +91,34 @@ export default function KundenProfil() {
               {bestellungen.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left">
-                    <thead className="bg-gray-50 text-gray-400 text-xs uppercase font-bold">
+                    <thead className="bg-slate-100/50 text-slate-400 text-[10px] uppercase font-black tracking-widest">
                       <tr>
-                        <th className="px-6 py-4">Bestell-Nr.</th>
-                        <th className="px-6 py-4">Datum</th>
-                        <th className="px-6 py-4">Status</th>
-                        <th className="px-6 py-4 text-right">Details</th>
+                        <th className="px-8 py-5">Order ID</th>
+                        <th className="px-8 py-5">Datum</th>
+                        <th className="px-8 py-5">Status</th>
+                        <th className="px-8 py-5 text-right">Aktion</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody className="divide-y divide-slate-200/30">
                       {bestellungen.map((b) => (
-                        <tr key={b.id} className="hover:bg-gray-50 transition-colors group">
-                          <td className="px-6 py-4 font-bold text-gray-700">#{b.id}</td>
-                          <td className="px-6 py-4 text-gray-600 text-sm">
+                        <tr key={b.id} className="hover:bg-blue-50/50 transition-colors group">
+                          <td className="px-8 py-6 font-bold text-slate-700">#{b.id}</td>
+                          <td className="px-8 py-6 text-slate-500 font-medium">
                             {new Date(b.erstelltAm).toLocaleDateString("de-DE")}
                           </td>
-                          <td className="px-6 py-4">
-                            <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                          <td className="px-8 py-6">
+                            <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider ${
                               b.status === 'BEZAHLT' 
-                                ? 'bg-green-100 text-green-700' 
-                                : 'bg-amber-100 text-amber-700'
+                                ? 'bg-green-100 text-green-600' 
+                                : 'bg-amber-100 text-amber-600'
                             }`}>
                               {b.status}
                             </span>
                           </td>
-                          <td className="px-6 py-4 text-right">
+                          <td className="px-8 py-6 text-right">
                             <button 
                               onClick={() => setSelectedOrder(b)}
-                              className="bg-gray-100 text-gray-600 group-hover:bg-blue-600 group-hover:text-white p-2 rounded-lg transition-all"
+                              className="bg-white border border-slate-200 text-slate-400 group-hover:bg-slate-900 group-hover:text-white group-hover:border-slate-900 w-10 h-10 rounded-xl transition-all flex items-center justify-center ml-auto shadow-sm"
                             >
                               →
                             </button>
@@ -120,9 +129,9 @@ export default function KundenProfil() {
                   </table>
                 </div>
               ) : (
-                <div className="p-12 text-center text-gray-400">
-                  <span className="text-4xl block mb-2">📦</span>
-                  <p className="font-medium">Noch keine Bestellungen vorhanden.</p>
+                <div className="p-20 text-center">
+                  <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">📦</div>
+                  <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Noch keine Bestellungen</p>
                 </div>
               )}
             </section>
@@ -130,45 +139,48 @@ export default function KundenProfil() {
         </div>
       </div>
 
-      {/* --- DETAIL MODAL (REIN INFORMATIV) --- */}
+      {/* --- DETAIL MODAL (LOGIK & DESIGN) --- */}
       {selectedOrder && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="p-6 border-b flex justify-between items-center bg-gray-50">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-[3rem] shadow-[0_40px_100px_rgba(0,0,0,0.3)] max-w-lg w-full overflow-hidden animate-in fade-in zoom-in duration-300">
+            <div className="p-10 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
               <div>
-                <h2 className="text-xl font-bold text-gray-800">Bestellung #{selectedOrder.id}</h2>
-                <p className="text-xs text-gray-500">{new Date(selectedOrder.erstelltAm).toLocaleString("de-DE")}</p>
+                <h2 className="text-2xl font-black text-slate-800 tracking-tight">Bestellung #{selectedOrder.id}</h2>
+                <p className="text-sm text-slate-400 font-medium">{new Date(selectedOrder.erstelltAm).toLocaleString("de-DE")}</p>
               </div>
-              <button onClick={() => setSelectedOrder(null)} className="text-3xl text-gray-300 hover:text-gray-600 transition-colors">×</button>
+              <button onClick={() => setSelectedOrder(null)} className="text-4xl text-slate-300 hover:text-slate-900 transition-colors">&times;</button>
             </div>
             
-            <div className="p-6">
-              <div className="space-y-3 mb-8">
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Positionen</p>
+            <div className="p-10">
+              <div className="space-y-4 mb-10">
+                <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-2">Positionen</p>
                 {selectedOrder.positionen?.map((pos, idx) => (
-                  <div key={idx} className="flex justify-between items-center text-sm bg-gray-50 p-3 rounded-xl border border-gray-100">
-                    <span className="font-semibold text-gray-700">{pos.software.name} <span className="text-gray-400 font-normal">x{pos.menge}</span></span>
-                    <span className="font-bold text-gray-900">{(pos.einzelpreis ?? 0).toFixed(2)} €</span>
+                  <div key={idx} className="flex justify-between items-center bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                    <div>
+                      <p className="font-bold text-slate-800">{pos.software.name}</p>
+                      <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-1">Menge: {pos.menge}</p>
+                    </div>
+                    <span className="font-black text-slate-900 text-lg">{(pos.einzelpreis ?? 0).toFixed(2)} €</span>
                   </div>
                 ))}
               </div>
 
-              <div className="bg-blue-600 rounded-2xl p-5 text-white shadow-lg shadow-blue-200">
+              <div className="bg-slate-900 rounded-4xl p-8 text-white shadow-2xl shadow-blue-900/20">
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="text-xs font-bold text-blue-200 uppercase">Status</p>
-                    <p className="font-bold text-lg">{selectedOrder.status}</p>
+                    <p className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-1">Status</p>
+                    <p className="font-black text-xl italic">{selectedOrder.status}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs font-bold text-blue-200 uppercase">Gesamtbetrag</p>
-                    <p className="text-2xl font-black">{(selectedOrder.gesamtpreis ?? 0).toFixed(2)} €</p>
+                    <p className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-1">Gesamtbetrag</p>
+                    <p className="text-3xl font-black text-blue-400">{(selectedOrder.gesamtpreis ?? 0).toFixed(2)} €</p>
                   </div>
                 </div>
               </div>
 
               <button 
                 onClick={() => setSelectedOrder(null)}
-                className="w-full mt-8 py-4 bg-gray-900 text-white rounded-2xl font-bold hover:bg-black transition-all active:scale-95 shadow-xl shadow-gray-200"
+                className="w-full mt-10 py-5 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-blue-500 transition-all active:scale-95 shadow-xl shadow-blue-100"
               >
                 Zurück zur Übersicht
               </button>

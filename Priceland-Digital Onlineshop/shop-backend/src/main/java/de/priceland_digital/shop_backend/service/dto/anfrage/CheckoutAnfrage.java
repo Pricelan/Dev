@@ -19,7 +19,7 @@ public class CheckoutAnfrage {
     private String ort;
     private String telefonnummer;
     private ZahlungsMethode zahlungsMethode; 
-
+    
     // Standard-Konstruktor
     public CheckoutAnfrage() {
     }
