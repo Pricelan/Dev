@@ -49,7 +49,7 @@ export default function SoftwareCard({ software, onAddToCart }: SoftwareCardProp
         </div>
 
         <p className="text-slate-500 text-sm leading-relaxed mb-10 line-clamp-3 font-medium">
-          {software.softwareBeschreibung || "Professionelle Lösung für höchste Ansprüche."}
+          {software.softwareBeschreibung || "Keine Beschreibung verfügbar."}
         </p>
       </div>
 
