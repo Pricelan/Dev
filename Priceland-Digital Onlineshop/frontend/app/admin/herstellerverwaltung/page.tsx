@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Hersteller } from '@/types/hersteller';
 import Link from 'next/link';
 
+// Hauptkomponente für die Herstellerverwaltung
 export default function HerstellerManagementSeite() {
   const [hersteller, setHersteller] = useState<Hersteller[]>([]);
   const [loading, setLoading] = useState(true);
@@ -14,8 +15,10 @@ export default function HerstellerManagementSeite() {
     adresse: ""
   });
 
+  // API Basis-URL
   const API_BASE = "http://localhost:8080/api/hersteller";
 
+  // Funktion zum Laden der Herstellerdaten
   const fetchHersteller = async () => {
     setLoading(true);
     try {
@@ -30,10 +33,12 @@ export default function HerstellerManagementSeite() {
     }
   };
 
+  // useEffect Hook zum Laden der Herstellerdaten beim Initialisieren
   useEffect(() => {
     fetchHersteller();
   }, []);
 
+  // Funktion zum Erstellen eines neuen Herstellers
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -44,7 +49,7 @@ export default function HerstellerManagementSeite() {
         credentials: "include",
         body: JSON.stringify(formData),
       });
-
+      // Überprüfung der Antwort
       if (res.ok) {
         setFormData({ name: "", email: "", webseite: "", adresse: "" });
         await fetchHersteller();
@@ -59,6 +64,7 @@ export default function HerstellerManagementSeite() {
     }
   };
 
+  // Funktion zum Löschen eines Herstellers
   const handleDelete = async (id: number) => {
     if (!confirm("Möchtest du diesen Partner wirklich löschen?")) return;
     try {
@@ -76,7 +82,7 @@ export default function HerstellerManagementSeite() {
   return (
     <div className="min-h-screen py-12 px-4 space-y-8">
       
-      {/* HEADER AREA */}
+      {/* HEADER BEREICH */}
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <Link href="/admin" className="text-blue-600 font-black text-[10px] uppercase tracking-[0.2em] mb-2 block hover:underline">
@@ -89,7 +95,7 @@ export default function HerstellerManagementSeite() {
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        {/* TABELLE - Nimmt 8 von 12 Spalten ein */}
+        {/* TABELLE - */}
         <div className="lg:col-span-8 bg-white/70 backdrop-blur-md border border-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04)] overflow-hidden">
           <table className="w-full text-left border-collapse">
             <thead>
@@ -134,7 +140,7 @@ export default function HerstellerManagementSeite() {
           {loading && <div className="p-20 text-center font-black text-slate-300 uppercase tracking-[0.3em] text-[10px] animate-pulse">Synchronisiere...</div>}
         </div>
 
-        {/* FORMULAR - Nimmt 4 von 12 Spalten ein */}
+        {/* FORMULAR */}
         <div className="lg:col-span-4 sticky top-8">
           <div className="bg-slate-900 p-8 rounded-[2.5rem] shadow-2xl shadow-slate-200 text-white">
             <h2 className="text-xl font-black mb-2 tracking-tight">Neuer Partner</h2>

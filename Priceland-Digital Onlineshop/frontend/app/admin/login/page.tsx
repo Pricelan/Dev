@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+// Hauptkomponente für die Admin-Login-Seite
 export default function AdminLogin() {
   const [username, setUsername] = useState("");
   const [passwort, setPasswort] = useState("");
@@ -10,9 +11,11 @@ export default function AdminLogin() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
+  // Funktion zum Handhaben des Login-Vorgangs
   async function handleLogin() {
     setError("");
     setIsLoading(true);
+    // API-Aufruf zum Login
     try {
       const res = await fetch("http://localhost:8080/api/admin/auth/login", {
         method: "POST",
@@ -20,14 +23,14 @@ export default function AdminLogin() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, passwort })
       });
-
+      // Überprüfung der Antwort
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
         setError(errorData.error || "Zugriff verweigert. Bitte Daten prüfen.");
         setIsLoading(false);
         return;
       }
-
+      // Erfolgreiches Login - Weiterleitung zum Admin-Dashboard
       router.push("/admin");
     } catch {
       setError("Server nicht erreichbar.");
@@ -42,7 +45,7 @@ export default function AdminLogin() {
     <div className="absolute top-[-10%] left-[-10%] w-160 h-160 bg-blue-100/40 rounded-full blur-[120px] -z-10"></div>
     <div className="absolute bottom-[-10%] right-[-10%] w-160 h-160 bg-slate-200/50 rounded-full blur-[120px] -z-10"></div>
 
-    {/* pt-20 schiebt die Box auf Mobile nach oben, pt-40 auf Desktop */}
+   
     <div className="w-full max-w-md pt-20 md:pt-40 z-10">
       
       {/* Logo / Brand Header */}

@@ -2,12 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { Hersteller } from "@/types/hersteller";  
 
-interface Hersteller {
-  id: number;
-  name: string;
-}
 
+// Hauptkomponente für das Formular zur Erstellung neuer Software
 export default function NewSoftwareForm() {
   const [name, setName] = useState("");
   const [version, setVersion] = useState("");
@@ -18,6 +16,7 @@ export default function NewSoftwareForm() {
   const [herstellerListe, setHerstellerListe] = useState<Hersteller[]>([]);
   const [kategorie, setKategorie] = useState<string>("LIZENZIERTE_SOFTWARE");
 
+  // useEffect Hook zum Laden der Herstellerliste beim Initialisieren
   useEffect(() => {
     fetch("http://localhost:8080/api/hersteller/all", {
       credentials: "include"
@@ -29,10 +28,12 @@ export default function NewSoftwareForm() {
       .catch(err => console.error("Hersteller-Fehler:", err));
   }, []);
 
+  // Funktion zum Handhaben des Formular-Submits
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!herstellerId) return alert("Bitte einen Hersteller auswählen");
 
+    // Vorbereitung der Daten für die API  
     const body = {
       name,
       version,
@@ -43,7 +44,7 @@ export default function NewSoftwareForm() {
       kategorie: kategorie,
       typ: kategorie
     };
-
+    // API-Aufruf zum Erstellen der neuen Software
     try {
       const res = await fetch("http://localhost:8080/api/admin/software", {
         method: "POST",
@@ -53,6 +54,7 @@ export default function NewSoftwareForm() {
       });
 
       if (!res.ok) throw new Error(await res.text());
+      // Erfolgreich erstellt - Weiterleitung zur Software-Übersicht
       window.location.href = "/admin/software";
     } catch {
       alert("Fehler beim Speichern.");

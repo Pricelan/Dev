@@ -5,6 +5,7 @@ import { apiFetch } from "@/lib/api";
 import Link from "next/link";
 import { Bestellung } from "@/types/bestellung";
 
+// Funktion zur Bestimmung der Stilklasse basierend auf dem Bestellstatus
 const getStatusStyle = (status: string) => {
   switch (status) {
     case 'BEZAHLT':
@@ -19,6 +20,7 @@ const getStatusStyle = (status: string) => {
   }
 };
 
+// Hauptkomponente für die Bestellverwaltung
 export default function AdminOrders() {
   const [orders, setOrders] = useState<Bestellung[]>([]);
   const [loading, setLoading] = useState(true);
@@ -37,13 +39,15 @@ export default function AdminOrders() {
       });
   };
 
+  // useEffect Hook um Bestellungen zu laden
   useEffect(() => {
+    // Nutzung von Promise.resolve().then() um sicherzustellen, dass der Ladevorgang nach der Initialisierung erfolgt
     Promise.resolve().then(() => loadOrders());
   }, []);
 
   return (
     <div className="space-y-8 relative">
-      {/* HEADER AREA */}
+      {/* HEADER BEREICH */}
       <div className="flex justify-between items-center">
         <div>
           <Link href="/admin" className="text-blue-600 font-black text-[10px] uppercase tracking-[0.2em] mb-2 block hover:underline">
@@ -58,7 +62,7 @@ export default function AdminOrders() {
         </button>
       </div>
 
-      {/* TABLE CARD */}
+      {/* TABELLE KARTE */}
       <div className="bg-white/70 backdrop-blur-md border border-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04)] overflow-hidden">
         <table className="w-full text-left border-collapse">
           <thead>

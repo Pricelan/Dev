@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import Link from "next/link";
 
+// Hauptkomponente für die Software-Bearbeitungsseite
 export default function EditSoftware({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = React.use(params);
   const id = resolvedParams.id;
@@ -15,6 +16,7 @@ export default function EditSoftware({ params }: { params: Promise<{ id: string 
   const [downloadLink, setDownloadLink] = useState("");
   const [loading, setLoading] = useState(true);
 
+  // useEffect Hook zum Laden der Software-Daten beim Initialisieren
   useEffect(() => {
     apiFetch(`/admin/software/details/${id}`)
       .then(data => {
@@ -31,9 +33,11 @@ export default function EditSoftware({ params }: { params: Promise<{ id: string 
       });
   }, [id]);
 
+  // Funktion zum Speichern der aktualisierten Software-Daten
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
+    // Vorbereitung der Daten für das Update
     const updateData = {
       name,
       version,
@@ -42,6 +46,7 @@ export default function EditSoftware({ params }: { params: Promise<{ id: string 
       downloadLink
     };
 
+    // API-Aufruf zum Aktualisieren der Software-Daten
     const res = await fetch(`http://localhost:8080/api/admin/software/details/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -56,7 +61,7 @@ export default function EditSoftware({ params }: { params: Promise<{ id: string 
       alert("Fehler beim Speichern: " + errorText);
     }
   };
-
+  // Anzeige eines Ladezustands, solange die Daten geladen werden
   if (loading) return (
     <div className="flex flex-col items-center justify-center py-24">
       <div className="animate-spin rounded-2xl h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
@@ -68,7 +73,7 @@ export default function EditSoftware({ params }: { params: Promise<{ id: string 
     <div className="min-h-screen py-12 px-4 flex justify-center items-start">
       <main className="max-w-4xl w-full relative">
         
-        {/* Hintergrund-Deko analog zur "Neu"-Seite */}
+        {/* Hintergrund-Deko */}
         <div className="absolute top-[-5%] left-[-5%] w-72 h-72 bg-blue-100/30 rounded-full blur-3xl -z-10"></div>
         
         <form onSubmit={handleSave} className="bg-white/70 backdrop-blur-2xl border border-white p-10 md:p-16 rounded-[3rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)]">

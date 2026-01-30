@@ -4,10 +4,12 @@ import { apiFetch } from "@/lib/api";
 import { Kunde } from "@/types/kunde";
 import Link from "next/link";
 
+// Hauptkomponente für die Kundenverwaltung
 export default function KundenVerwaltung() {
   const [kunden, setKunden] = useState<Kunde[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // useEffect Hook zum Laden der Kundendaten beim Initialisieren
   useEffect(() => {
     apiFetch("/admin/kunden")
       .then(data => {
@@ -20,9 +22,10 @@ export default function KundenVerwaltung() {
       });
   }, []);
 
+  // Funktion zum Sperren eines Kunden
   const handleSperren = (id: number) => {
     if (confirm(`Kunde #${id} wirklich sperren?`)) {
-      // Hier käme dein API-Call zum Sperren hin
+      // Hier würde die API-Aufruf zum Sperren des Kunden erfolgen
       console.log("Kunde gesperrt:", id);
     }
   };
