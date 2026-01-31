@@ -2,6 +2,7 @@
 
 import { createContext, ReactNode, useState, useContext, useEffect } from "react";
 import { Kunde } from "@/types/kunde";
+import { apiFetch } from "@/lib/api";
 
 // Definition des Typs für den Kunden-Kontext
 type KundeContextType = {
@@ -29,12 +30,9 @@ useEffect(() => {
     }
     
     try {
-      const res = await fetch("http://localhost:8080/api/kunden/auth/me", { 
-        credentials: "include" 
-      });
+      const res = await apiFetch("/kunden/auth/me");
         if (res.ok) {
-        const data = await res.json();
-        setKunde(data);
+        setKunde(res);
       } else {
         setKunde(null);
       }
@@ -51,8 +49,7 @@ useEffect(() => {
   const logout = async () => {
     try {
       // Anfrage an das Backend zum Ausloggen
-      await fetch("http://localhost:8080/api/auth/logout", { 
-        credentials: "include", 
+      await apiFetch("/auth/logout", {
         method: "POST" 
       });
     } catch (err) {

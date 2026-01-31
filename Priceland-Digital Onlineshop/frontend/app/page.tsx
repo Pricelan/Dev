@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Button } from "./ui/button";
 import "@/app/ui/grid.css";
 
+// Hauptkomponente für die Startseite
 export default function Startseite() {
  
   return (
@@ -109,7 +110,7 @@ export default function Startseite() {
 
           {/* Pro */}
           <div className="bg-[#0A6CFF] p-8 rounded-2xl shadow-xl text-white transform scale-105 flex flex-col">
-            <h3 className="text-lg font-bold">Pro</h3>
+            <h3 className="text-lg font-bold">Premium</h3>
             <p className="opacity-80">Für Profis</p>
             <h2 className="text-2xl font-bold my-4">€19,99 / Monat</h2>
             <ul className="space-y-2 mb-6 grow">

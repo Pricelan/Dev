@@ -8,6 +8,7 @@ interface SoftwareItem {
   name: string;
   version: string;
   preis: number;
+  kategorie: string;
   hersteller?: {
     name: string;
   };
@@ -28,15 +29,20 @@ export default function Grid({ software }: GridProps) {
         let labelTop = "Professionelle Tools";
         let btnText = "Kategorie anzeigen";
 
+        // Bestimmung der Kategorie und entsprechende Anpassungen
         if (item.preis === 0) {
           categoryClass = "card-gratis";
           labelTop = "Gratis & Open Source";
           btnText = "Gratis entdecken";
-        } else if (item.name.toLowerCase().includes("game") || item.preis > 100) { 
+       } else if (item.kategorie === "COMPUTER_SPIELE") { 
           categoryClass = "card-games";
-          labelTop = "Abo oder Lizenz";
-          btnText = "Games durchsuchen";
-        }
+          labelTop = "Gaming & Unterhaltung";
+          btnText = "Jetzt zocken";
+      } else {
+          categoryClass = "card-tools";
+          labelTop = "Professionelle Tools";
+          btnText = "Details ansehen";
+    }
 
         return (
           <div key={item.softwareId} className={`software-card ${categoryClass}`}>

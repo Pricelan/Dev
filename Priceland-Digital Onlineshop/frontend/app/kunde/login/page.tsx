@@ -4,22 +4,24 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useKunde } from "@/context/kundeContext";
 import Link from "next/link";
+import { apiFetch } from "@/lib/api";
 
+// Hauptkomponente für die Kunden-Login-Seite
 export default function Login() {
   const { setKunde } = useKunde();
   const router = useRouter();
   
-  // States für die Eingaben
+  // Zustände für E-Mail, Passwort und Ladezustand
   const [email, setEmail] = useState("");
   const [passwort, setPasswort] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Funktion zum Absenden des Login-Formulars
   async function submit() {
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:8080/api/kunden/auth/login", {
+      const res = await apiFetch("/kunden/auth/login", {
         method: "POST",
-        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
           email: email, 

@@ -53,6 +53,7 @@
   flex-grow: 1; 
 }
 
+/* Listenelemente */
 .feature-list li {
   font-size: 0.95rem;
   color: #718096;
@@ -61,6 +62,7 @@
   align-items: center;
 }
 
+/* Listenelement Häkchen */
 .feature-list li::before {
   content: "✓";
   color: #3182ce;
@@ -78,7 +80,7 @@
   cursor: pointer;
   transition: transform 0.1s active;
 }
-
+  /* Verschiedene Button-Farben für Kategorien */
 .card-tools .action-btn { background: #0A6CFF; color: white; }
 .card-gratis .action-btn { background: #10b981; color: white; }
 .card-games .action-btn { background: #8b5cf6; color: white; }

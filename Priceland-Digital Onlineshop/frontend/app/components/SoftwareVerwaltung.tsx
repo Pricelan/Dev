@@ -1,23 +1,27 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Software } from "@/types/software";
+import { apiFetch } from "@/lib/api";
 
+// Hauptkomponente für die Software-Verwaltung im Admin-Bereich
 export default function SoftwareVerwaltung() {
-  // WICHTIG: Immer mit [] initialisieren
+  // Zustand für die Suchanfrage und die Software-Liste
   const [query, setQuery] = useState("");
   const [softwareListe, setSoftwareListe] = useState<Software[]>([]); 
   const [loading, setLoading] = useState(true);
 
+  // useEffect Hook zum Laden der Software-Daten basierend auf der Suchanfrage
  useEffect(() => {
-    // Definiere eine interne Funktion für den Fetch
-    const fetchData = async () => {
-        setLoading(true); // Jetzt ist es sicher
+        // Funktion zum Abrufen der Software-Daten
+        const apiFetchData = async () => {
+        setLoading(true); 
+        // Bestimme die URL basierend auf der Suchanfrage
         const url = query.length > 0 
-            ? `http://localhost:8080/api/software/suche?name=${query}`
-            : `http://localhost:8080/api/software`; // Entferne /alle, falls der Endpunkt nicht existiert
+            ? `/software/suche?name=${query}`
+            : `/software`; 
 
         try {
-            const res = await fetch(url);
+            const res = await apiFetch(url);
             if (!res.ok) throw new Error("Fehler beim Laden");
             const data = await res.json();
             setSoftwareListe(Array.isArray(data) ? data : []);
@@ -29,7 +33,7 @@ export default function SoftwareVerwaltung() {
         }
     };
 
-    fetchData();
+    apiFetchData();
 }, [query]);
 
   return (
@@ -55,7 +59,7 @@ export default function SoftwareVerwaltung() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-  {/* Bedingung 1: Es wurde noch gar nichts getippt */}
+  {/* Bedingung 1: Keine Suchanfrage - zeige Hinweis */}
   {query.length === 0 ? (
     <tr>
       <td colSpan={3} className="px-6 py-12 text-center text-gray-400">
@@ -66,8 +70,8 @@ export default function SoftwareVerwaltung() {
       </td>
     </tr>
   ) : (
-    /* Bedingung 2: Es wird gesucht - zeige Ergebnisse oder "Nichts gefunden" */
-    Array.isArray(softwareListe) && softwareListe.length > 0 ? (
+    // Bedingung 2: Suchanfrage vorhanden - zeige Ergebnisse oder Lade-/Keine-Daten-Hinweis
+      Array.isArray(softwareListe) && softwareListe.length > 0 ? (
       softwareListe.map((s) => (
         <tr key={s.id} className="hover:bg-gray-50 transition-colors">
           <td className="px-6 py-4 font-mono text-sm text-gray-500">#{s.id}</td>

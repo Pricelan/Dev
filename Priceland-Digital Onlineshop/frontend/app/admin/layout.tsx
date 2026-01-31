@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+// Hauptlayout-Komponente für den Admin-Bereich
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
@@ -11,11 +12,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className="min-h-screen bg-[#f1f5f9] relative overflow-hidden font-sans">
       
-      {/* Hintergrund-Akzente (identisch zum Dashboard für Konsistenz) */}
       <div className="absolute top-[-5%] left-[-2%] w-140 h-140 bg-blue-100/30 rounded-full blur-[100px]"></div>
       <div className="absolute bottom-[-5%] right-[-2%] w-120 h-120 bg-slate-200/40 rounded-full blur-[100px]"></div>
 
-      {/* Modern Admin Header */}
+      {/* Admin Header */}
       <header className="z-20 border-b border-slate-200/50 bg-white/60 backdrop-blur-md sticky top-0">
         <div className="max-w-7xl mx-auto px-6 md:px-8 py-5 flex justify-between items-center">
           <div className="flex items-center gap-4">
@@ -56,15 +56,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       </header>
 
-      {/* Main Content Bereich */}
+      {/* Main Content Area */}
       <main className="relative z-10 max-w-7xl mx-auto p-6 md:p-8">
-        {/* Wir entfernen hier die umschließende weiße Box, da deine Unterseiten (Dashboard) eigene Karten-Designs haben */}
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
           {children}
         </div>
       </main>
 
-      {/* Footer / Status Bar */}
+      {/* Admin Footer */}
       <footer className="max-w-7xl mx-auto px-8 py-10 flex justify-between items-center">
         <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">
           &copy; 2026 Priceland Digital – Internal Systems

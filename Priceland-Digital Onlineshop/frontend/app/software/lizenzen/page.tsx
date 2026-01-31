@@ -6,15 +6,18 @@ import { Software } from "@/types/software";
 import { useWarenkorb } from "@/context/warenkorbContext";
 import SoftwareCard from "@/app/components/SoftwareCard";
 import Link from "next/link";
+import { apiFetch } from "@/lib/api";
 
+// Hauptkomponente für die Lizenzierte-Software-Seite
 export default function SoftwareShopPage() {
   const [software, setSoftware] = useState<Software[]>([]);
   const [loading, setLoading] = useState(true);
   const { refresh } = useWarenkorb();
 
+  // useEffect Hook zum Laden der lizenzierten Software-Daten beim Initialisieren
   useEffect(() => {
     setLoading(true);
-    fetch("http://localhost:8080/api/software")
+    apiFetch("/software")
       .then((res) => res.json())
       .then((data) => {
         const dataArray = Array.isArray(data) ? data : (data.content || []);
@@ -25,13 +28,13 @@ export default function SoftwareShopPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  // Funktion zum Hinzufügen der Software zum Warenkorb
   async function addToCart(id: string | number) {
     const softwareId = typeof id === "string" ? parseInt(id, 10) : id;
     const token = getGastToken();
     try {
-      const res = await fetch("http://localhost:8080/api/warenkorb/add", {
+      const res = await apiFetch("/warenkorb/add", {
         method: "POST",
-        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ softwareId, menge: 1, gastToken: token }),
       });
@@ -45,10 +48,10 @@ export default function SoftwareShopPage() {
 
   return (
     <div className="min-h-screen bg-[#f8fafc] relative overflow-hidden">
-      {/* Dekorative Hintergründe wie im Admin */}
+      
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-100/40 rounded-full blur-[120px] -z-10" />
       <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-100/40 rounded-full blur-[120px] -z-10" />
-
+      {/* Navigations-Header */}
       <div className="max-w-7xl mx-auto px-6 py-12">
         <header className="mb-16">
           <Link href="/" className="group flex items-center gap-2 text-slate-400 hover:text-blue-600 transition-colors mb-8 no-underline">

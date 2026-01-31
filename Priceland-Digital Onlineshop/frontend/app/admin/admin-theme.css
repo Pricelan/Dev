@@ -1,13 +1,13 @@
 :root {
-  /* Modernisierte Farbpalette */
-  --primary: #2563eb;          /* Ein lebendigeres Blau */
-  --primary-dark: #1e293b;     /* Tiefes Slate für Buttons */
+/* Farbpalette */
+  --primary: #2563eb;          
+  --primary-dark: #1e293b;     
   --danger: #ef4444;
-  --bg: #f1f5f9;               /* Kühleres Grau-Blau */
-  --card: rgba(255, 255, 255, 0.7); /* Transparent für Glassmorphism */
+  --bg: #f1f5f9;               
+  --card: rgba(255, 255, 255, 0.7); 
   --border: rgba(255, 255, 255, 0.6);
-  --text: #0f172a;             /* Fast Schwarz (Slate-900) */
-  --muted: #64748b;            /* Slate-500 */
+  --text: #0f172a;             
+  --muted: #64748b;            
   --radius-lg: 24px;
   --radius-xl: 32px;
 }
@@ -25,6 +25,7 @@ body {
   animation: fadeIn 0.5s ease-out;
 }
 
+/* Section Header */
 .admin-section h2 {
   font-weight: 900;
   letter-spacing: -0.025em;
@@ -32,6 +33,7 @@ body {
   font-size: 1.5rem;
 }
 
+/* Muted Text */
 .muted {
   color: var(--muted);
   font-weight: 500;
@@ -46,7 +48,7 @@ body {
   gap: 1.5rem;
 }
 
-/* Card - Der Glassmorphism Effekt */
+/* Card */
 .card {
   background: var(--card);
   backdrop-filter: blur(16px);
@@ -59,12 +61,14 @@ body {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Card Hover Effect */
 .card:hover {
   transform: translateY(-4px);
   box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.08);
   border-color: rgba(37, 99, 235, 0.2);
 }
 
+/* Card Header */
 .card-header {
   display: flex;
   justify-content: space-between;
@@ -72,6 +76,7 @@ body {
   margin-bottom: 1rem;
 }
 
+/* Badge */
 .badge {
   background: #eff6ff;
   color: var(--primary);
@@ -84,6 +89,7 @@ body {
   border: 1px solid rgba(37, 99, 235, 0.1);
 }
 
+/* Card Body */
 .card-body p {
   margin: 0.5rem 0;
   font-size: 0.925rem;
@@ -115,11 +121,13 @@ body {
   cursor: pointer;
 }
 
+/* Button Hover Effect */
 .btn-secondary:hover {
   background: #000000;
   transform: scale(1.02);
 }
 
+/* Danger Button */
 .btn-danger {
   background: #fef2f2;
   color: var(--danger);
@@ -131,6 +139,7 @@ body {
   transition: all 0.2s;
 }
 
+/* Danger Button Hover Effect */
 .btn-danger:hover {
   background: var(--danger);
   color: white;
@@ -149,12 +158,14 @@ body {
   transition: all 0.2s;
 }
 
+/* Input Focus Effect */
 .search-input:focus {
   background: white;
   border-color: var(--primary);
   box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
 }
 
+/* Animations */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }

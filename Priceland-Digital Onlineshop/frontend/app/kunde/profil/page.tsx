@@ -3,17 +3,19 @@
 import { useEffect, useState } from "react";
 import { useKunde } from "@/context/kundeContext";
 import { Bestellung } from "@/types/bestellung";
+import { apiFetch } from "@/lib/api";
 
+// Hauptkomponente für das Kundenprofil
 export default function KundenProfil() {
   const { kunde } = useKunde();
   const [bestellungen, setBestellungen] = useState<Bestellung[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Bestellung | null>(null);
 
-  // --- DEINE LOGIK ---
+  // useEffect Hook zum Laden der Bestellungen des Kunden beim Initialisieren
   useEffect(() => {
     if (!kunde?.id) return;
 
-    fetch(`http://localhost:8080/api/bestellungen/kunde/${kunde.id}`, {
+    apiFetch(`/bestellungen/kunde/${kunde.id}`, {
       method: 'GET',
       credentials: "include" 
     })
@@ -37,11 +39,11 @@ export default function KundenProfil() {
     );
   }
 
-  // --- DEIN DESIGN (JETZT MODERNISIERT) ---
+  
   return (
     <div className="min-h-screen bg-[#f1f5f9] relative overflow-hidden py-12 px-4 md:px-8">
       
-      {/* Hintergrund-Deko passend zum Shop */}
+      {/* Hintergrund-Deko */}
       <div className="absolute top-[-10%] left-[-5%] w-160 h-160 bg-blue-100/40 rounded-full blur-[120px]"></div>
       <div className="absolute bottom-0 right-[-5%] w-120 h-120 bg-indigo-100/40 rounded-full blur-[100px]"></div>
 
@@ -139,7 +141,7 @@ export default function KundenProfil() {
         </div>
       </div>
 
-      {/* --- DETAIL MODAL (LOGIK & DESIGN) --- */}
+      {/* Detail-Modal für Bestellungen */}
       {selectedOrder && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-[3rem] shadow-[0_40px_100px_rgba(0,0,0,0.3)] max-w-lg w-full overflow-hidden animate-in fade-in zoom-in duration-300">

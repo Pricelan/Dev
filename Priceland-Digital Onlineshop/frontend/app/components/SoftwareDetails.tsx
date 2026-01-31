@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { Software } from '@/types/software';
 
+// Hauptkomponente für die Software-Detailansicht
 export default function SoftwareDetails({ software, addToCart }: { software: Software, addToCart: () => void }) {
   
-  // 1. Sicherheitscheck: Wenn software noch nicht da ist, zeige nichts
+  // 1. Sicherheitscheck: Falls keine Software-Daten vorhanden sind, nichts rendern
   if (!software) return null;
 
+  // Funktion zum Bestimmen des Kategoriespezifischen Pfads
   const getCategoryPath = () => {
     switch (software.kategorie) {
       case "COMPUTER_SPIELE": return "/software/games";
@@ -17,7 +19,7 @@ export default function SoftwareDetails({ software, addToCart }: { software: Sof
     }
   };
 
-  // 2. Sicherheitscheck für den Preis: Fallback auf 0, falls undefined
+  // 2. Preis extrahieren, Standardwert 0 falls nicht definiert
   const price = software.preis ?? 0;
 
   return (

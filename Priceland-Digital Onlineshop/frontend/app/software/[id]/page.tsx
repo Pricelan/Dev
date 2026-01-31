@@ -6,32 +6,34 @@ import SoftwareDetail from "@/app/components/SoftwareDetails";
 import { Software } from "@/types/software";
 import { useWarenkorb } from "@/context/warenkorbContext";
 import { getGastToken } from "@/lib/gastToken";
+import { apiFetch } from "@/lib/api";
 
+// Hauptkomponente für die Software-Detailseite
 export default function SoftwareDetailPage() {
   const { id } = useParams();
   const [software, setSoftware] = useState<Software | null>(null);
   const [loading, setLoading] = useState(true);
   const { refresh } = useWarenkorb();
 
+  // useEffect Hook zum Laden der Software-Daten beim Initialisieren
   useEffect(() => {
     if (!id) return;
     setLoading(true);
-    fetch(`http://localhost:8080/api/software/${id}`)
+    apiFetch(`/software/${id}`)
       .then((res) => res.json())
       .then((data) => setSoftware(data))
       .catch((err) => console.error("Fehler:", err))
       .finally(() => setLoading(false));
   }, [id]);
 
-  // Funktion zum Hinzufügen (Logik direkt hier, damit die Child-Komponente sauber bleibt)
+  // Funktion zum Hinzufügen der Software zum Warenkorb
   async function handleAddToCart() {
     if (!software) return;
     const token = getGastToken();
 
     try {
-      const res = await fetch("http://localhost:8080/api/warenkorb/add", {
+      const res = await apiFetch("/warenkorb/add", {
         method: "POST",
-        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           softwareId: software.id,
@@ -50,7 +52,7 @@ export default function SoftwareDetailPage() {
     }
   }
 
-  // Ladebildschirm passend zum Design
+  // Anzeige eines Ladezustands, wenn die Software-Daten noch geladen werden
   if (loading || !software) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#f8fafc]">
@@ -62,7 +64,7 @@ export default function SoftwareDetailPage() {
     );
   }
 
-  // Die SoftwareDetail Komponente regelt jetzt die Links zurück zur Kategorie
+  // Anzeige der Software-Details
   return (
     <SoftwareDetail 
       software={software} 

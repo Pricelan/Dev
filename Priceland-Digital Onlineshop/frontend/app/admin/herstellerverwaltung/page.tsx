@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Hersteller } from '@/types/hersteller';
 import Link from 'next/link';
+import { apiFetch } from "@/lib/api";
 
 // Hauptkomponente für die Herstellerverwaltung
 export default function HerstellerManagementSeite() {
@@ -14,15 +15,13 @@ export default function HerstellerManagementSeite() {
     webseite: "",
     adresse: ""
   });
-
-  // API Basis-URL
-  const API_BASE = "http://localhost:8080/api/hersteller";
+  
 
   // Funktion zum Laden der Herstellerdaten
   const fetchHersteller = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/all`);
+      const res = await apiFetch(`/hersteller/all`);
       if (!res.ok) throw new Error("Fehler beim Laden");
       const data = await res.json();
       setHersteller(data);
@@ -43,10 +42,9 @@ export default function HerstellerManagementSeite() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const res = await fetch(API_BASE, {
+      const res = await apiFetch(`/hersteller`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
         body: JSON.stringify(formData),
       });
       // Überprüfung der Antwort
@@ -68,10 +66,9 @@ export default function HerstellerManagementSeite() {
   const handleDelete = async (id: number) => {
     if (!confirm("Möchtest du diesen Partner wirklich löschen?")) return;
     try {
-      const res = await fetch(`${API_BASE}/${id}`, {
+      const res = await apiFetch(`/hersteller/${id}`, {
         method: "DELETE",
-        credentials: "include",
-      });
+        });
       if (res.ok) fetchHersteller();
       else alert("Löschen fehlgeschlagen (evtl. noch Software verknüpft).");
     } catch (err) {

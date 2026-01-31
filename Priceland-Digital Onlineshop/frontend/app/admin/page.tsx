@@ -8,12 +8,14 @@ import { useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/api';
 import { Bestellung } from '@/types/bestellung';
 
+// Hauptkomponente für das Admin-Dashboard
 export default function AdminDashboard() {
   const [umsatz, setUmsatz] = useState(0);
   const [loading, setLoading] = useState(true);
+  // Zustand für Bestellungen
   const [orders, setOrders] = useState<Bestellung[]>([]);
   
-
+  // Funktion zum Abmelden des Admins
   const handleLogout = async () => {
     try {
       await apiFetch("/admin/auth/logout", { 
@@ -27,6 +29,7 @@ export default function AdminDashboard() {
     }
   };
 
+  // useEffect Hook zum Überprüfen der Admin-Session beim Initialisieren
   useEffect(() => {
     apiFetch("/admin/auth/check-admin")
       .then(isAdmin => {
@@ -41,14 +44,15 @@ export default function AdminDashboard() {
       });
   }, []);
 
+  // useEffect Hook zum Laden von Umsatz und Bestellungen
   useEffect(() => {
   if (!loading) {
-    // Gesamtumsatz
+    // Gesamtumsatz laden
     apiFetch("/bestellungen/admin/umsatz")
       .then(data => setUmsatz(data))
       .catch(err => console.error(err));
 
-    // Alle Bestellungen für die Detail-Stats
+    // Bestellungen laden
     apiFetch("/bestellungen")
       .then(data => setOrders(data))
       .catch(err => console.error(err));
@@ -69,7 +73,7 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-[#f1f5f9] relative overflow-hidden py-10 px-4 md:px-8 font-sans">
       
-      {/* Hintergrund-Deko für Admin-Look (etwas kühler) */}
+      {/* Hintergrund-Deko */}
       <div className="absolute top-[-10%] left-[-5%] w-160 h-160 bg-blue-200/20 rounded-full blur-[120px]"></div>
       <div className="absolute bottom-0 right-[-5%] w-160 h-160 bg-slate-200/30 rounded-full blur-[120px]"></div>
 
@@ -104,7 +108,7 @@ export default function AdminDashboard() {
           {/* LINKER TEIL: Inventar & Kunden */}
           <div className="lg:col-span-8 space-y-8">
             
-            {/* Software Verwaltung mit "Alle anzeigen" Link */}
+            {/* Software Verwaltung */}
             <section className="bg-white/70 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-white overflow-hidden">
               <div className="p-8 border-b border-slate-100 flex justify-between items-center bg-white/30">
                 <h2 className="text-2xl font-black text-slate-800 tracking-tight">Software & Lizenzen</h2>
@@ -132,7 +136,7 @@ export default function AdminDashboard() {
        {/* RECHTER TEIL: Stats & Schnellzugriff */}
           <div className="lg:col-span-4 space-y-8">
             
-            {/* High-End Umsatz-Karte */}
+            {/* Umsatz Statistik Karte */}
             <div className="bg-slate-900 p-10 rounded-[3rem] text-white shadow-2xl shadow-blue-900/20 relative overflow-hidden group border border-white/5">
               <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#3b82f6_1px,transparent_1px)] bg-size-[16px_16px]"></div>
               
@@ -172,7 +176,7 @@ export default function AdminDashboard() {
               <div className="absolute right-[-10%] bottom-[-10%] text-6xl opacity-20 rotate-12">📈</div>
             </div>
 
-            {/* Suche & Quick Actions Sticky-Container */}
+            {/* Schnellzugriffsbereich */}
             <div className="space-y-6 sticky top-10">
               <HerstellerSuche />
 
@@ -190,9 +194,9 @@ export default function AdminDashboard() {
                 </div>
               </div>
             </div>
-          </div> {/* Ende lg:col-span-4 */}
-        </div> {/* Ende grid */}
-      </div> {/* Ende max-w-7xl */}
+          </div> 
+        </div> 
+      </div> 
     </div> 
   );
 }

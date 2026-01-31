@@ -1,9 +1,9 @@
-
 "use client";
 
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
+// Hauptkomponente für die Checkout-Erfolgreich-Seite
 export default function CheckoutErfolgreichPage() {
   const params = useSearchParams();
   const orderId = params.get("orderId");
@@ -11,14 +11,14 @@ export default function CheckoutErfolgreichPage() {
   return (
     <div className="min-h-screen bg-[#f1f5f9] relative overflow-hidden flex items-center justify-center p-6">
       
-      {/* Hintergrund-Deko passend zum Shop */}
+      {/* Hintergrund-Deko Elemente */}
       <div className="absolute top-[-10%] left-[-5%] w-120 h-120 bg-green-100/40 rounded-full blur-[100px]"></div>
       <div className="absolute bottom-[-10%] right-[-5%] w-120 h-120 bg-blue-100/40 rounded-full blur-[100px]"></div>
 
       <main className="max-w-lg w-full relative z-10">
         <div className="bg-white/70 backdrop-blur-2xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] rounded-[3rem] p-10 md:p-16 border border-white/60 text-center">
           
-          {/* Erfolgs-Icon mit Glow */}
+          {/* Erfolg-Icon */}
           <div className="relative mb-10 inline-block">
             <div className="absolute inset-0 bg-green-400 blur-2xl opacity-20 animate-pulse"></div>
             <div className="relative w-24 h-24 bg-linear-to-br from-green-400 to-emerald-600 rounded-3xl flex items-center justify-center shadow-xl shadow-green-200 text-white">
@@ -67,7 +67,7 @@ export default function CheckoutErfolgreichPage() {
           </div>
         </div>
         
-        {/* Zusatz-Info unterm Card */}
+        {/* Support Hinweis */}
         <p className="text-center mt-8 text-slate-400 text-xs font-medium">
           Probleme bei der Bestellung? <span className="text-blue-600 cursor-pointer">Kontaktiere unseren Support</span>
         </p>

@@ -13,6 +13,7 @@ interface SoftwareItem {
   hersteller?: Hersteller;
 }
 
+// Hauptkomponente für die Admin-Software-Übersicht
 export default function AdminSoftwareList() {
   const [software, setSoftware] = useState<SoftwareItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -20,7 +21,7 @@ export default function AdminSoftwareList() {
   const handleDelete = async (id: number) => {
     if (!confirm("Möchtest du dieses Produkt wirklich löschen?")) return;
     try {
-      // Nutze apiFetch für Konsistenz (Credentials sind dort meist integriert)
+      // API-Aufruf zum Löschen der Software
       await apiFetch(`/admin/software/löschen/${id}`, { method: "DELETE" });
       setSoftware(prev => prev.filter(s => s.id !== id));
     } catch {
@@ -28,6 +29,7 @@ export default function AdminSoftwareList() {
     }
   };
 
+  // useEffect Hook zum Laden der Software-Daten beim Initialisieren
   useEffect(() => {
     apiFetch("/software") 
       .then(data => setSoftware(data))
@@ -35,6 +37,7 @@ export default function AdminSoftwareList() {
       .finally(() => setLoading(false));
   }, []);
 
+  // Ladeanzeige während der Datenabfrage
   if (loading) return (
     <div className="flex justify-center py-20">
       <div className="animate-spin rounded-2xl h-10 w-10 border-4 border-blue-600 border-t-transparent"></div>
@@ -43,7 +46,7 @@ export default function AdminSoftwareList() {
 
   return (
     <div className="space-y-8 pt-10">
-      {/* GRID - Kompakter für die Dashboard-Ansicht */}
+      {/* HEADER BEREICH */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {software.map(item => (
           <div key={item.id} className="bg-white/80 backdrop-blur-md border border-white rounded-[2.5rem] p-6 shadow-sm flex flex-col justify-between hover:shadow-xl hover:-translate-y-1 transition-all group">
@@ -59,7 +62,7 @@ export default function AdminSoftwareList() {
                 <span className="bg-slate-100 text-slate-500 text-[8px] font-black px-2 py-1 rounded-lg uppercase">ID {item.id}</span>
               </div>
 
-              {/* KOMPAKTE HERSTELLER BOX */}
+              {/* HERSTELLER & PREIS */}
               <div className="bg-slate-50/50 rounded-xl p-3 mb-4 border border-slate-100">
                  <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Brand</p>
                  <p className="text-sm font-bold text-slate-700">{item.hersteller?.name || "Standard"}</p>

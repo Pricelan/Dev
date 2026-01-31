@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { apiFetch } from "@/lib/api";
 
 // Hauptkomponente für die Admin-Login-Seite
 export default function AdminLogin() {
@@ -17,9 +18,8 @@ export default function AdminLogin() {
     setIsLoading(true);
     // API-Aufruf zum Login
     try {
-      const res = await fetch("http://localhost:8080/api/admin/auth/login", {
+      const res = await apiFetch("/admin/auth/login", {
         method: "POST",
-        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, passwort })
       });

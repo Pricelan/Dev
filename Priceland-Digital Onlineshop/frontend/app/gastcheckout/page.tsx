@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { getGastToken } from "@/lib/gastToken";
+import { apiFetch } from "@/lib/api";
 
+// Hauptkomponente für die Gast-Checkout-Seite
 export default function GastCheckoutPage() {
   const router = useRouter();
   const [form, setForm] = useState({
@@ -17,37 +19,42 @@ export default function GastCheckoutPage() {
     telefonnummer: ""
   });
 
+  // Zustand für die gewählte Zahlungsmethode
   const [zahlungsMethode, setZahlungsMethode] = useState("VORKASSE");
+  // Zustand für den Ladezustand
   const [loading, setLoading] = useState(false);
 
+  // Funktion zum Aktualisieren des Formularzustands
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
+  // Funktion zum Absenden der Bestellung
   async function submit() {
     try {
       setLoading(true);
       const token = getGastToken();
 
+      // Vorbereitung der Nutzlast für die API
       const payload = {
         gastToken: token,
         zahlungsMethode: zahlungsMethode,
         ...form 
       };
 
-      const res = await fetch("http://localhost:8080/api/checkout/checkout", {
+      // API-Aufruf zum Erstellen der Bestellung
+      const res = await apiFetch("/checkout/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include", 
         body: JSON.stringify(payload)
       });
-  
+      // Überprüfung der Antwort
       if (!res.ok) {
         const errorMsg = await res.text();
         alert("Fehler bei der Bestellung: " + errorMsg);
         return;
       }
-
+      // Erfolgreiche Bestellung - Weiterleitung zur Erfolgsseite
       const order = await res.json();
       localStorage.setItem("gastCheckout", JSON.stringify(form));
       router.push(`/checkout/erfolgreich?orderId=${order.id}`);

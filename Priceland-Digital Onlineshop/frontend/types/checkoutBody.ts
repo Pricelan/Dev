@@ -1,3 +1,4 @@
+// Typdefinition für den Checkout-Body
 export type CheckoutBody = {
     kundeId: number | null;
     gastToken: string;

@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { apiFetch } from "@/lib/api";
 
 // Hauptkomponente für die Registrierungsseite
 export default function RegisterPage() {
@@ -37,7 +38,7 @@ export default function RegisterPage() {
 
     // API-Aufruf zur Registrierung
     try {
-      const response = await fetch("http://localhost:8080/api/kunden/auth/register", {
+      const response = await apiFetch("/kunden/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

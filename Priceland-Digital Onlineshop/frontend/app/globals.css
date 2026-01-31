@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+/* Definition von CSS-Variablen für das Theme */
 @theme {
   
   --color-primary: #1f6bff;
@@ -17,12 +18,14 @@
   --spacing-page-width: 1200px;
 }
 
+/* Basis-Stile für das gesamte Projekt */
 @layer base {
   :root {
     --background: #ffffff;
     --foreground: #171717;
   }
 
+  /* Dunkelmodus-Unterstützung */
   @media (prefers-color-scheme: dark) {
     :root {
       --background: #0a0a0a;
@@ -30,6 +33,7 @@
     }
   }
 
+  /* Globale Stile für den Body */
   body {
     background-color: var(--background);
     color: var(--foreground);

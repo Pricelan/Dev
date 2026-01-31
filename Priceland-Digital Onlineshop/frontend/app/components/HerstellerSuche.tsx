@@ -2,14 +2,17 @@
 import React, { useEffect, useState } from "react";
 import { Hersteller } from '@/types/hersteller';
 import Link from 'next/link';
+import { apiFetch } from "@/lib/api";
 
+// Hauptkomponente für die Hersteller-Suche im Admin-Dashboard
 export default function HerstellerSuche() {
   const [hersteller, setHersteller] = useState<Hersteller[]>([]);
   const [suchbegriff, setSuchbegriff] = useState("");
   const [loading, setLoading] = useState(true);
 
+  // useEffect Hook zum Laden der Herstellerliste beim Initialisieren
   useEffect(() => {
-    fetch("http://localhost:8080/api/hersteller/all")
+    apiFetch("/hersteller/all")
       .then((res) => res.json())
       .then((data) => {
         setHersteller(data);
@@ -32,7 +35,7 @@ export default function HerstellerSuche() {
         <h3 className="font-bold text-gray-800 flex items-center gap-2">
           <span className="text-blue-600">🏢</span> Hersteller-Suche
         </h3>
-        {/* Link zur großen Verwaltungsseite */}
+        {/* Link zur Herstellerverwaltung */}
         <Link 
           href="/admin/herstellerverwaltung" 
           className="text-xs bg-gray-50 hover:bg-gray-100 text-gray-600 px-2 py-1 rounded-lg border transition-colors"

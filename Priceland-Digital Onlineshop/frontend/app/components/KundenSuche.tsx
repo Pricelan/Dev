@@ -4,14 +4,17 @@ import { apiFetch } from "@/lib/api";
 import Link from "next/link";
 import {Kunde} from "@/types/kunde";
 
+// Hauptkomponente für die Kunden-Suche im Admin-Dashboard
 export default function KundenSuche() {
   const [kunden, setKunden] = useState<Kunde[]>([]);
   const [suchbegriff, setSuchbegriff] = useState("");
 
+  // useEffect Hook zum Laden der Kundenliste beim Initialisieren
   useEffect(() => {
     apiFetch("/admin/kunden").then(setKunden).catch(console.error);
   }, []);
 
+  // Filtert die Kunden basierend auf der Eingabe
   const gefiltert = kunden.filter(k => 
     `${k.vorname} ${k.nachname}`.toLowerCase().includes(suchbegriff.toLowerCase()) ||
     k.email.toLowerCase().includes(suchbegriff.toLowerCase())

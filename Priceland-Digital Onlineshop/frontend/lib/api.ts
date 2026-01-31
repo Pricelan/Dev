@@ -12,15 +12,21 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
     });
 
     if (!res.ok) {
-        if (res.status === 401) {
-            // Bei 401 Unauthorized zur Admin-Login-Seite weiterleiten
-            window.location.href = "/admin/login";
-        }
+       if (res.status === 401) {
+        // Prüfen, ob der Nutzer gerade im Admin-Bereich unterwegs ist
+        const isAdminArea = window.location.pathname.startsWith("/admin");
+
+        if (isAdminArea) {
+        window.location.href = "/admin/login";
+    }   else {
+                window.location.href = "/login"; 
+    }
+}
         const errorText = await res.text();
         throw new Error(errorText || `Fehler: ${res.status}`);
     }
 
-    // Überprüfen, ob die Antwort JSON-Daten enthält
+    // Überprüfung, ob die Antwort JSON-Daten enthält
     const contentType = res.headers.get("content-type");
     if (contentType && contentType.includes("application/json")) {
         return res.json();

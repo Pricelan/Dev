@@ -1,14 +1,15 @@
 import { ReactNode, ButtonHTMLAttributes } from "react";
 
-// Definierte Varianten für den Button
+// Definition der möglichen Button-Varianten
 type ButtonVariant = "blue" | "red" | "green" | "purple" | "outline";
 
+// Props für die Button-Komponente
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
   variant?: ButtonVariant;
 }
 
-// Button-Komponente mit verschiedenen Stil-Varianten
+// Wiederverwendbare Button-Komponente mit Varianten
 export function Button({ children, variant = "blue", style, ...props }: ButtonProps) {
  
   type VariantStyle = { bg: string; color: string; border?: string };
@@ -20,7 +21,7 @@ export function Button({ children, variant = "blue", style, ...props }: ButtonPr
     outline: { bg: "transparent", color: "#64748b", border: "1px solid #e2e8f0" }
   };
 
-  // Auswahl der Stile basierend auf der Variante
+  // Auswahl des Stils basierend auf der Variante
   const selected = variants[variant];
 
   return (

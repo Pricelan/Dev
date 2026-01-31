@@ -4,25 +4,29 @@ import React, { useState } from "react";
 import Link from "next/link"; 
 import { Software } from "@/types/software";
 
+// Props für die SoftwareCard Komponente
 interface SoftwareCardProps {
   software: Software;
   onAddToCart: (id: string | number) => void;
 }
 
+// Hauptkomponente für die Software-Karte im Onlineshop
 export default function SoftwareCard({ software, onAddToCart }: SoftwareCardProps) {
   const [added, setAdded] = useState(false);
 
   if (!software) return null;
 
+  // Funktion zum Handhaben des Klicks auf den Warenkorb-Button
   const handleBtnClick = (e: React.MouseEvent) => {
     e.preventDefault();   
     e.stopPropagation();  
     
     console.log("Button geklickt für:", software.name);
     
+    // Software zum Warenkorb hinzufügen
     onAddToCart(software.id);
     setAdded(true);
-
+    // Rücksetzen des Zustands nach 2 Sekunden
     setTimeout(() => setAdded(false), 2000);
   };
 

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Hersteller } from "@/types/hersteller";  
+import { apiFetch } from "@/lib/api";
 
 
 // Hauptkomponente für das Formular zur Erstellung neuer Software
@@ -18,9 +19,7 @@ export default function NewSoftwareForm() {
 
   // useEffect Hook zum Laden der Herstellerliste beim Initialisieren
   useEffect(() => {
-    fetch("http://localhost:8080/api/hersteller/all", {
-      credentials: "include"
-    })
+    apiFetch("/hersteller/all")
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) setHerstellerListe(data);
@@ -46,9 +45,8 @@ export default function NewSoftwareForm() {
     };
     // API-Aufruf zum Erstellen der neuen Software
     try {
-      const res = await fetch("http://localhost:8080/api/admin/software", {
+      const res = await apiFetch("/admin/software", {
         method: "POST",
-        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });

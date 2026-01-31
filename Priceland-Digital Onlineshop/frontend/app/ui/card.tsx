@@ -1,10 +1,12 @@
 import { ReactNode } from "react";
 
+// Props für die Card-Komponente
 interface CardProps {
   children: ReactNode;
   className?: string; 
 }
 
+// Wiederverwendbare Card-Komponente für konsistentes Styling
 export function Card({ children, className = "" }: CardProps) {
   return (
     <div 

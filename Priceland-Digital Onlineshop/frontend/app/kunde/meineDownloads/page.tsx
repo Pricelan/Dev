@@ -1,25 +1,18 @@
 "use client";
 import {useEffect, useState} from "react";
-
-type Download = {
-  id: number;
-  lizenzKey: string;
-  downloadLink: string; 
-  gekauftAm: string;
-  software: {
-    name: string;
-    version: string;
-  };
-};
+import { Download } from "@/types/download";
+import { apiFetch } from "@/lib/api";
 
 
-
+// Hauptkomponente für die Seite "Meine Downloads"
 export default function MeineLizenzen() {
+  // Zustand für die Liste der Downloads
   const [downloads, setDownloads] = useState<Download[]>([]);
 
+  // useEffect Hook zum Laden der Downloads beim Initialisieren
   useEffect(() => {
-    fetch("http://localhost:8080/api/lizenzen/meine-lizenzen", {
-      credentials: "include",
+    apiFetch("/lizenzen/meine-lizenzen", {
+      method: "GET",
     })
       .then(r => r.json())
       .then(setDownloads);

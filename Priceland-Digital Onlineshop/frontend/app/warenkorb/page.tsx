@@ -7,12 +7,16 @@ import { CheckoutBody } from "@/types/checkoutBody";
 import { useRouter } from "next/navigation";
 import { useKunde } from "@/context/kundeContext";
 import Link from "next/link";
+import { apiFetch } from "@/lib/api";
 
+// Hauptkomponente für die Warenkorb-Seite
 export default function WarenkorbPage() {
   const { kunde, loading: kundeLoading } = useKunde();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+  // Zustand für die ausgewählte Zahlungsmethode
   const [zahlungsMethode, setZahlungsMethode] = useState("PAYPAL");
+  // Zustand für den Warenkorb
   const [warenkorb, setWarenkorb] = useState<Warenkorb>({
     warenkorbId: 0,
     gesamtmenge: 0,
@@ -20,16 +24,18 @@ export default function WarenkorbPage() {
     positionen: []
   });
 
+  // Gesamtpreis des Warenkorbs
   const gesamtpreis = warenkorb?.gesamtpreis ?? 0;
-  // Hilfsvariable für die Prüfung auf kostenlose Software
+  // Prüfen, ob der Gesamtpreis null ist
   const istKostenlos = gesamtpreis === 0;
 
+  // Funktion zum Laden des Warenkorbs
   const fetchWarenkorb = () => {
     const token = getGastToken();
-    fetch(`http://localhost:8080/api/warenkorb?gastToken=${token}`)
+    apiFetch(`/warenkorb?gastToken=${token}`)
       .then(res => {
-        if (!res.ok) throw new Error("Nicht gefunden");
-        return res.json();
+        if (!res) throw new Error("Nicht gefunden");
+        return res;
       })
       .then(data => {
         setWarenkorb(data);
@@ -41,30 +47,33 @@ export default function WarenkorbPage() {
       });
   };
 
+  // useEffect Hook zum Laden des Warenkorbs beim Initialisieren
   useEffect(() => {
     fetchWarenkorb();
   }, []);
 
+  // Funktion zum Entfernen einer Position aus dem Warenkorb
   function removePosition(positionId: number) {
     const token = getGastToken();
-    fetch(`http://localhost:8080/api/warenkorb/position/${positionId}?gastToken=${token}`, {
+    apiFetch(`/warenkorb/position/${positionId}?gastToken=${token}`, {
       method: "DELETE",
     })
     .then(() => fetchWarenkorb());
   }
 
+  // Funktion zum Checkout-Prozess
   async function checkout() {
     const token = getGastToken();
     let body: CheckoutBody;
-
+    // Vorbereitung der Checkout-Daten basierend auf Kunde oder Gast
     if (kunde) {
       body = { 
         kundeId: kunde.id, 
         gastToken: token,
-        // Wenn kostenlos, schicken wir einen neutralen Wert mit
-        zahlungsMethode: istKostenlos ? "VORKASSE" : zahlungsMethode 
+        zahlungsMethode: zahlungsMethode
       };
     } else {
+      // Gast-Checkout
       const gastData = JSON.parse(localStorage.getItem("gastCheckout") || "{}");
       body = {
         kundeId: null,
@@ -74,10 +83,9 @@ export default function WarenkorbPage() {
     }
 
     try {
-      const res = await fetch("http://localhost:8080/api/checkout/checkout", {
+      const res = await apiFetch("/checkout/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include", 
         body: JSON.stringify(body),
       });
 
@@ -86,7 +94,7 @@ export default function WarenkorbPage() {
         alert("Checkout fehlgeschlagen: " + text);
         return;
       }
-
+      // Erfolgreicher Checkout
       const bestellung = await res.json();
       router.push("/checkout/erfolgreich?orderId=" + bestellung.id);
     } catch (err) {
@@ -94,7 +102,7 @@ export default function WarenkorbPage() {
       alert("Backend nicht erreichbar");
     }
   }
-
+  // Ladeanzeige während des Ladens
   if (loading || kundeLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -102,7 +110,7 @@ export default function WarenkorbPage() {
       </div>
     );
   }
-
+  // Anzeige, wenn der Warenkorb leer ist
   if (!warenkorb || warenkorb.positionen.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6 text-center">
@@ -153,7 +161,7 @@ export default function WarenkorbPage() {
             <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xl sticky top-6">
               <h2 className="text-lg font-bold text-slate-900 mb-6 border-b pb-4">Bestellübersicht</h2>
               
-              {/* ZAHLUNGSMETHODE NUR ANZEIGEN WENN PREIS > 0 */}
+              {/*/ Zahlungsoptionen nur anzeigen, wenn nicht kostenlos  */}
               {!istKostenlos && kunde && (
                 <div className="mb-6 animate-in fade-in duration-500">
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Bezahlmethode</label>

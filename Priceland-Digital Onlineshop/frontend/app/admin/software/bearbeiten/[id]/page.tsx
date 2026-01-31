@@ -47,11 +47,10 @@ export default function EditSoftware({ params }: { params: Promise<{ id: string 
     };
 
     // API-Aufruf zum Aktualisieren der Software-Daten
-    const res = await fetch(`http://localhost:8080/api/admin/software/details/${id}`, {
+    const res = await apiFetch(`/admin/software/details/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updateData),
-      credentials: "include"
+      body: JSON.stringify(updateData)
     });
 
     if (res.ok) {

@@ -6,15 +6,18 @@ import { Software } from "@/types/software";
 import { useWarenkorb } from "@/context/warenkorbContext";
 import SoftwareCard from "@/app/components/SoftwareCard";
 import Link from "next/link";
+import { apiFetch } from "@/lib/api";
 
+// Hauptkomponente für die Kostenlose-Software-Seite
 export default function SoftwareFreePage() {
   const [software, setSoftware] = useState<Software[]>([]);
   const [loading, setLoading] = useState(true); 
   const { refresh } = useWarenkorb();
 
+  // useEffect Hook zum Laden der kostenlosen Software-Daten beim Initialisieren
   useEffect(() => {
     setLoading(true);
-    fetch("http://localhost:8080/api/software")
+    apiFetch("/software")
       .then((res) => res.json())
       .then((data) => {
         const dataArray = Array.isArray(data) ? data : (data.content || []);
@@ -25,14 +28,14 @@ export default function SoftwareFreePage() {
       .finally(() => setLoading(false));
   }, []);
 
+  // Funktion zum Hinzufügen der Software zum Warenkorb
   async function addToCart(softwareId: string | number) {
     const token = getGastToken();
     const idNum = typeof softwareId === "string" ? parseInt(softwareId, 10) : softwareId;
 
     try {
-      const res = await fetch("http://localhost:8080/api/warenkorb/add", {
+      const res = await apiFetch("/warenkorb/add", {
         method: "POST",
-        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ softwareId: idNum, menge: 1, gastToken: token }),
       });
@@ -46,7 +49,7 @@ export default function SoftwareFreePage() {
 
   return (
     <div className="min-h-screen bg-[#f8fafc] relative overflow-hidden">
-      {/* Subtile Farbakzente für den Gratis-Bereich */}
+      
       <div className="absolute top-0 right-1/4 w-96 h-96 bg-emerald-100/30 rounded-full blur-[120px] -z-10" />
       <div className="absolute bottom-10 left-10 w-64 h-64 bg-blue-100/20 rounded-full blur-[100px] -z-10" />
 
