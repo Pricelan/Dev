@@ -20,7 +20,6 @@ export default function SoftwareDetailPage() {
     if (!id) return;
     setLoading(true);
     apiFetch(`/software/${id}`)
-      .then((res) => res.json())
       .then((data) => setSoftware(data))
       .catch((err) => console.error("Fehler:", err))
       .finally(() => setLoading(false));

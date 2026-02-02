@@ -15,35 +15,46 @@ export default function GameShopPage() {
   const { refresh } = useWarenkorb();
 
   // useEffect Hook zum Laden der Spiele-Daten beim Initialisieren
-  useEffect(() => {
-    setLoading(true);
-    apiFetch("/software")
-      .then((res) => res.json())
-      .then((data) => {
-        const dataArray = Array.isArray(data) ? data : (data.content || []);
-        const filtered = dataArray.filter((s: Software) => s.kategorie === "COMPUTER_SPIELE");
-        setSoftware(filtered);
-      })
-      .catch((err) => console.error(err))
-      .finally(() => setLoading(false));
-  }, []);
+useEffect(() => {
+  apiFetch("/software")
+    .then((data) => {
+      const dataArray = Array.isArray(data) ? data : (data?.content || []);
+      const filtered = dataArray.filter((s: Software) => s.kategorie === "COMPUTER_SPIELE");
+      setSoftware(filtered);
+    })
+    .catch((err) => console.error("Fehler beim Laden der Software:", err))
+    .finally(() => setLoading(false));
+}, []);
 
   // Funktion zum Hinzufügen der Software zum Warenkorb
-  async function addToCart(softwareId: string | number) {
+ async function addToCart(softwareId: string | number) {
     const token = getGastToken();
     const idNum = typeof softwareId === "string" ? parseInt(softwareId, 10) : softwareId;
-    // API-Aufruf zum Hinzufügen der Software zum Warenkorb
+
     try {
-      const res = await apiFetch("/warenkorb/add", {
+      // API-Aufruf zum Hinzufügen der Software zum Warenkorb
+      await apiFetch("/warenkorb/add", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ softwareId: idNum, menge: 1, gastToken: token }),
+        body: JSON.stringify({ 
+          softwareId: idNum, 
+          menge: 1, 
+          gastToken: token 
+        }),
       });
-      if (!res.ok) throw new Error();
+
+      // Warenkorb-Kontext aktualisieren
       await refresh();
-      alert("In den Warenkorb gelegt!");
-    } catch {
-      alert("Fehler beim Hinzufügen");
+      alert("Erfolgreich in den Warenkorb gelegt!");
+      
+    } catch (err: unknown) {
+      console.error("Warenkorb-Fehler:", err);
+      // Fehlerbehandlung
+      if (err instanceof Error) {
+        alert(err.message || "Fehler beim Hinzufügen");
+      } else {
+        alert("Fehler beim Hinzufügen");
+      }
     }
   }
 

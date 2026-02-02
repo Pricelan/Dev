@@ -42,19 +42,26 @@ public class BestellController {
     // Neue Bestellung erstellen
     @PostMapping
     public BestellAntwort erstelleBestellung(
-            @RequestBody BestellAnfrage request,
-            HttpSession session
+        @RequestBody BestellAnfrage request,
+        HttpSession session
     ) {
-        requireAdmin(session);
+    requireAdmin(session);
 
-        Bestellung bestellung = bestellService.erstelleBestellung(
-                request.getKundeId(),
-                request.getPositionen()
+    // Validierung: Mindestens eine Position in der Bestellung
+    if (request.getPositionen() == null || request.getPositionen().isEmpty()) {
+        throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST, 
+            "Die Bestellung darf nicht leer sein!"
         );
-
-        return BestellMapper.toAntwort(bestellung);
     }
 
+    Bestellung bestellung = bestellService.erstelleBestellung(
+            request.getKundeId(),
+            request.getPositionen()
+    );
+
+    return BestellMapper.toAntwort(bestellung);
+}
     // Alle Bestellungen abrufen (Admin)
    @GetMapping
     public List<BestellAntwort> getAll(HttpSession session) { 
@@ -133,6 +140,5 @@ public class BestellController {
         return bestellService.berechneGesamtUmsatz();
 
 }
-}
 
-
+}    

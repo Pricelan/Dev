@@ -88,14 +88,14 @@ return (
 // RootLayout-Komponente für das gesamte Projekt
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="de" className="scroll-smooth">
+    <html lang="de" className="scroll-smooth" data-scroll-behavior="smooth">
       <body className="bg-slate-50 text-gray-900 selection:bg-blue-100 selection:text-blue-700 antialiased">
         <KundeProvider>
           <WarenkorbProvider>
             <div className="flex flex-col min-h-screen">
               <Header />
               
-              {/*Hauptbereich */}
+              {/* Hauptbereich */}
               <main className="grow">
                 {children}
               </main>

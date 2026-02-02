@@ -13,8 +13,7 @@ export default function HerstellerSuche() {
   // useEffect Hook zum Laden der Herstellerliste beim Initialisieren
   useEffect(() => {
     apiFetch("/hersteller/all")
-      .then((res) => res.json())
-      .then((data) => {
+        .then((data) => {
         setHersteller(data);
         setLoading(false);
       })

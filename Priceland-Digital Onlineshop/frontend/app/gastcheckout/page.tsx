@@ -30,41 +30,41 @@ export default function GastCheckoutPage() {
   }
 
   // Funktion zum Absenden der Bestellung
-  async function submit() {
-    try {
-      setLoading(true);
-      const token = getGastToken();
+async function submit() {
+  try {
+    setLoading(true);
+    const token = getGastToken();
 
-      // Vorbereitung der Nutzlast für die API
-      const payload = {
-        gastToken: token,
-        zahlungsMethode: zahlungsMethode,
-        ...form 
-      };
+    const payload = {
+      gastToken: token,
+      zahlungsMethode: zahlungsMethode,
+      ...form 
+    };
 
-      // API-Aufruf zum Erstellen der Bestellung
-      const res = await apiFetch("/checkout/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-      // Überprüfung der Antwort
-      if (!res.ok) {
-        const errorMsg = await res.text();
-        alert("Fehler bei der Bestellung: " + errorMsg);
-        return;
-      }
-      // Erfolgreiche Bestellung - Weiterleitung zur Erfolgsseite
-      const order = await res.json();
-      localStorage.setItem("gastCheckout", JSON.stringify(form));
-      router.push(`/checkout/erfolgreich?orderId=${order.id}`);
-    } catch (err) {
-      console.error(err);
-      alert("Netzwerkfehler.");
-    } finally {
-      setLoading(false);
+    // API-Aufruf zum Erstellen der Bestellung
+    const order = await apiFetch("/checkout/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    // Bestellung erfolgreich, weiterleiten zur Erfolgsseite
+    localStorage.setItem("gastCheckout", JSON.stringify(form));
+    router.push(`/checkout/erfolgreich?orderId=${order.id}`);
+
+  } catch (err) {
+    // Fehlerbehandlung
+    console.error(err);
+    // Anzeige einer Fehlermeldung
+    if (err && typeof err === "object" && "message" in err) {
+      alert((err as { message?: string }).message || "Fehler bei der Bestellung.");
+    } else {
+      alert("Fehler bei der Bestellung.");
     }
+  } finally {
+    setLoading(false);
   }
+}
 
   return (
     <div className="max-w-xl mx-auto p-6 bg-white shadow-lg rounded-2xl my-10">

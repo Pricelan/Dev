@@ -31,21 +31,27 @@ export default function WarenkorbPage() {
 
   // Funktion zum Laden des Warenkorbs
   const fetchWarenkorb = () => {
-    const token = getGastToken();
-    apiFetch(`/warenkorb?gastToken=${token}`)
-      .then(res => {
-        if (!res) throw new Error("Nicht gefunden");
-        return res;
-      })
-      .then(data => {
+  const token = getGastToken();
+  
+  // apiFetch liefert direkt die Daten (Warenkorb-Objekt)
+  apiFetch(`/warenkorb?gastToken=${token}`)
+    .then(data => {
+      // Wenn kein Warenkorb vorhanden ist, einen leeren setzen
+      if (!data) {
+        setWarenkorb({ warenkorbId: 0, gesamtmenge: 0, gesamtpreis: 0, positionen: [] }); 
+      } else {
         setWarenkorb(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error("Fehler beim Laden:", err);
-        setLoading(false);
-      });
-  };
+      }
+    })
+    .catch(err => {
+      console.error("Fehler beim Laden des Warenkorbs:", err);
+      // Bei Fehlern ebenfalls einen leeren Warenkorb setzen
+      setWarenkorb({ warenkorbId: 0, gesamtmenge: 0, gesamtpreis: 0, positionen: [] });
+    })
+    .finally(() => {
+      setLoading(false);
+    });
+};
 
   // useEffect Hook zum Laden des Warenkorbs beim Initialisieren
   useEffect(() => {
@@ -61,11 +67,24 @@ export default function WarenkorbPage() {
     .then(() => fetchWarenkorb());
   }
 
-  // Funktion zum Checkout-Prozess
+  // Zustand, um Mehrfacheinreichungen zu verhindern
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Checkout-Funktion zum Abschließen der Bestellung
   async function checkout() {
+    // PRÜFUNG: Sicherstellen, dass der Warenkorb nicht leer ist
+    if (!warenkorb || warenkorb.positionen.length === 0) {
+      alert("Dein Warenkorb ist leer!");
+      return;
+    }
+
+    // SPERRE: Wenn bereits eine Einreichung läuft, sofort abbrechen
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
     const token = getGastToken();
     let body: CheckoutBody;
-    // Vorbereitung der Checkout-Daten basierend auf Kunde oder Gast
+
     if (kunde) {
       body = { 
         kundeId: kunde.id, 
@@ -73,7 +92,6 @@ export default function WarenkorbPage() {
         zahlungsMethode: zahlungsMethode
       };
     } else {
-      // Gast-Checkout
       const gastData = JSON.parse(localStorage.getItem("gastCheckout") || "{}");
       body = {
         kundeId: null,
@@ -83,26 +101,29 @@ export default function WarenkorbPage() {
     }
 
     try {
-      const res = await apiFetch("/checkout/checkout", {
+      // API-Aufruf zum Erstellen der Bestellung
+      const bestellung = await apiFetch("/checkout/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
 
-      if (!res.ok) {
-        const text = await res.text();
-        alert("Checkout fehlgeschlagen: " + text);
-        return;
-      }
-      // Erfolgreicher Checkout
-      const bestellung = await res.json();
+      // Bestellung erfolgreich, weiterleiten zur Erfolgsseite
       router.push("/checkout/erfolgreich?orderId=" + bestellung.id);
-    } catch (err) {
-      console.error(err);
-      alert("Backend nicht erreichbar");
+      
+    } catch (err: unknown) {
+      console.error("Checkout-Fehler:", err);
+      // Fehlerbehandlung
+      if (err instanceof Error) {
+        alert(err.message || "Checkout fehlgeschlagen. Bitte versuche es erneut.");
+      } else {
+        alert("Checkout fehlgeschlagen. Bitte versuche es erneut.");
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   }
-  // Ladeanzeige während des Ladens
+  // Anzeige eines Ladezustands, wenn der Warenkorb oder Kundendaten noch geladen werden
   if (loading || kundeLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">

@@ -4,7 +4,6 @@ import { apiFetch } from "@/lib/api";
 import { Warenkorb, WarenkorbItem } from "@/types/warenkorb";
 import { createContext, useContext, useEffect, useState } from "react";
 
-// Definition des Warenkorb-Kontexts
 type WarenkorbContextType = {
   warenkorb: Warenkorb | null;
   items: WarenkorbItem[];
@@ -13,13 +12,10 @@ type WarenkorbContextType = {
   refresh: () => Promise<void>;
 };
 
-// Erstellung des Warenkorb-Kontexts
 const WarenkorbContext = createContext<WarenkorbContextType | null>(null);
 
-// Funktion zum Abrufen oder Erstellen eines Gast-Tokens
 function getOrCreateGastToken(): string {
   if (typeof window === "undefined") return "";
-  
   let token = localStorage.getItem("gastToken");
   if (!token) {
     token = crypto.randomUUID();
@@ -28,34 +24,37 @@ function getOrCreateGastToken(): string {
   return token;
 }
 
-// Warenkorb-Provider-Komponente
 export function WarenkorbProvider({ children }: { children: React.ReactNode }) {
   const [warenkorb, setWarenkorb] = useState<Warenkorb | null>(null);
-  // Funktion zum Aktualisieren des Warenkorbs
+
   const refresh = async () => {
     const gastToken = getOrCreateGastToken();
-    // API-Aufruf zum Abrufen des Warenkorbs
-    const res = await apiFetch(
-      `/warenkorb?gastToken=${gastToken}`
-    );
+    
+    try {
+      // apiFetch gibt direkt die Daten zurück (oder null bei 401/Gast)
+      const data = await apiFetch(`/warenkorb?gastToken=${gastToken}`);
 
-    if (!res.ok) {
-      console.error("Warenkorb konnte nicht geladen werden", res.status);
+      if (!data) {
+        // Wenn data null ist, setzen wir den State auf null (Gast-Modus)
+        setWarenkorb(null);
+        return;
+      }
+
+      setWarenkorb(data);
+    } catch (error) {
+      console.error("Warenkorb konnte nicht geladen werden", error);
       setWarenkorb(null);
-      return;
     }
-
-    setWarenkorb(res);
   };
 
-  // useEffect Hook zum Laden des Warenkorbs beim Initialisieren
   useEffect(() => {
-    (async () => {
+    // Avoid calling setState synchronously in effect
+    const fetchWarenkorb = async () => {
       await refresh();
-    })();
+    };
+    fetchWarenkorb();
   }, []);
 
-  // Berechnung der Gesamtmenge und des Gesamtpreises
   const items = warenkorb?.positionen ?? [];
   const gesamtMenge = items.reduce((sum, p) => sum + p.menge, 0);
   const gesamtPreis = items.reduce(
@@ -63,29 +62,17 @@ export function WarenkorbProvider({ children }: { children: React.ReactNode }) {
     0
   );
 
-
- 
-  // Rückgabe des Warenkorb-Kontexts mit den bereitgestellten Werten
   return (
     <WarenkorbContext.Provider
-      value={{
-        warenkorb,
-        items,
-        gesamtMenge,
-        gesamtPreis,
-        refresh,
-      }}
+      value={{ warenkorb, items, gesamtMenge, gesamtPreis, refresh }}
     >
       {children}
     </WarenkorbContext.Provider>
   );
 }
 
-
 export function useWarenkorb() {
   const ctx = useContext(WarenkorbContext);
-  if (!ctx) {
-    throw new Error("useWarenkorb must be used inside WarenkorbProvider");
-  }
+  if (!ctx) throw new Error("useWarenkorb must be used inside WarenkorbProvider");
   return ctx;
 }

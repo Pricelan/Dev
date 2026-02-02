@@ -38,7 +38,8 @@ export default function RegisterPage() {
 
     // API-Aufruf zur Registrierung
     try {
-      const response = await apiFetch("/kunden/auth/register", {
+      // API-Aufruf zur Registrierung
+      await apiFetch("/kunden/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -54,17 +55,20 @@ export default function RegisterPage() {
         }),
       });
 
+      alert("Registrierung erfolgreich!");
+      window.location.href = "/kunde/login";
+
       // Antwort prüfen
-      if (response.ok) {
-        alert("Registrierung erfolgreich!");
-        window.location.href = "/kunde/login";
+     } catch (error) {
+      // Fehlerbehandlung
+      console.error("Registrierungsfehler:", error);
+      
+      if (error instanceof Error) {
+        // Anzeige einer Fehlermeldung
+        alert("Fehler: " + error.message);
       } else {
-        const errorData = await response.json();
-        alert("Fehler: " + (errorData.message || "Registrierung fehlgeschlagen"));
+        alert("Server nicht erreichbar oder unbekannter Fehler.");
       }
-    } catch (error) {
-      console.error("Netzwerkfehler:", error);
-      alert("Server nicht erreichbar.");
     }
   };
 

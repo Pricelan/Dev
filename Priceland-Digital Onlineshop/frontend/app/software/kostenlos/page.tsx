@@ -16,10 +16,8 @@ export default function SoftwareFreePage() {
 
   // useEffect Hook zum Laden der kostenlosen Software-Daten beim Initialisieren
   useEffect(() => {
-    setLoading(true);
     apiFetch("/software")
-      .then((res) => res.json())
-      .then((data) => {
+        .then((data) => {
         const dataArray = Array.isArray(data) ? data : (data.content || []);
         const filtered = dataArray.filter((s: Software) => s.kategorie === "KOSTENLOSE_SOFTWARE");
         setSoftware(filtered);
@@ -33,17 +31,31 @@ export default function SoftwareFreePage() {
     const token = getGastToken();
     const idNum = typeof softwareId === "string" ? parseInt(softwareId, 10) : softwareId;
 
+    
     try {
-      const res = await apiFetch("/warenkorb/add", {
+      // API-Aufruf zum Hinzufügen der Software zum Warenkorb
+        await apiFetch("/warenkorb/add", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ softwareId: idNum, menge: 1, gastToken: token }),
+        body: JSON.stringify({ 
+          softwareId: idNum, 
+          menge: 1, 
+          gastToken: token 
+        }),
       });
-      if (!res.ok) throw new Error();
+
+      // Warenkorb-Kontext aktualisieren
       await refresh();
       alert("In den Warenkorb gelegt!");
-    } catch {
-      alert("Fehler beim Hinzufügen");
+      
+    } catch (err: unknown) {
+      console.error("Warenkorb-Fehler:", err);
+      // Fehlerbehandlung
+      if (err instanceof Error) {
+        alert(err.message || "Fehler beim Hinzufügen");
+      } else {
+        alert("Fehler beim Hinzufügen");
+      }
     }
   }
 

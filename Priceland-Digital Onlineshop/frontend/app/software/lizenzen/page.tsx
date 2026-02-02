@@ -16,10 +16,8 @@ export default function SoftwareShopPage() {
 
   // useEffect Hook zum Laden der lizenzierten Software-Daten beim Initialisieren
   useEffect(() => {
-    setLoading(true);
     apiFetch("/software")
-      .then((res) => res.json())
-      .then((data) => {
+        .then((data) => {
         const dataArray = Array.isArray(data) ? data : (data.content || []);
         const filtered = dataArray.filter((s: Software) => s.kategorie === "LIZENZIERTE_SOFTWARE");
         setSoftware(filtered);
@@ -32,17 +30,27 @@ export default function SoftwareShopPage() {
   async function addToCart(id: string | number) {
     const softwareId = typeof id === "string" ? parseInt(id, 10) : id;
     const token = getGastToken();
+    
     try {
-      const res = await apiFetch("/warenkorb/add", {
+      // API-Aufruf zum Hinzufügen der Software zum Warenkorb
+      await apiFetch("/warenkorb/add", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ softwareId, menge: 1, gastToken: token }),
       });
-      if (!res.ok) throw new Error();
+
+      // Warenkorb-Kontext aktualisieren
       await refresh();
       alert("In den Warenkorb gelegt!");
-    } catch {
-      alert("Fehler beim Hinzufügen");
+      
+    } catch (err: unknown) {
+      console.error("Warenkorb-Fehler:", err);
+      // Fehlerbehandlung
+      if (err && typeof err === "object" && "message" in err) {
+        alert((err as { message?: string }).message || "Fehler beim Hinzufügen");
+      } else {
+        alert("Fehler beim Hinzufügen");
+      }
     }
   }
 

@@ -75,13 +75,17 @@ public class KundenAuthController {
     public ResponseEntity<Kunde> me(HttpSession session) {
         Long id = (Long) session.getAttribute("kunde_id");
         
+        // Keine ID im Session-Attribut bedeutet, dass der Kunde nicht eingeloggt ist.
+        // In diesem Fall senden wir null zurück.
         if (id == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.ok(null); 
         }
         
+        // Ansonsten suchen wir den Kunden in der DB und senden ihn zurück.
+        // Wenn der Kunde nicht gefunden wird, senden wir ebenfalls null zurück.
         return kundenRepository.findById(id)
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+                .orElse(ResponseEntity.ok(null));
     }
 
     // Kunde ausloggen

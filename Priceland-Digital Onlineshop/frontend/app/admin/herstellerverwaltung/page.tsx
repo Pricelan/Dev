@@ -21,12 +21,15 @@ export default function HerstellerManagementSeite() {
   const fetchHersteller = async () => {
     setLoading(true);
     try {
-      const res = await apiFetch(`/hersteller/all`);
-      if (!res.ok) throw new Error("Fehler beim Laden");
-      const data = await res.json();
-      setHersteller(data);
+      // apiFetch liefert direkt die Daten (das Array)
+      const data = await apiFetch(`/hersteller/all`);
+      
+      // Kein .ok und kein .json() mehr nötig!
+      setHersteller(data); 
     } catch (err) {
+      // Wenn apiFetch einen Fehler wirft (z.B. 404), landet er hier
       console.error("Fetch-Fehler:", err);
+      alert("Hersteller konnten nicht geladen werden.");
     } finally {
       setLoading(false);
     }
@@ -39,42 +42,48 @@ export default function HerstellerManagementSeite() {
 
   // Funktion zum Erstellen eines neuen Herstellers
   const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    try {
-      const res = await apiFetch(`/hersteller`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-      // Überprüfung der Antwort
-      if (res.ok) {
-        setFormData({ name: "", email: "", webseite: "", adresse: "" });
-        await fetchHersteller();
-      } else {
-        const errorData = await res.json();
-        alert("Fehler: " + (errorData.message || "Unbekannter Fehler"));
-      }
-    } catch {
-      alert("Netzwerkfehler.");
-    } finally {
-      setIsSubmitting(false);
+  e.preventDefault();
+  setIsSubmitting(true);
+  try {
+    // apiFetch wirft Fehler bei nicht-ok Status
+    await apiFetch(`/hersteller`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    });
+
+    // Wenn wir hier ankommen, war die Erstellung erfolgreich
+    setFormData({ name: "", email: "", webseite: "", adresse: "" });
+    await fetchHersteller();
+  } catch (err: unknown) {
+    // Fehlerbehandlung
+    if (err instanceof Error) {
+      alert("Fehler: " + (err.message || "Unbekannter Fehler"));
+    } else {
+      alert("Fehler: Unbekannter Fehler");
     }
-  };
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   // Funktion zum Löschen eines Herstellers
   const handleDelete = async (id: number) => {
-    if (!confirm("Möchtest du diesen Partner wirklich löschen?")) return;
-    try {
-      const res = await apiFetch(`/hersteller/${id}`, {
-        method: "DELETE",
-        });
-      if (res.ok) fetchHersteller();
-      else alert("Löschen fehlgeschlagen (evtl. noch Software verknüpft).");
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  if (!confirm("Möchtest du diesen Partner wirklich löschen?")) return;
+  try {
+    // apiFetch wirft Fehler bei nicht-ok Status
+    await apiFetch(`/hersteller/${id}`, {
+      method: "DELETE",
+    });
+
+    // Wenn wir hier ankommen, war das Löschen erfolgreich
+    fetchHersteller();
+  } catch (err: unknown) {
+    // Fehlerbehandlung
+    console.error(err);
+    alert("Löschen fehlgeschlagen (evtl. noch Software verknüpft).");
+  }
+};
 
   return (
     <div className="min-h-screen py-12 px-4 space-y-8">

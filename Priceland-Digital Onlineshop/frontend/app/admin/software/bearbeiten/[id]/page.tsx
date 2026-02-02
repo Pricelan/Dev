@@ -22,7 +22,7 @@ export default function EditSoftware({ params }: { params: Promise<{ id: string 
       .then(data => {
         setName(data.name || "");
         setVersion(data.version || "");
-        setPreis(data.preis || "");
+        setPreis(data.preis?.toString() || "");
         setBeschreibung(data.softwareBeschreibung || "");
         setDownloadLink(data.downloadLink || "");
         setLoading(false);
@@ -39,6 +39,7 @@ export default function EditSoftware({ params }: { params: Promise<{ id: string 
 
     // Vorbereitung der Daten für das Update
     const updateData = {
+      id: Number(id),
       name,
       version,
       preis: Number(preis),
@@ -46,20 +47,25 @@ export default function EditSoftware({ params }: { params: Promise<{ id: string 
       downloadLink
     };
 
-    // API-Aufruf zum Aktualisieren der Software-Daten
-    const res = await apiFetch(`/admin/software/details/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updateData)
-    });
+   try {
+      // API-Aufruf zum Aktualisieren der Software
+      await apiFetch(`/admin/software/details/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updateData)
+      });
 
-    if (res.ok) {
+      // Erfolgsmeldung und Weiterleitung zur Software-Übersicht
+      alert("Software erfolgreich aktualisiert!");
       window.location.href = "/admin/software";
-    } else {
-      const errorText = await res.text();
-      alert("Fehler beim Speichern: " + errorText);
+
+    } catch (err: unknown) {
+      // Fehlerbehandlung
+      console.error("Fehler beim Speichern:", err);
+      alert("Fehler beim Speichern: " + ((err instanceof Error && err.message) || "Unbekannter Fehler"));
     }
   };
+
   // Anzeige eines Ladezustands, solange die Daten geladen werden
   if (loading) return (
     <div className="flex flex-col items-center justify-center py-24">

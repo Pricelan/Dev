@@ -1,68 +1,57 @@
 "use client";
 
-import { createContext, ReactNode, useState, useContext, useEffect } from "react";
+import { createContext, ReactNode, useState, useContext, useEffect, useCallback } from "react";
 import { Kunde } from "@/types/kunde";
 import { apiFetch } from "@/lib/api";
 
-// Definition des Typs für den Kunden-Kontext
+// Definieren des Typs für den Kunde-Kontext
 type KundeContextType = {
   kunde: Kunde | null;
   setKunde: React.Dispatch<React.SetStateAction<Kunde | null>>;
   logout: () => void;
-  loading: boolean; 
+  loading: boolean;
 };
 
-// Erstellung des Kunden-Kontexts
+// Erstellen des Kunde-Kontexts
 export const KundeContext = createContext<KundeContextType | undefined>(undefined);
 
-// Kunden-Provider-Komponente zur Bereitstellung des Kunden-Kontexts
+// Anbieter-Komponente für den Kunde-Kontext
 export function KundeProvider({ children }: { children: ReactNode }) {
   const [kunde, setKunde] = useState<Kunde | null>(null);
+  
+  // Ladezustand für die Authentifizierung
   const [loading, setLoading] = useState(true);
 
-// Überprüfung des angemeldeten Kunden beim Laden der Komponente
-useEffect(() => {
-  const checkUser = async () => {
-   // Admin-Bereich überspringen
-    if (window.location.pathname.startsWith('/admin')) {
-      setLoading(false);
-      return;
-    }
-    
+  const checkUser = useCallback(async () => {
+    // Überprüfen, ob der Benutzer eingeloggt ist
     try {
-      const res = await apiFetch("/kunden/auth/me");
-        if (res.ok) {
-        setKunde(res);
-      } else {
-        setKunde(null);
-      }
+      const data = await apiFetch("/kunden/auth/me");
+      setKunde(data || null);
     } catch {
       setKunde(null);
     } finally {
       setLoading(false);
     }
-  };
-  checkUser();
-}, []);
+  }, []);
 
-  // Funktion zum Ausloggen des Kunden
+  // useEffect Hook zum Überprüfen des Benutzers beim Initialisieren
+  useEffect(() => {
+    checkUser();
+  }, [checkUser]);
+
+  // Funktion zum Ausloggen des Benutzers
   const logout = async () => {
     try {
-      // Anfrage an das Backend zum Ausloggen
-      await apiFetch("/auth/logout", {
-        method: "POST" 
-      });
+      await apiFetch("/auth/logout", { method: "POST" });
     } catch (err) {
       console.error("Logout fehlgeschlagen", err);
     } finally {
-      // Kundenstatus zurücksetzen
       setKunde(null);
-      // Weiterleitung zur Startseite
       window.location.href = "/";
     }
   };
 
-  // Bereitstellung des Kunden-Kontexts für die Kindkomponenten
+
   return (
     <KundeContext.Provider value={{ kunde, setKunde, logout, loading }}>
       {children}
@@ -70,7 +59,7 @@ useEffect(() => {
   );
 }
 
-// Custom Hook zum Zugriff auf den Kunden-Kontext
+// Custom Hook zum Verwenden des Kunde-Kontexts
 export function useKunde() {
   const context = useContext(KundeContext);
   if (context === undefined) {

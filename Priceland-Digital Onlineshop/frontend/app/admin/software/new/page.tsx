@@ -20,7 +20,6 @@ export default function NewSoftwareForm() {
   // useEffect Hook zum Laden der Herstellerliste beim Initialisieren
   useEffect(() => {
     apiFetch("/hersteller/all")
-      .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) setHerstellerListe(data);
       })
@@ -43,20 +42,27 @@ export default function NewSoftwareForm() {
       kategorie: kategorie,
       typ: kategorie
     };
-    // API-Aufruf zum Erstellen der neuen Software
+   // API-Aufruf zum Erstellen der neuen Software
     try {
-      const res = await apiFetch("/admin/software", {
+      // apiFetch wirft Fehler bei nicht-ok Status
+      await apiFetch("/admin/software", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
 
-      if (!res.ok) throw new Error(await res.text());
-      // Erfolgreich erstellt - Weiterleitung zur Software-Übersicht
+      // Erfolgsmeldung und Weiterleitung zur Software-Übersicht
+      alert("Software erfolgreich angelegt!");
       window.location.href = "/admin/software";
-    } catch {
-      alert("Fehler beim Speichern.");
-    }
+    } catch (err: unknown) {
+      // Fehlerbehandlung
+      console.error("Speicher-Fehler:", err);
+      let message = "Unbekannter Fehler";
+      if (err instanceof Error) {
+        message = err.message;
+      }
+      alert("Fehler beim Speichern: " + message);
+    } 
   };
 
   return (

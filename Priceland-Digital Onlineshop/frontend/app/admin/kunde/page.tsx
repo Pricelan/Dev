@@ -73,7 +73,7 @@ export default function KundenVerwaltung() {
                   </div>
                 </td>
 
-                {/* E-Mail & Tel */}
+                {/* E-Mail & Telefonnummer */}
                 <td className="px-8 py-6">
                   <div className="flex flex-col text-sm">
                     <span className="text-slate-700 font-medium">{k.email}</span>

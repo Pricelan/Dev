@@ -18,32 +18,36 @@ export default function Login() {
 
   // Funktion zum Absenden des Login-Formulars
   async function submit() {
-    setLoading(true);
-    try {
-      const res = await apiFetch("/kunden/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          email: email, 
-          passwort: passwort 
-        })
-      });
+  setLoading(true);
+  try {
+    // apiFetch wirft Fehler bei nicht-ok Status
+    const kunde = await apiFetch("/kunden/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        email: email, 
+        passwort: passwort 
+      })
+    });
 
-      if (!res.ok) {
-        alert("Login fehlgeschlagen. Bitte prüfe E-Mail und Passwort.");
-        return;
-      }
+    // Login erfolgreich, Kunde im Kontext setzen und weiterleiten
+    setKunde(kunde);
+    router.push("/"); 
 
-      const kunde = await res.json();
-      setKunde(kunde);
-      router.push("/"); 
-    } catch (error) {
-      console.error("Login-Fehler:", error);
-      alert("Server nicht erreichbar.");
-    } finally {
-      setLoading(false);
+  } catch (error) {
+    // Fehlerbehandlung
+    console.error("Login-Fehler:", error);
+    
+    // Anzeige einer Fehlermeldung
+    if (error instanceof Error) {
+      alert(error.message);
+    } else {
+      alert("Ein unbekannter Fehler ist aufgetreten.");
     }
+  } finally {
+    setLoading(false);
   }
+}
 
   return (
     <div className="min-h-screen bg-[#f8fafc] flex flex-col items-center justify-center p-6 relative overflow-hidden">

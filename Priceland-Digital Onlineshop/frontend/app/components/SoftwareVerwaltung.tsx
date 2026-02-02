@@ -10,23 +10,23 @@ export default function SoftwareVerwaltung() {
   const [softwareListe, setSoftwareListe] = useState<Software[]>([]); 
   const [loading, setLoading] = useState(true);
 
-  // useEffect Hook zum Laden der Software-Daten basierend auf der Suchanfrage
- useEffect(() => {
-        // Funktion zum Abrufen der Software-Daten
-        const apiFetchData = async () => {
+    // useEffect Hook zum Laden der Software-Daten basierend auf der Suchanfrage
+    useEffect(() => {
+    const apiFetchData = async () => {
         setLoading(true); 
-        // Bestimme die URL basierend auf der Suchanfrage
+        
         const url = query.length > 0 
             ? `/software/suche?name=${query}`
             : `/software`; 
 
         try {
-            const res = await apiFetch(url);
-            if (!res.ok) throw new Error("Fehler beim Laden");
-            const data = await res.json();
+            // apiFetch wirft Fehler bei nicht-ok Status
+            const data = await apiFetch(url);
+            
+            // Setzt die Software-Liste, wenn die Daten ein Array sind
             setSoftwareListe(Array.isArray(data) ? data : []);
         } catch (error) {
-            console.error(error);
+            console.error("Fehler beim Laden der Software:", error);
             setSoftwareListe([]);
         } finally {
             setLoading(false);

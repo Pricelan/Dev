@@ -14,8 +14,7 @@ export default function MeineLizenzen() {
     apiFetch("/lizenzen/meine-lizenzen", {
       method: "GET",
     })
-      .then(r => r.json())
-      .then(setDownloads);
+    .then(setDownloads);
   }, []);
 
   return (

@@ -14,29 +14,32 @@ export default function AdminLogin() {
 
   // Funktion zum Handhaben des Login-Vorgangs
   async function handleLogin() {
-    setError("");
-    setIsLoading(true);
-    // API-Aufruf zum Login
-    try {
-      const res = await apiFetch("/admin/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, passwort })
-      });
-      // Überprüfung der Antwort
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        setError(errorData.error || "Zugriff verweigert. Bitte Daten prüfen.");
-        setIsLoading(false);
-        return;
-      }
-      // Erfolgreiches Login - Weiterleitung zum Admin-Dashboard
-      router.push("/admin");
-    } catch {
-      setError("Server nicht erreichbar.");
-      setIsLoading(false);
+  setError("");
+  setIsLoading(true);
+
+  try {
+    // apiFetch wirft Fehler bei nicht-ok Status
+    await apiFetch("/admin/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, passwort })
+    });
+
+    // Login erfolgreich, weiterleiten zum Admin-Dashboard
+    router.push("/admin");
+    
+  } catch (err) {
+    // Fehlerbehandlung
+    if (err instanceof Error) {
+      // Anzeige der Fehlermeldung
+      setError(err.message);
+    } else {
+      setError("Ein unbekannter Fehler ist aufgetreten.");
     }
+  } finally {
+    setIsLoading(false);
   }
+}
 
  return (
   <div className="min-h-screen bg-[#f1f5f9] flex flex-col items-center p-6 relative overflow-hidden">

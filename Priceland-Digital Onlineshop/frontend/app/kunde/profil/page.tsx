@@ -13,23 +13,22 @@ export default function KundenProfil() {
 
   // useEffect Hook zum Laden der Bestellungen des Kunden beim Initialisieren
   useEffect(() => {
-    if (!kunde?.id) return;
+  if (!kunde?.id) return;
 
-    apiFetch(`/bestellungen/kunde/${kunde.id}`, {
-      method: 'GET',
-      credentials: "include" 
-    })
-    .then(async res => {
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error("Backend meldet:", res.status, errorText);
-        return [];
-      }
-      return res.json();
-    })
-    .then(data => setBestellungen(data))
-    .catch(err => console.error("Netzwerkfehler:", err));
-  }, [kunde]);
+  apiFetch(`/bestellungen/kunde/${kunde.id}`, {
+    method: 'GET',
+    credentials: "include" 
+  })
+  .then(data => {
+    // Erfolgreiches Laden der Bestellungen
+    setBestellungen(data || []);
+  })
+  .catch(err => {
+    // Fehler beim Laden der Bestellungen
+    console.error("Fehler beim Laden der Bestellungen:", err);
+    setBestellungen([]); // Leere Liste bei Fehler
+  });
+}, [kunde]);
 
   if (!kunde) {
     return (
