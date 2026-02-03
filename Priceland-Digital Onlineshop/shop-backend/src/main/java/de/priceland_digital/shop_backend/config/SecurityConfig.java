@@ -26,14 +26,14 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             
-            // 2. Standard-Logins von Spring Security abschalten 
+            // 2. Standard-Login-Formular und HTTP-Basic-Authentifizierung deaktivieren
             .formLogin(form -> form.disable())
             .httpBasic(basic -> basic.disable())
 
             // 3. Session-Management konfigurieren
             .sessionManagement(session -> session
-            .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // Erstellt Session nur wenn nötig
-            .sessionFixation().migrateSession() // SICHERER: Übernimmt Attribute in eine neue Session-ID
+            .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // Sessions nur bei Bedarf erstellen
+            .sessionFixation().migrateSession() // Session-Fixation verhindern
 )
 
             // 4. Alle Requests erlauben 
@@ -41,9 +41,9 @@ public class SecurityConfig {
                 .anyRequest().permitAll()
             )
             .logout(logout -> logout
-            .logoutUrl("/api/auth/logout") // Der Pfad für dein Frontend
-                .invalidateHttpSession(true)   // Vernichtet die Session im Server
-                .deleteCookies("JSESSIONID")   // Löscht den Cookie im Browser
+            .logoutUrl("/api/auth/logout") // Logout-URL definieren
+                .invalidateHttpSession(true)   // Session ungültig machen
+                .deleteCookies("JSESSIONID")   // JSESSIONID-Cookie löschen
                 .permitAll()
             );  
         return http.build();
@@ -53,10 +53,10 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         
-        // Erlaubt das Next.js Frontend
+        // Erlaubt Anfragen von der React-Entwicklungsumgebung
         configuration.setAllowedOrigins(List.of("http://localhost:3000"));
         
-        // Erlaubt alle gängigen HTTP-Methoden
+        // Erlaubt gängige HTTP-Methoden
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         
         // Erlaubt wichtige Header für Authentifizierung und Content-Type
@@ -66,7 +66,7 @@ public class SecurityConfig {
         configuration.setAllowCredentials(true); 
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        // Wendet diese Regeln auf alle API-Endpunkte an
+        // CORS-Konfiguration für alle Pfade anwenden
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
