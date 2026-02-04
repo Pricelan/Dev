@@ -8,3 +8,4 @@ public interface TestKundenRepository {
     Optional<Kunde> findById(Long id);
     Kunde save(Kunde kunde);
 }
+
