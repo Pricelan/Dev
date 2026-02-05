@@ -18,7 +18,6 @@ export default function SoftwareDetailPage() {
   // useEffect Hook zum Laden der Software-Daten beim Initialisieren
   useEffect(() => {
     if (!id) return;
-    setLoading(true);
     apiFetch(`/software/${id}`)
       .then((data) => setSoftware(data))
       .catch((err) => console.error("Fehler:", err))
@@ -31,7 +30,7 @@ export default function SoftwareDetailPage() {
     const token = getGastToken();
 
     try {
-      const res = await apiFetch("/warenkorb/add", {
+        await apiFetch("/warenkorb/add", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -41,8 +40,7 @@ export default function SoftwareDetailPage() {
         }),
       });
 
-      if (!res.ok) throw new Error("Fehler beim Hinzufügen");
-      
+            
       await refresh();
       alert(`${software.name} wurde dem Warenkorb hinzugefügt!`);
     } catch (err) {
