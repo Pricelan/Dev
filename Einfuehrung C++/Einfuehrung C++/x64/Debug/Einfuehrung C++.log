@@ -1,3 +1,0 @@
-﻿  u_kopf_eingabe.cpp
-C:\Dev\Einfuehrung C++\u_kopf_eingabe.cpp(8,15): warning C4244: "Argument": Konvertierung von "time_t" in "unsigned int", möglicher Datenverlust
-  Einfuehrung C++.vcxproj -> C:\Dev\Einfuehrung C++\x64\Debug\Einfuehrung C++.exe
