@@ -27,6 +27,9 @@
     <ClInclude Include="Position.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="Bauer.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ChessFlipCore.cpp">
@@ -36,6 +39,9 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="Figur.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="Bauer.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
