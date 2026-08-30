@@ -1,7 +1,0 @@
-<Solution>
-  <Configurations>
-    <Platform Name="x64" />
-    <Platform Name="x86" />
-  </Configurations>
-  <Project Path="BoardGameEngine_Chess.vcxproj" Id="a43e8ccc-a5d4-438f-8502-d299424b0c80" />
-</Solution>

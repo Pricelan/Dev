@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Figuren.cpp">
+    <ClCompile Include="ChessFlip.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
