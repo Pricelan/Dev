@@ -8,7 +8,7 @@ public:
 	bool erlaubterZug(Position ziel) override;
 
 	int getLetzterZugZeitpunkt() const { return letzterZugZeitpunkt; } // Getter für den Zeitpunkt des letzten Zugs des Bauern
-
+	void setLetzterZugZeitpunkt(int zeitpunkt) { letzterZugZeitpunkt = zeitpunkt; } // Setter für den Zeitpunkt des letzten Zugs des Bauern
 
 private:
 	

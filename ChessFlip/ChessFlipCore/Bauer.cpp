@@ -1,5 +1,5 @@
 #include "Bauer.h"
-
+#include <cmath>
 
 
 bool Bauer::erlaubterZug(Position ziel)
@@ -13,6 +13,10 @@ bool Bauer::erlaubterZug(Position ziel)
 	{
 		richtung = -1;
 	}
-	return (ziel.spalte == getPosition().spalte && ziel.reihe == getPosition().reihe + richtung) ||
-		(getIstErsterZug() && ziel.spalte == getPosition().spalte && ziel.reihe == getPosition().reihe + 2 * richtung);
+
+	bool einFeldVorwaerts = (ziel.spalte == getPosition().spalte) && (ziel.reihe == getPosition().reihe + richtung);
+	bool doppelSchritt = (ziel.spalte == getPosition().spalte) && (ziel.reihe == getPosition().reihe + 2 * richtung) && getIstErsterZug();
+	bool diagonalSchlag = (std::abs(ziel.spalte - getPosition().spalte) == 1) && (ziel.reihe == getPosition().reihe + richtung);
+
+	return einFeldVorwaerts || doppelSchritt || diagonalSchlag;
 }

@@ -12,6 +12,7 @@ public:
 	Position getPosition() const { return position; }
 	Farbe getFarbe() const { return farbe; }
 	bool getIstErsterZug() const { return istErsterZug; }
+	void setIstErsterZug(bool ersterZug) { istErsterZug = ersterZug;}
 
 private:
 	Farbe farbe;
