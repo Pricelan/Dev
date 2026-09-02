@@ -152,16 +152,23 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Bauer.h" />
+    <ClInclude Include="Dame.h" />
     <ClInclude Include="Figur.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="Koenig.h" />
+    <ClInclude Include="Laeufer.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Position.h" />
     <ClInclude Include="Springer.h" />
+    <ClInclude Include="Turm.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Bauer.cpp" />
     <ClCompile Include="ChessFlipCore.cpp" />
+    <ClCompile Include="Dame.cpp" />
     <ClCompile Include="Figur.cpp" />
+    <ClCompile Include="Koenig.cpp" />
+    <ClCompile Include="Laeufer.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -169,6 +176,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Springer.cpp" />
+    <ClCompile Include="Turm.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

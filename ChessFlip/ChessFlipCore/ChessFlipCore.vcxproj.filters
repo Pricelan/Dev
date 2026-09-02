@@ -33,6 +33,18 @@
     <ClInclude Include="Springer.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="Turm.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="Laeufer.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="Dame.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="Koenig.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ChessFlipCore.cpp">
@@ -48,6 +60,18 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="Springer.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="Turm.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="Laeufer.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="Dame.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="Koenig.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
