@@ -21,28 +21,34 @@
     <ClInclude Include="pch.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="Figur.h">
+    <ClInclude Include="Backend\Bauer.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="Position.h">
+    <ClInclude Include="Backend\Dame.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="Bauer.h">
+    <ClInclude Include="Backend\Figur.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="Springer.h">
+    <ClInclude Include="Backend\Koenig.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="Turm.h">
+    <ClInclude Include="Backend\Laeufer.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="Laeufer.h">
+    <ClInclude Include="Backend\Position.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="Dame.h">
+    <ClInclude Include="Backend\Springer.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="Koenig.h">
+    <ClInclude Include="Backend\Turm.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\Spielfeld.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\FigurTyp.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
@@ -53,25 +59,28 @@
     <ClCompile Include="pch.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="Figur.cpp">
+    <ClCompile Include="Backend\Bauer.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="Bauer.cpp">
+    <ClCompile Include="Backend\Dame.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="Springer.cpp">
+    <ClCompile Include="Backend\Figur.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="Turm.cpp">
+    <ClCompile Include="Backend\Koenig.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="Laeufer.cpp">
+    <ClCompile Include="Backend\Laeufer.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="Dame.cpp">
+    <ClCompile Include="Backend\Springer.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="Koenig.cpp">
+    <ClCompile Include="Backend\Turm.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="Backend\Spielfeld.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

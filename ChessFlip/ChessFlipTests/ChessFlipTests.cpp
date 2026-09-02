@@ -7,6 +7,8 @@
 #include "Laeufer.h"
 #include "Dame.h"
 #include "Koenig.h"
+#include "Spielfeld.h"
+#include "FigurTyp.h"
 
 int main(int argc, char* argv[]) {
     return Catch::Session().run(argc, argv);
@@ -45,8 +47,15 @@ TEST_CASE("Dame erlaubt vertikaler Zug wie ein Turm") {
 	Position ziel(2, 5);
 	REQUIRE(dame.erlaubterZug(ziel) == true);
 }
+
 TEST_CASE("Koenig erlaubt ein vertikaler Zug") {
 	Koenig koenig(Figur::Farbe::Schwarz, Position(1, 4));
 	Position ziel(2, 4);
 	REQUIRE(koenig.erlaubterZug(ziel) == true);
+}
+
+TEST_CASE("Turm steht nach Startaufstellung auf der richtigen Position") {
+	Spielfeld spielfeld;
+	REQUIRE(dynamic_cast<Turm*>(spielfeld.getFigur(0, 0)) != nullptr);
+	REQUIRE(spielfeld.getFigur(0, 0) ->getFarbe() == Figur::Farbe::Weiss);
 }

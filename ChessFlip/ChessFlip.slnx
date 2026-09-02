@@ -3,9 +3,7 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="ChessFlip/ChessFlip.vcxproj" Id="92cf61be-6beb-42f6-9f3f-fd13e28dee86">
-    <BuildDependency Project="ChessFlipCore/ChessFlipCore.vcxproj" />
-  </Project>
+  <Project Path="ChessFlip/ChessFlip.vcxproj" Id="92cf61be-6beb-42f6-9f3f-fd13e28dee86" />
   <Project Path="ChessFlipCore/ChessFlipCore.vcxproj" Id="8260d800-1931-4b20-9b40-8824a6aa700a" />
   <Project Path="ChessFlipTests/ChessFlipTests.vcxproj" Id="355db129-617b-41df-95ba-6e5a05408f00">
     <BuildDependency Project="ChessFlipCore/ChessFlipCore.vcxproj" />

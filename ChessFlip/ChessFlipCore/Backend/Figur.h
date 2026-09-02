@@ -6,6 +6,7 @@ class Figur
 {
 public:
 	virtual bool erlaubterZug(Position ziel) = 0;
+	virtual ~Figur();
 	enum class Farbe { Weiss, Schwarz };
 	Figur(Farbe farbe, Position position);
 
