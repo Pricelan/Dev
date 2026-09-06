@@ -59,3 +59,17 @@ TEST_CASE("Turm steht nach Startaufstellung auf der richtigen Position") {
 	REQUIRE(dynamic_cast<Turm*>(spielfeld.getFigur(0, 0)) != nullptr);
 	REQUIRE(spielfeld.getFigur(0, 0) ->getFarbe() == Figur::Farbe::Weiss);
 }
+
+TEST_CASE("Alle Bauern in der weißen Bauernreihe sind tatsächlich wei0") {
+	Spielfeld spielfeld;
+	for (int spalte = 0; spalte < 8; spalte++) {
+		REQUIRE(dynamic_cast<Bauer*>(spielfeld.getFigur(1, spalte)) != nullptr);
+		REQUIRE(spielfeld.getFigur(1, spalte)->getFarbe() == Figur::Farbe::Weiss);
+	}
+}
+
+TEST_CASE("Prüfung auf leere Reihe nach Startaufstellung") {
+	Spielfeld spielfeld;
+	REQUIRE(spielfeld.istFeldFrei(2, 3));
+
+}

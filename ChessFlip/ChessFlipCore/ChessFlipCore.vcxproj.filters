@@ -51,6 +51,12 @@
     <ClInclude Include="Backend\FigurTyp.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="Backend\Spielengine.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\Teilnehmer.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ChessFlipCore.cpp">
@@ -81,6 +87,12 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="Backend\Spielfeld.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="Backend\Spielengine.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="Backend\Teilnehmer.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

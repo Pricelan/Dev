@@ -158,8 +158,10 @@
     <ClInclude Include="Backend\Koenig.h" />
     <ClInclude Include="Backend\Laeufer.h" />
     <ClInclude Include="Backend\Position.h" />
+    <ClInclude Include="Backend\Spielengine.h" />
     <ClInclude Include="Backend\Spielfeld.h" />
     <ClInclude Include="Backend\Springer.h" />
+    <ClInclude Include="Backend\Teilnehmer.h" />
     <ClInclude Include="Backend\Turm.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
@@ -170,8 +172,10 @@
     <ClCompile Include="Backend\Figur.cpp" />
     <ClCompile Include="Backend\Koenig.cpp" />
     <ClCompile Include="Backend\Laeufer.cpp" />
+    <ClCompile Include="Backend\Spielengine.cpp" />
     <ClCompile Include="Backend\Spielfeld.cpp" />
     <ClCompile Include="Backend\Springer.cpp" />
+    <ClCompile Include="Backend\Teilnehmer.cpp" />
     <ClCompile Include="Backend\Turm.cpp" />
     <ClCompile Include="ChessFlipCore.cpp" />
     <ClCompile Include="pch.cpp">
