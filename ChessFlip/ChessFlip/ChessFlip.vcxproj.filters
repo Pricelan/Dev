@@ -18,5 +18,16 @@
     <ClCompile Include="ChessFlip.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="SchachFenster.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="SchachFenster.h">
+      <Filter>Headerdateien</Filter>
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="SchachFenster.ui" />
   </ItemGroup>
 </Project>

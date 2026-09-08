@@ -14,7 +14,9 @@ public:
     bool pruefeZug(Position start, Position ziel) const;
     void zugAusfuehren(Position start, Position ziel);
     void naechsteRunde();
-    
+    Figur::Farbe getAktuellerZug() const {
+        return aktuellerZug;
+    }
 
 
 private:
