@@ -9,9 +9,10 @@
 #include "Springer.h"
 #include <Qlabel>
 
-SchachFenster::SchachFenster(Spielfeld* spielfeld, QWidget *parent)
-	: QMainWindow(parent), spielfeld(spielfeld)
+SchachFenster::SchachFenster(Spielengine* spielengine, QWidget *parent)
+	: QMainWindow(parent), spielengine(spielengine)
 {
+    const Spielfeld* spielfeld = spielengine->getSpielfeld();
 	ui.setupUi(this);
 
     QWidget* zentral = new QWidget(this);
@@ -54,11 +55,24 @@ SchachFenster::SchachFenster(Spielfeld* spielfeld, QWidget *parent)
 
     }
 
+    QString zahlen = "12345678";
+    for (int reihe = 0; reihe < 8; reihe++) {
+        QLabel* labelLinks = new QLabel(QString(zahlen[7-reihe]), this);
+        labelLinks->setAlignment(Qt::AlignCenter);
+        layout->addWidget(labelLinks, reihe + 1, 0);
+
+        QLabel* labelRechts = new QLabel(QString(zahlen[7-reihe]), this);
+        labelRechts->setAlignment(Qt::AlignCenter);
+        layout->addWidget(labelRechts, reihe + 1, 9);
+
+    }
+
     aussenLayout->addLayout(layout);
     eingabefeld = new QLineEdit(this);
     aussenLayout->addWidget(eingabefeld);
     eingabefeld->setPlaceholderText("Zug eingeben (z.B. e2e4): ");
     eingabefeld->setStyleSheet("font-size: 20px; padding: 8px;");
+    connect(eingabefeld, &QLineEdit::returnPressed, this, &SchachFenster::zugAnnahmeClicked);
     setCentralWidget(zentral);
     resize(8 * 60, 8 * 60);
     
@@ -80,4 +94,8 @@ QString SchachFenster::symbolFuerFigur(Figur* figur) {
     if (dynamic_cast<Koenig*>(figur) != nullptr) return weiss ? "♚" : "♔"; 
 
     return "";
+}
+
+void SchachFenster::zugAnnahmeClicked() {
+    QString text = eingabefeld->text();
 }

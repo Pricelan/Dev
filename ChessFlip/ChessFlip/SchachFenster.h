@@ -9,20 +9,25 @@
 #include "Figur.h"
 #include <QLineEdit>
 #include <QVBoxLayout>
+#include "Spielengine.h"
 
 class SchachFenster : public QMainWindow
 {
 	Q_OBJECT
 
 public:
-	SchachFenster(Spielfeld* spielfeld, QWidget *parent = nullptr);
+	SchachFenster(Spielengine* spielengine, QWidget *parent = nullptr);
 	~SchachFenster();
 
 private:
 	Ui::SchachFensterClass ui;
 	QPushButton* felder[8][8];
-	Spielfeld* spielfeld;
+	Spielengine* spielengine;
 	QString symbolFuerFigur(Figur* figur);
 	QLineEdit* eingabefeld;
+
+private slots:
+	void zugAnnahmeClicked();
+
 };
 

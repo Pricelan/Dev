@@ -17,6 +17,10 @@ public:
     Figur::Farbe getAktuellerZug() const {
         return aktuellerZug;
     }
+    const Spielfeld* getSpielfeld() const {
+        return spielfeld;
+    }
+
 
 
 private:
