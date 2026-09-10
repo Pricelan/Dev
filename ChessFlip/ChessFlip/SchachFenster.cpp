@@ -19,7 +19,9 @@ SchachFenster::SchachFenster(Spielengine* spielengine, QWidget *parent)
     QWidget* zentral = new QWidget(this);
     QVBoxLayout* aussenLayout = new QVBoxLayout(zentral);
     QGridLayout* layout = new QGridLayout();
-    
+    statusLabel = new QLabel(this);
+    aussenLayout->addWidget(statusLabel);
+    statusAktualisieren();
     layout->setSpacing(0);
     layout->setContentsMargins(0, 0, 0, 0);
 
@@ -111,6 +113,7 @@ void SchachFenster::zugAnnahmeClicked() {
         spielengine->naechsteRunde();
         eingabefeld->setText("");
         brettAktualisieren();
+        statusAktualisieren();
 }
 
 void SchachFenster::brettAktualisieren() {
@@ -121,4 +124,13 @@ void SchachFenster::brettAktualisieren() {
             felder[8 - reihe][spalte - 1]->setText(symbolFuerFigur(figurTyp));
         }
     }
+}
+
+void SchachFenster::statusAktualisieren() {
+        
+    QString farbeText = (spielengine->getAktuellerZug() == Figur::Farbe::Weiss) ? "Weiß" : "Schwarz";
+    QString nameText = QString::fromStdString(spielengine->getAktuellerSpieler());
+    QString rundeText = QString::number(spielengine->getRundenZaehler());
+    QString maxRundenText = QString::number(Spielengine::MAX_RUNDEN);
+    statusLabel->setText("Am Zug: " + farbeText + " (" + nameText + ")   Runde " + rundeText + "/" + maxRundenText);
 }

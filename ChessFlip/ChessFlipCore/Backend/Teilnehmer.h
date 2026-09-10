@@ -11,6 +11,7 @@ public:
 	virtual void ermittleZug(Spielfeld* spielfeld, Position& start, Position& ziel) = 0;
 	Figur::Farbe getFarbe() const { return farbe; }
 	void setFarbe(Figur::Farbe neueFarbe) { farbe = neueFarbe; }
+	std::string getName() const { return name; }
 
 private: 
 

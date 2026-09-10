@@ -1,7 +1,7 @@
 #pragma once
 #include "Spielfeld.h"
 #include "Teilnehmer.h"
-
+#include <string>
 
 
 class Spielengine {
@@ -20,8 +20,9 @@ public:
     const Spielfeld* getSpielfeld() const {
         return spielfeld;
     }
-
-
+    int getRundenZaehler() const { return rundenZaehler; }
+    std::string getAktuellerSpieler() const;
+    
 
 private:
     Position koenigFinden(Figur::Farbe farbe) const;

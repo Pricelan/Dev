@@ -26,6 +26,8 @@ private:
 	QString symbolFuerFigur(Figur* figur);
 	QLineEdit* eingabefeld;
 	void brettAktualisieren();
+	QLabel* statusLabel;
+	void statusAktualisieren();
 
 private slots:
 	void zugAnnahmeClicked();

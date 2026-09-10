@@ -11,6 +11,7 @@ public:
 	Figur(Farbe farbe, Position position);
 
 	Position getPosition() const { return position; }
+	void setPosition(Position neuePosition) { position = neuePosition; }
 	Farbe getFarbe() const { return farbe; }
 	bool getIstErsterZug() const { return istErsterZug; }
 	void setIstErsterZug(bool ersterZug) { istErsterZug = ersterZug;}

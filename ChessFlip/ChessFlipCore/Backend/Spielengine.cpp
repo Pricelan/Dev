@@ -1,6 +1,7 @@
 #include "Spielengine.h"
 #include "Koenig.h"
 #include <cassert>
+#include "Springer.h"
 
 Spielengine::Spielengine(Teilnehmer* teilnehmer1, Teilnehmer* teilnehmer2) : spielfeld(new Spielfeld()), teilnehmer1(teilnehmer1), teilnehmer2(teilnehmer2),
 aktuellerZug(Figur::Farbe::Weiss), rundenZaehler(0) {}
@@ -80,9 +81,13 @@ bool Spielengine::pruefeZug(Position start, Position ziel) const {
 		return false;
 	}
 
-	if (!(ziehendeFigur->erlaubterZug(ziel) && istWegFrei(start, ziel))) {
+	if (!ziehendeFigur->erlaubterZug(ziel)) {
 		return false;
 	}
+	if (dynamic_cast<Springer*>(ziehendeFigur) == nullptr && !istWegFrei(start, ziel)) {
+		return false;
+	}
+	
 	return true;
 }
 
@@ -92,9 +97,12 @@ void Spielengine::zugAusfuehren(Position start, Position ziel) {
 	Figur* ziehendeFigur = spielfeld->getFigur(start.reihe, start.spalte);
 	Figur* zielFigur = spielfeld->getFigur(ziel.reihe, ziel.spalte);
 	delete zielFigur;
-
+	
+	ziehendeFigur->setPosition(ziel);
 	spielfeld->setzeFigur(ziehendeFigur, ziel);
+	ziehendeFigur->setIstErsterZug(false);
 	spielfeld->setzeFigur(nullptr, start);
+
 }
 
 void Spielengine::naechsteRunde() {
@@ -110,4 +118,15 @@ void Spielengine::naechsteRunde() {
 			teilnehmer2->setFarbe(temp);
 		}
 	}
+}
+
+std::string Spielengine::getAktuellerSpieler() const {
+
+	if (teilnehmer1->getFarbe() == aktuellerZug) {
+		return teilnehmer1->getName();
+	}
+	else
+		return teilnehmer2->getName();
+
+
 }
