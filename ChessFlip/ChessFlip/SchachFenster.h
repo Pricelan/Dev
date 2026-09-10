@@ -25,6 +25,7 @@ private:
 	Spielengine* spielengine;
 	QString symbolFuerFigur(Figur* figur);
 	QLineEdit* eingabefeld;
+	void brettAktualisieren();
 
 private slots:
 	void zugAnnahmeClicked();

@@ -164,6 +164,7 @@
     <ClInclude Include="Backend\Springer.h" />
     <ClInclude Include="Backend\Teilnehmer.h" />
     <ClInclude Include="Backend\Turm.h" />
+    <ClInclude Include="Backend\ZugParser.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
@@ -179,6 +180,7 @@
     <ClCompile Include="Backend\Springer.cpp" />
     <ClCompile Include="Backend\Teilnehmer.cpp" />
     <ClCompile Include="Backend\Turm.cpp" />
+    <ClCompile Include="Backend\ZugParser.cpp" />
     <ClCompile Include="ChessFlipCore.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

@@ -7,6 +7,7 @@
 #include "Koenig.h"
 #include "Laeufer.h"
 #include "Springer.h"
+#include "ZugParser.h"
 #include <Qlabel>
 
 SchachFenster::SchachFenster(Spielengine* spielengine, QWidget *parent)
@@ -34,9 +35,9 @@ SchachFenster::SchachFenster(Spielengine* spielengine, QWidget *parent)
             QPushButton* button = new QPushButton(this);
             button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
             button->setStyleSheet(farbe);
-            Figur* figurTyp = spielfeld->getFigur(reihe - 1, spalte - 1);
+            Figur* figurTyp = spielfeld->getFigur(8 - reihe, spalte - 1);
             button->setText(symbolFuerFigur(figurTyp));
-            felder[reihe - 1][spalte - 1] = button;
+            felder[8 - reihe][spalte - 1] = button;
             layout->addWidget(button, reihe, spalte);
            
         }
@@ -86,16 +87,38 @@ QString SchachFenster::symbolFuerFigur(Figur* figur) {
 
     bool weiss = (figur->getFarbe() == Figur::Farbe::Weiss);
 
-    if (dynamic_cast<Bauer*>(figur) != nullptr) return weiss ? "♟" : "♙"; 
-    if (dynamic_cast<Turm*>(figur) != nullptr) return weiss ? "♜" : "♖"; 
-    if (dynamic_cast<Springer*>(figur) != nullptr) return weiss ? "♞" : "♘"; 
-    if (dynamic_cast<Laeufer*>(figur) != nullptr) return weiss ? "♝" : "♗"; 
-    if (dynamic_cast<Dame*>(figur) != nullptr) return weiss ? "♛" : "♕"; 
-    if (dynamic_cast<Koenig*>(figur) != nullptr) return weiss ? "♚" : "♔"; 
+    if (dynamic_cast<Bauer*>(figur) != nullptr) return weiss ? "♙" : "♟"; 
+    if (dynamic_cast<Turm*>(figur) != nullptr) return weiss ? "♖" : "♜"; 
+    if (dynamic_cast<Springer*>(figur) != nullptr) return weiss ? "♘" : "♞"; 
+    if (dynamic_cast<Laeufer*>(figur) != nullptr) return weiss ? "♗" : "♝"; 
+    if (dynamic_cast<Dame*>(figur) != nullptr) return weiss ? "♕" : "♛"; 
+    if (dynamic_cast<Koenig*>(figur) != nullptr) return weiss ? "♔" : "♚"; 
 
     return "";
 }
 
 void SchachFenster::zugAnnahmeClicked() {
     QString text = eingabefeld->text();
+    std::string eingabe = text.toStdString();
+    Position start, ziel;
+    if (!parseZugString(eingabe, start, ziel)) {
+        return;
+    }
+    if (!spielengine->pruefeZug(start, ziel)) {
+        return;
+    }
+        spielengine->zugAusfuehren(start, ziel);
+        spielengine->naechsteRunde();
+        eingabefeld->setText("");
+        brettAktualisieren();
+}
+
+void SchachFenster::brettAktualisieren() {
+    const Spielfeld* spielfeld = spielengine->getSpielfeld();
+    for (int reihe = 8; reihe >= 1; reihe--) {
+        for (int spalte = 1; spalte < 9; spalte++) {
+            Figur* figurTyp = spielfeld->getFigur(8 - reihe, spalte - 1);
+            felder[8 - reihe][spalte - 1]->setText(symbolFuerFigur(figurTyp));
+        }
+    }
 }
