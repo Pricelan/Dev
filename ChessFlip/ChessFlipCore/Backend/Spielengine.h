@@ -2,6 +2,8 @@
 #include "Spielfeld.h"
 #include "Teilnehmer.h"
 #include <string>
+#include "Figur.h"
+#include "FigurTyp.h"
 
 
 class Spielengine {
@@ -10,10 +12,12 @@ public:
    	Spielengine(Teilnehmer* teilnehmer1, Teilnehmer* teilnehmer2);
 	~Spielengine();
 
+    bool istBauernumwandlungFaellig(Position pos) const;
     bool istSchach(Figur::Farbe farbe) const;
     bool pruefeZug(Position start, Position ziel) const;
     void zugAusfuehren(Position start, Position ziel);
     void naechsteRunde();
+    void wandleBauerUm(Position pos, FigurTyp typ);
     Figur::Farbe getAktuellerZug() const {
         return aktuellerZug;
     }

@@ -21,13 +21,20 @@
     <ClCompile Include="SchachFenster.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="StartMenue.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="SchachFenster.h">
       <Filter>Headerdateien</Filter>
     </QtMoc>
+    <QtMoc Include="StartMenue.h">
+      <Filter>Headerdateien</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="SchachFenster.ui" />
+    <QtUic Include="StartMenue.ui" />
   </ItemGroup>
 </Project>

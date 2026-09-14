@@ -171,6 +171,7 @@
   <ItemGroup>
     <ClCompile Include="ChessFlip.cpp" />
     <ClCompile Include="SchachFenster.cpp" />
+    <ClCompile Include="StartMenue.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ChessFlipCore\ChessFlipCore.vcxproj">
@@ -182,6 +183,10 @@
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="SchachFenster.ui" />
+    <QtUic Include="StartMenue.ui" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="StartMenue.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Import Project="$(QtMsBuild)\qt.targets" Condition="Exists('$(QtMsBuild)\qt.targets')" />

@@ -2,6 +2,7 @@
 #include "Koenig.h"
 #include <cassert>
 #include "Springer.h"
+#include "Bauer.h"
 
 Spielengine::Spielengine(Teilnehmer* teilnehmer1, Teilnehmer* teilnehmer2) : spielfeld(new Spielfeld()), teilnehmer1(teilnehmer1), teilnehmer2(teilnehmer2),
 aktuellerZug(Figur::Farbe::Weiss), rundenZaehler(0) {}
@@ -44,6 +45,33 @@ bool Spielengine::istWegFrei(Position start, Position ziel) const {
 	return true;
 
 }
+
+bool Spielengine::istBauernumwandlungFaellig(Position pos) const {
+	Figur* figur = spielfeld->getFigur(pos.reihe, pos.spalte);
+	Bauer* bauer = dynamic_cast<Bauer*>(figur);
+	if (bauer == nullptr) {
+		return false;
+	}
+	if (bauer->getFarbe() == Figur::Farbe::Weiss) {
+		return pos.reihe == 7;
+	}
+	else {
+		return pos.reihe == 0;
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 bool Spielengine::istSchach(Figur::Farbe farbe) const {
 
@@ -130,3 +158,4 @@ std::string Spielengine::getAktuellerSpieler() const {
 
 
 }
+
