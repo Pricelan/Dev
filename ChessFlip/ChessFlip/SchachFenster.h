@@ -32,5 +32,8 @@ private:
 private slots:
 	void zugAnnahmeClicked();
 
+signals:
+	void spielBeendet();
+
 };
 
