@@ -111,6 +111,9 @@ void SchachFenster::zugAnnahmeClicked() {
     if (spielengine->istRochadeMoeglich(start, ziel)) {
         spielengine->rochadeAusfuehren(start, ziel);
     }
+    else if (spielengine->istEnPassantMoeglich(start, ziel)) {
+        spielengine->enPassantAusfuehren(start, ziel);
+    }
     else {
         if (!spielengine->pruefeZug(start, ziel)) {
             return;

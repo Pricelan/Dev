@@ -12,6 +12,7 @@ public:
 	Figur::Farbe getFarbe() const { return farbe; }
 	void setFarbe(Figur::Farbe neueFarbe) { farbe = neueFarbe; }
 	std::string getName() const { return name; }
+	void setName(std::string neuerName) { name = neuerName;  }
 
 private: 
 

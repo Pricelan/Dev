@@ -186,6 +186,17 @@ void Spielengine::zugAusfuehren(Position start, Position ziel) {
 	Figur* zielFigur = spielfeld->getFigur(ziel.reihe, ziel.spalte);
 	delete zielFigur;
 	
+		
+		if (dynamic_cast<Bauer*>(ziehendeFigur) != nullptr && std::abs(ziel.reihe-start.reihe) == 2) {
+			// War ein Bauer-Doppelschritt: merken für En Passant
+			letzterDoppelschritt = ziel;
+			letzterZugWarDoppelschritt = true;
+		}
+		else {
+			// War kein Bauer-Doppelschritt: zurücksetze
+			letzterZugWarDoppelschritt = false;
+		}
+
 	ziehendeFigur->setPosition(ziel);
 	spielfeld->setzeFigur(ziehendeFigur, ziel);
 	ziehendeFigur->setIstErsterZug(false);
@@ -287,4 +298,38 @@ void Spielengine::rochadeAusfuehren(Position start, Position ziel){
 	spielfeld->setzeFigur(turm, neueTurmPos);
 	spielfeld->setzeFigur(nullptr, turmPos);
 	turm->setIstErsterZug(false);
+}
+
+bool Spielengine::istEnPassantMoeglich(Position start, Position ziel) const {
+	Figur* bauer = spielfeld->getFigur(start.reihe, start.spalte);
+	if (dynamic_cast<Bauer*>(bauer) == nullptr) {
+		return false;
+	}
+	if (std::abs(ziel.spalte - start.spalte) != 1 || std::abs(ziel.reihe - start.reihe) != 1) {
+		return false;
+	}
+	Figur* zielFigur = spielfeld->getFigur(ziel.reihe, ziel.spalte);
+		if (zielFigur != nullptr) {
+			return false;
+		}
+		if (!letzterZugWarDoppelschritt) {
+			return false;
+		}
+		if (letzterDoppelschritt.reihe != start.reihe || letzterDoppelschritt.spalte != ziel.spalte) {
+			return false;
+		}
+	return true;
+}
+
+void Spielengine::enPassantAusfuehren(Position start, Position ziel) {
+	Figur* bauer = spielfeld->getFigur(start.reihe, start.spalte);
+	Figur* zielFigur = spielfeld->getFigur(letzterDoppelschritt.reihe, letzterDoppelschritt.spalte);
+
+	bauer->setPosition(ziel);
+	spielfeld->setzeFigur(bauer, ziel);
+	spielfeld->setzeFigur(nullptr, start);
+	bauer->setIstErsterZug(false);
+	delete zielFigur;
+
+	spielfeld->setzeFigur(nullptr, letzterDoppelschritt);
 }

@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Persistenz">
+      <UniqueIdentifier>{7c5948ec-ad28-425f-b1ce-6fbf3ac3830a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -63,6 +66,9 @@
     <ClInclude Include="Backend\ZugParser.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="Persistenz\Protokollierer.h">
+      <Filter>Persistenz</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ChessFlipCore.cpp">
@@ -106,6 +112,9 @@
     </ClCompile>
     <ClCompile Include="Backend\ZugParser.cpp">
       <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="Persistenz\Protokollierer.cpp">
+      <Filter>Persistenz</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
