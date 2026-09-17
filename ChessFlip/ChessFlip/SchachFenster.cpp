@@ -11,6 +11,7 @@
 #include <Qlabel>
 #include <QMessageBox>
 #include "FigurTyp.h"
+#include "../ChessFlipCore/Persistenz/Protokollierer.h"
 
 SchachFenster::SchachFenster(Spielengine* spielengine, QWidget *parent)
 	: QMainWindow(parent), spielengine(spielengine)
@@ -77,6 +78,9 @@ SchachFenster::SchachFenster(Spielengine* spielengine, QWidget *parent)
     aussenLayout->addWidget(eingabefeld);
     eingabefeld->setPlaceholderText("Zug eingeben (z.B. e2e4): ");
     eingabefeld->setStyleSheet("font-size: 20px; padding: 8px;");
+    speichernButton = new QPushButton("Spiel speichern", this);
+    aussenLayout->addWidget(speichernButton);
+    connect(speichernButton, &QPushButton::clicked, this, &SchachFenster::speichernClicked);
     connect(eingabefeld, &QLineEdit::returnPressed, this, &SchachFenster::zugAnnahmeClicked);
     setCentralWidget(zentral);
     resize(8 * 60, 8 * 60);
@@ -106,6 +110,7 @@ void SchachFenster::zugAnnahmeClicked() {
     std::string eingabe = text.toStdString();
     Position start, ziel;
     if (!parseZugString(eingabe, start, ziel)) {
+        QMessageBox::warning(this, "Ungültige Eingabe", "Bitte im Format e2e4 eingeben.");
         return;
     }
     if (spielengine->istRochadeMoeglich(start, ziel)) {
@@ -116,6 +121,7 @@ void SchachFenster::zugAnnahmeClicked() {
     }
     else {
         if (!spielengine->pruefeZug(start, ziel)) {
+            QMessageBox::warning(this, "Ungültiger Zug", "Der Zug kann nach Fide-Regeln nicht durchgeführt werden");
             return;
         }
         spielengine->zugAusfuehren(start, ziel);
@@ -174,4 +180,14 @@ void SchachFenster::statusAktualisieren() {
     QString rundeText = QString::number(spielengine->getRundenZaehler());
     QString maxRundenText = QString::number(Spielengine::MAX_RUNDEN);
     statusLabel->setText("Am Zug: " + farbeText + " (" + nameText + ")   Runde " + rundeText + "/" + maxRundenText);
+}
+
+void SchachFenster::closeEvent(QCloseEvent* event) {
+    Protokollierer::speichern(*spielengine, "spielstand.txt");
+    QMainWindow::closeEvent(event);
+}
+
+void SchachFenster::speichernClicked() {
+    Protokollierer::speichern(*spielengine, "spielstand.txt");
+    QMessageBox::information(this, "Gespeichert", "Speilstand wurde gespeichert.");
 }

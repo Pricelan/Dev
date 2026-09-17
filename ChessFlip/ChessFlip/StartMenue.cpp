@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <QLabel>
 #include <QPainter>
+#include <fstream>
 
 StartMenue::StartMenue(QWidget *parent)
 	: QDialog(parent)
@@ -25,6 +26,12 @@ StartMenue::StartMenue(QWidget *parent)
 	spieler2->setPlaceholderText("Name Spieler2 (Schwarz)");
 	spieler1->setVisible(false);
 	spieler2->setVisible(false);
+	std::ifstream test("spielstand.txt");
+	bool dateiExistiert = test.good();
+	fortsetzenButton = new QPushButton("Spiel fortsetzen", this);
+	layout->addWidget(fortsetzenButton);
+	fortsetzenButton->setVisible(dateiExistiert);
+	connect(fortsetzenButton, &QPushButton::clicked, this, &StartMenue::fortsetzenClicked);
 	vsModus = new QPushButton("VS-Modus starten", this);
 	layout->addWidget(vsModus);
 	connect(vsModus, &QPushButton::clicked, this, &StartMenue::vsModusClicked);
@@ -56,6 +63,15 @@ void StartMenue::vsModusClicked() {
 
 void StartMenue::kiModusClicked() {
 	QMessageBox::information(this,"Hinweis", "In Entwicklung");
+}
+
+void StartMenue::fortsetzenClicked() {
+	fortsetzenGewaehlt = true;
+	accept();
+}
+
+bool StartMenue::getFortsetzenGewaehlt() const {
+	return fortsetzenGewaehlt;
 }
 
 void StartMenue::paintEvent(QPaintEvent* event) {

@@ -22,6 +22,7 @@ public:
 private:
 	Ui::SchachFensterClass ui;
 	QPushButton* felder[8][8];
+	QPushButton* speichernButton;
 	Spielengine* spielengine;
 	QString symbolFuerFigur(Figur* figur);
 	QLineEdit* eingabefeld;
@@ -29,8 +30,12 @@ private:
 	QLabel* statusLabel;
 	void statusAktualisieren();
 
+protected:
+	void closeEvent(QCloseEvent* event) override;
+
 private slots:
 	void zugAnnahmeClicked();
+	void speichernClicked();
 
 signals:
 	void spielBeendet();

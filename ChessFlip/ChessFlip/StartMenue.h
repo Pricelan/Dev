@@ -16,6 +16,7 @@ public:
 	~StartMenue();
 	QString getSpieler1Name() const;
 	QString getSpieler2Name() const;
+	bool getFortsetzenGewaehlt() const;
 
 
 private:
@@ -25,6 +26,8 @@ private:
 	QPushButton* vsModus;
 	QPushButton* kiMode;
 	QPushButton* start;
+	QPushButton* fortsetzenButton;
+	bool fortsetzenGewaehlt = false;
 
 protected:
 	void paintEvent(QPaintEvent* event) override;
@@ -33,6 +36,7 @@ private slots:
 
 	void vsModusClicked();
 	void kiModusClicked();
+	void fortsetzenClicked();
 	
 };
 

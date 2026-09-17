@@ -69,6 +69,9 @@
     <ClInclude Include="Persistenz\Protokollierer.h">
       <Filter>Persistenz</Filter>
     </ClInclude>
+    <ClInclude Include="Backend\KiGegner.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ChessFlipCore.cpp">
@@ -115,6 +118,9 @@
     </ClCompile>
     <ClCompile Include="Persistenz\Protokollierer.cpp">
       <Filter>Persistenz</Filter>
+    </ClCompile>
+    <ClCompile Include="Backend\KiGegner.cpp">
+      <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
