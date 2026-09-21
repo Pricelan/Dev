@@ -20,7 +20,7 @@ public:
     bool pruefeZug(Position start, Position ziel) const;
     bool istEnPassantMoeglich(Position start, Position ziel) const;
     void zugAusfuehren(Position start, Position ziel);
-    void naechsteRunde();
+    bool naechsteRunde();
     void wandleBauerUm(Position pos, FigurTyp typ);
     void rochadeAusfuehren(Position start, Position ziel);
     void enPassantAusfuehren(Position start, Position ziel);
@@ -28,6 +28,9 @@ public:
         return aktuellerZug;
     }
     const Spielfeld* getSpielfeld() const {
+        return spielfeld;
+    }
+    Spielfeld* getSpielfeldVeraenderbar() const {
         return spielfeld;
     }
     int getRundenZaehler() const { return rundenZaehler; }

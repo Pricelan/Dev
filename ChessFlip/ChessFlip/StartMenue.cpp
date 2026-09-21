@@ -59,10 +59,19 @@ void StartMenue::vsModusClicked() {
 	spieler1->setVisible(true);
 	spieler2->setVisible(true);
 	start->setVisible(true);
+	kiModusGewaehlt = false;
 }
 
 void StartMenue::kiModusClicked() {
-	QMessageBox::information(this,"Hinweis", "In Entwicklung");
+	spieler1->setVisible(true);
+	spieler2->setVisible(false);
+	start->setVisible(true);
+	kiModusGewaehlt = true;
+	
+}
+
+bool StartMenue::getKiModusGewaehlt() const {
+	return kiModusGewaehlt;
 }
 
 void StartMenue::fortsetzenClicked() {

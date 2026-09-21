@@ -12,9 +12,10 @@
 #include <QMessageBox>
 #include "FigurTyp.h"
 #include "../ChessFlipCore/Persistenz/Protokollierer.h"
+#include "KiGegner.h"
 
-SchachFenster::SchachFenster(Spielengine* spielengine, QWidget *parent)
-	: QMainWindow(parent), spielengine(spielengine)
+SchachFenster::SchachFenster(Spielengine* spielengine, KiGegner* kiGegner, QWidget *parent)
+	: QMainWindow(parent), spielengine(spielengine), kiGegner(kiGegner)
 {
     const Spielfeld* spielfeld = spielengine->getSpielfeld();
 	ui.setupUi(this);
@@ -113,6 +114,14 @@ void SchachFenster::zugAnnahmeClicked() {
         QMessageBox::warning(this, "Ungültige Eingabe", "Bitte im Format e2e4 eingeben.");
         return;
     }
+    zugVerarbeiten(start, ziel);
+    
+    
+}
+
+
+void SchachFenster::zugVerarbeiten(Position start, Position ziel) {
+
     if (spielengine->istRochadeMoeglich(start, ziel)) {
         spielengine->rochadeAusfuehren(start, ziel);
     }
@@ -126,42 +135,52 @@ void SchachFenster::zugAnnahmeClicked() {
         }
         spielengine->zugAusfuehren(start, ziel);
     }
-      
-        if (spielengine->istBauernumwandlungFaellig(ziel)) {
-            QMessageBox box;
-            box.setText("Bauernumwandlung - wähle eine Figur: ");
-            QPushButton* damebutton = box.addButton("♕", QMessageBox::ActionRole);
-            QPushButton* turmbutton = box.addButton("♖", QMessageBox::ActionRole);
-            QPushButton* laeuferbutton = box.addButton("♝", QMessageBox::ActionRole);
-            QPushButton* springerbutton = box.addButton("♞", QMessageBox::ActionRole);
-            box.exec();
 
-            if (box.clickedButton() == damebutton) {
-                spielengine->wandleBauerUm(ziel, FigurTyp::Dame);
-            }
-            else if (box.clickedButton() == springerbutton) {
-                spielengine->wandleBauerUm(ziel, FigurTyp::Springer);
-            }
-            else if (box.clickedButton() == laeuferbutton) {
-                spielengine->wandleBauerUm(ziel, FigurTyp::Laeufer);
-            }
-            else if (box.clickedButton() == turmbutton) {
-                spielengine->wandleBauerUm(ziel, FigurTyp::Turm);
-            }
+    if (spielengine->istBauernumwandlungFaellig(ziel)) {
+        QMessageBox box;
+        box.setText("Bauernumwandlung - wähle eine Figur: ");
+        QPushButton* damebutton = box.addButton("♕", QMessageBox::ActionRole);
+        QPushButton* turmbutton = box.addButton("♖", QMessageBox::ActionRole);
+        QPushButton* laeuferbutton = box.addButton("♝", QMessageBox::ActionRole);
+        QPushButton* springerbutton = box.addButton("♞", QMessageBox::ActionRole);
+        box.exec();
 
-            }
-        QString gewinnerName = QString::fromStdString(spielengine->getAktuellerSpieler());
-
-        spielengine->naechsteRunde();
-        eingabefeld->setText("");
-        brettAktualisieren();
-        statusAktualisieren();
-
-        if (spielengine->istSchachmatt(spielengine->getAktuellerZug())) {
-            QMessageBox::information(this, "Spielende", gewinnerName + " hat gewonnen (Schachmatt)!");
-            emit spielBeendet();
+        if (box.clickedButton() == damebutton) {
+            spielengine->wandleBauerUm(ziel, FigurTyp::Dame);
         }
+        else if (box.clickedButton() == springerbutton) {
+            spielengine->wandleBauerUm(ziel, FigurTyp::Springer);
+        }
+        else if (box.clickedButton() == laeuferbutton) {
+            spielengine->wandleBauerUm(ziel, FigurTyp::Laeufer);
+        }
+        else if (box.clickedButton() == turmbutton) {
+            spielengine->wandleBauerUm(ziel, FigurTyp::Turm);
+        }
+
+    }
+    QString gewinnerName = QString::fromStdString(spielengine->getAktuellerSpieler());
+
+    bool geflippt = spielengine->naechsteRunde();
+    eingabefeld->setText("");
+    brettAktualisieren();
+    statusAktualisieren();
+    if (geflippt) {
+        QMessageBox::information(this, "Flip!", "Die Seiten wurden getauscht!");
+    }
+
+    if (spielengine->istSchachmatt(spielengine->getAktuellerZug())) {
+        QMessageBox::information(this, "Spielende", gewinnerName + " hat gewonnen (Schachmatt)!");
+        emit spielBeendet();
+    }
+    if (kiGegner != nullptr && spielengine->getAktuellerZug() == kiGegner->getFarbe()) {
+        Position kiStart, kiZiel;
+        kiGegner->ermittleZug(nullptr, kiStart, kiZiel);
+        zugVerarbeiten(kiStart, kiZiel);
+    }
+
 }
+
 
 void SchachFenster::brettAktualisieren() {
     const Spielfeld* spielfeld = spielengine->getSpielfeld();

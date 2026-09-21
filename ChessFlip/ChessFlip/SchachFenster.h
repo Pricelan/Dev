@@ -10,13 +10,14 @@
 #include <QLineEdit>
 #include <QVBoxLayout>
 #include "Spielengine.h"
+#include "KiGegner.h"
 
 class SchachFenster : public QMainWindow
 {
 	Q_OBJECT
 
 public:
-	SchachFenster(Spielengine* spielengine, QWidget *parent = nullptr);
+	SchachFenster(Spielengine* spielengine, KiGegner* kiGegner = nullptr, QWidget *parent = nullptr);
 	~SchachFenster();
 
 private:
@@ -29,6 +30,8 @@ private:
 	void brettAktualisieren();
 	QLabel* statusLabel;
 	void statusAktualisieren();
+	KiGegner* kiGegner;
+	void zugVerarbeiten(Position start, Position ziel);
 
 protected:
 	void closeEvent(QCloseEvent* event) override;

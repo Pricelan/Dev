@@ -204,7 +204,7 @@ void Spielengine::zugAusfuehren(Position start, Position ziel) {
 
 }
 
-void Spielengine::naechsteRunde() {
+bool Spielengine::naechsteRunde() {
 
 	aktuellerZug = (aktuellerZug == Figur::Farbe::Weiss) ? Figur::Farbe::Schwarz : Figur::Farbe::Weiss;
 
@@ -215,8 +215,10 @@ void Spielengine::naechsteRunde() {
 			Figur::Farbe temp = teilnehmer1->getFarbe();
 			teilnehmer1->setFarbe(teilnehmer2->getFarbe());
 			teilnehmer2->setFarbe(temp);
+			return true;
 		}
 	}
+	return false;
 }
 
 std::string Spielengine::getAktuellerSpieler() const {

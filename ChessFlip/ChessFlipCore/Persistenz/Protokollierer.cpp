@@ -8,6 +8,7 @@
 #include "..\Backend\Dame.h"
 #include "..\Backend\Laeufer.h"
 #include "..\Backend\Turm.h"
+#include "..\Backend\KiGegner.h"
 
 
 void Protokollierer::speichern(const Spielengine& engine, const std::string& dateiname) {
@@ -19,6 +20,7 @@ void Protokollierer::speichern(const Spielengine& engine, const std::string& dat
 	datei << "Spieler2Name;" << engine.teilnehmer2->getName() << "\n";
 	datei << "letzterZugWarDoppelschritt;" << engine.letzterZugWarDoppelschritt << "\n";
 	datei << "letzterDoppelschritt;" << engine.letzterDoppelschritt.reihe << ";" << engine.letzterDoppelschritt.spalte << "\n";
+	datei << "Teilnehmer2IstKi;" << (dynamic_cast<KiGegner*>(engine.teilnehmer2) != nullptr) << "\n";
 
 	for (int reihe = 0; reihe < 8; reihe++) {
 		for (int spalte = 0; spalte < 8; spalte++) {
@@ -42,6 +44,19 @@ std::string Protokollierer::figurTypAlsText(Figur* figur) {
 	if (dynamic_cast<Dame*>(figur) != nullptr) return "Dame";
 
 	return "";
+}
+
+bool Protokollierer::warTeilnehmer2Ki(const std::string& dateiname) {
+	std::ifstream datei(dateiname);
+	std::string zeile;
+	
+	while (std::getline(datei, zeile)) {
+		std::vector<std::string> teile = teileAufteilen(zeile);
+		if (teile[0] == "Teilnehmer2IstKi") {
+			return (teile[1] == "1");
+		}
+	}
+	return false;
 }
 
 void Protokollierer::laden(Spielengine& engine, const std::string& dateiname) {

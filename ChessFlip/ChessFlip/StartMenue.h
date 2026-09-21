@@ -17,6 +17,7 @@ public:
 	QString getSpieler1Name() const;
 	QString getSpieler2Name() const;
 	bool getFortsetzenGewaehlt() const;
+	bool getKiModusGewaehlt() const;
 
 
 private:
@@ -28,6 +29,7 @@ private:
 	QPushButton* start;
 	QPushButton* fortsetzenButton;
 	bool fortsetzenGewaehlt = false;
+	bool kiModusGewaehlt = false;
 
 protected:
 	void paintEvent(QPaintEvent* event) override;

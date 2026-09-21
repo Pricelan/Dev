@@ -6,12 +6,14 @@
 #include "StartMenue.h"
 #include <QEventLoop>
 #include "../ChessFlipCore/Persistenz/Protokollierer.h"
+#include "KiGegner.h"
 
 
-int main(int argc, char *argv[])
+
+int main(int argc, char* argv[])
 {
     QApplication app(argc, argv);
-       
+
     while (true) {
         StartMenue menue;
         if (menue.exec() != QDialog::Accepted) {
@@ -27,12 +29,30 @@ int main(int argc, char *argv[])
             name2 = menue.getSpieler2Name().toStdString();
         }
         Spieler spieler1(Figur::Farbe::Weiss, name1);
-        Spieler spieler2(Figur::Farbe::Schwarz, name2);
-        Spielengine spielengine(&spieler1, &spieler2);
+
+        Teilnehmer* teilnehmer2 = nullptr;
+        KiGegner* kiGegner = nullptr;
+        bool erstelleKiGegner = menue.getKiModusGewaehlt() || (menue.getFortsetzenGewaehlt() && Protokollierer::warTeilnehmer2Ki("spielstand.txt"));
+
+        if (erstelleKiGegner) {
+            kiGegner = new KiGegner(Figur::Farbe::Schwarz);
+            teilnehmer2 = kiGegner;
+        }
+        else {
+            teilnehmer2 = new Spieler(Figur::Farbe::Schwarz, name2);
+        }
+
+        Spielengine spielengine(&spieler1, teilnehmer2);
+
+        if (kiGegner != nullptr) {
+            kiGegner->setSpielengine(&spielengine);
+        }
+
         if (menue.getFortsetzenGewaehlt()) {
             Protokollierer::laden(spielengine, "spielstand.txt");
         }
-        SchachFenster schachfenster(&spielengine);
+
+        SchachFenster schachfenster(&spielengine, kiGegner);                
         schachfenster.show();
 
         QEventLoop wartenAufSpielende;
@@ -41,4 +61,5 @@ int main(int argc, char *argv[])
 
         schachfenster.close();
     }
+
 }

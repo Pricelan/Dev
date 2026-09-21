@@ -70,3 +70,83 @@ int KiGegner::bewerteStellung(Figur::Farbe kiFarbe) const {
 	}
 	return summe;
 }
+
+Figur* KiGegner::zugSimulieren(Position start, Position ziel) {
+	Figur* ziehendeFigur = engine->getSpielfeld()->getFigur(start.reihe, start.spalte);
+	Figur* geschlageneFigur = engine->getSpielfeld()->getFigur(ziel.reihe, ziel.spalte);
+
+	engine->getSpielfeldVeraenderbar()->setzeFigur(ziehendeFigur, ziel);
+	engine->getSpielfeldVeraenderbar()->setzeFigur(nullptr, start);
+	return geschlageneFigur;
+
+
+}
+
+void KiGegner::zugRueckgaengig(Position start, Position ziel, Figur* geschlageneFigur) {
+	Figur* ziehendeFigur = engine->getSpielfeld()->getFigur(ziel.reihe, ziel.spalte);
+
+	engine->getSpielfeldVeraenderbar()->setzeFigur(ziehendeFigur, start);
+	engine->getSpielfeldVeraenderbar()->setzeFigur(geschlageneFigur, ziel);
+
+}
+
+int KiGegner::minimax(int tiefe, Figur::Farbe farbe) {
+
+	if (engine->istSchachmatt(farbe)) {
+		if (farbe == getFarbe()) {
+			return -10000;
+		}
+		else {
+			return 10000;
+		}
+	}
+	if (tiefe == 0) {
+		return bewerteStellung(getFarbe());
+	}
+
+	std::vector<std::pair<Position, Position>> zuege = alleZuege(farbe);
+	Figur::Farbe gegnerFarbe = (farbe == Figur::Farbe::Weiss) ? Figur::Farbe::Schwarz : Figur::Farbe::Weiss;
+		
+	int besterWert = (farbe == getFarbe()) ? -1000 : 1000;
+		for (std::pair<Position, Position> zug: zuege) {
+			Figur* geschlageneFigur = zugSimulieren(zug.first, zug.second);
+			
+			int wert = minimax(tiefe - 1, gegnerFarbe);
+			zugRueckgaengig(zug.first, zug.second, geschlageneFigur);
+
+			if (farbe == getFarbe()) {
+				if (wert > besterWert) {
+					besterWert = wert;
+				}
+			}
+			else {
+				if (wert < besterWert) {
+					besterWert = wert;
+				}
+			}
+			
+	}
+
+		return besterWert;
+}
+
+void KiGegner::ermittleZug(Spielfeld* spielfeld, Position& start, Position& ziel) {
+	std::vector<std::pair<Position, Position>> zuege = alleZuege(getFarbe());
+	int besterWert = -1000;
+	Figur::Farbe gegnerFarbeVonKi = (getFarbe() == Figur::Farbe::Weiss) ? Figur::Farbe::Schwarz : Figur::Farbe::Weiss;
+	for (std::pair<Position, Position> zug : zuege) {
+
+		Figur* geschlageneFigur = zugSimulieren(zug.first, zug.second);
+				int wert = minimax(SUCHTIEFE - 1, gegnerFarbeVonKi);
+		zugRueckgaengig(zug.first, zug.second, geschlageneFigur);
+
+		if (wert > besterWert) {
+			besterWert = wert;
+			start = zug.first;
+			ziel = zug.second;
+		}
+
+
+	}
+
+}
