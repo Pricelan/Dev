@@ -35,6 +35,7 @@ public:
     }
     int getRundenZaehler() const { return rundenZaehler; }
     std::string getAktuellerSpieler() const;
+    void setAktuellerZug(Figur::Farbe farbe) { aktuellerZug = farbe; }
         
 
 private:

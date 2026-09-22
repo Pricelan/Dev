@@ -7,6 +7,7 @@
 #include "Dame.h"
 #include "Laeufer.h"
 #include "Turm.h"
+#include <fstream>
 
 
 KiGegner::KiGegner(Figur::Farbe farbe) : Teilnehmer(farbe, "Tiro") {}
@@ -18,6 +19,8 @@ void KiGegner::setSpielengine(Spielengine* engine) {
 std::vector<std::pair<Position, Position>> KiGegner::alleZuege(Figur::Farbe farbe) {
 	std::vector<std::pair<Position, Position>> zuege;
 
+	Figur::Farbe alterZug = engine->getAktuellerZug();
+	engine->setAktuellerZug(farbe);
 
 	for (int startReihe = 0; startReihe < 8; startReihe++) {
 		for (int startSpalte = 0; startSpalte < 8; startSpalte++) {
@@ -25,16 +28,18 @@ std::vector<std::pair<Position, Position>> KiGegner::alleZuege(Figur::Farbe farb
 			if (figur == nullptr || figur->getFarbe() != farbe) {
 				continue;
 			}
+			
 			for (int zielReihe = 0; zielReihe < 8; zielReihe++) {
 				for (int zielSpalte = 0; zielSpalte < 8; zielSpalte++) {
 					if (engine->pruefeZug(Position(startReihe, startSpalte), Position(zielReihe, zielSpalte))) {
 						zuege.push_back(std::make_pair(Position(startReihe, startSpalte), Position(zielReihe, zielSpalte)));
-
+						
 					}
 				}
 			}
 		}
 	}
+	engine->setAktuellerZug(alterZug);
 	return zuege;
 }
 
@@ -75,24 +80,26 @@ Figur* KiGegner::zugSimulieren(Position start, Position ziel) {
 	Figur* ziehendeFigur = engine->getSpielfeld()->getFigur(start.reihe, start.spalte);
 	Figur* geschlageneFigur = engine->getSpielfeld()->getFigur(ziel.reihe, ziel.spalte);
 
+	ziehendeFigur->setPosition(ziel);
 	engine->getSpielfeldVeraenderbar()->setzeFigur(ziehendeFigur, ziel);
 	engine->getSpielfeldVeraenderbar()->setzeFigur(nullptr, start);
 	return geschlageneFigur;
-
-
 }
 
 void KiGegner::zugRueckgaengig(Position start, Position ziel, Figur* geschlageneFigur) {
 	Figur* ziehendeFigur = engine->getSpielfeld()->getFigur(ziel.reihe, ziel.spalte);
 
+	ziehendeFigur->setPosition(start);
 	engine->getSpielfeldVeraenderbar()->setzeFigur(ziehendeFigur, start);
 	engine->getSpielfeldVeraenderbar()->setzeFigur(geschlageneFigur, ziel);
-
 }
 
 int KiGegner::minimax(int tiefe, Figur::Farbe farbe) {
+	Figur::Farbe alterZug = engine->getAktuellerZug();
+	engine->setAktuellerZug(farbe);
 
 	if (engine->istSchachmatt(farbe)) {
+		engine->setAktuellerZug(alterZug);
 		if (farbe == getFarbe()) {
 			return -10000;
 		}
@@ -101,6 +108,7 @@ int KiGegner::minimax(int tiefe, Figur::Farbe farbe) {
 		}
 	}
 	if (tiefe == 0) {
+		engine->setAktuellerZug(alterZug);
 		return bewerteStellung(getFarbe());
 	}
 
@@ -126,11 +134,13 @@ int KiGegner::minimax(int tiefe, Figur::Farbe farbe) {
 			}
 			
 	}
-
+		engine->setAktuellerZug(alterZug);
 		return besterWert;
 }
 
 void KiGegner::ermittleZug(Spielfeld* spielfeld, Position& start, Position& ziel) {
+	std::ofstream log("ki_protokoll.txt", std::ios::app);
+
 	std::vector<std::pair<Position, Position>> zuege = alleZuege(getFarbe());
 	int besterWert = -1000;
 	Figur::Farbe gegnerFarbeVonKi = (getFarbe() == Figur::Farbe::Weiss) ? Figur::Farbe::Schwarz : Figur::Farbe::Weiss;
@@ -145,8 +155,11 @@ void KiGegner::ermittleZug(Spielfeld* spielfeld, Position& start, Position& ziel
 			start = zug.first;
 			ziel = zug.second;
 		}
+		log << "Zug (" << zug.first.reihe << "," << zug.first.spalte << ") -> ("
+			<< zug.second.reihe << "," << zug.second.spalte << ") bewertet mit " << wert << "\n";
 
 
 	}
-
+	log << "Gewaehlter Zug: (" << start.reihe << "," << start.spalte << ") -> ("
+		<< ziel.reihe << "," << ziel.spalte << "), Bewertung " << besterWert << "\n\n";
 }

@@ -268,3 +268,29 @@ TEST_CASE("Ungueltige Eingabe wird abgelehnt") {
 	REQUIRE(parseZugString("ysda123", start, ziel) == false);
 	REQUIRE(parseZugString("i9i9", start, ziel) == false); // Spalte 'i' existiert nicht (nur a-h)
 }
+
+TEST_CASE("KI erkennt Narrenmatt-Moeglichkeit") {
+	Spieler spieler1(Figur::Farbe::Weiss, "Test1");
+	KiGegner ki(Figur::Farbe::Schwarz);
+	Spielengine engine(&spieler1, &ki);
+	ki.setSpielengine(&engine);
+
+	engine.zugAusfuehren(Position(1, 5), Position(2, 5)); // f2f3
+	engine.naechsteRunde();
+	engine.zugAusfuehren(Position(6, 4), Position(4, 4)); // e7e5
+	engine.naechsteRunde();
+	engine.zugAusfuehren(Position(1, 6), Position(3, 6)); // g2g4
+	engine.naechsteRunde();
+
+	Position start, ziel;
+	ki.ermittleZug(nullptr, start, ziel);
+
+
+	bool damenzugMoeglich = engine.pruefeZug(Position(7, 3), Position(3, 7));
+	REQUIRE(damenzugMoeglich == true);
+	REQUIRE(start.reihe == 7);
+	REQUIRE(start.spalte == 3);
+	REQUIRE(ziel.reihe == 3);
+	REQUIRE(ziel.spalte == 7);
+}
+
