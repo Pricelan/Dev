@@ -27,7 +27,7 @@ StartMenue::StartMenue(QWidget *parent)
 	spieler1->setVisible(false);
 	spieler2->setVisible(false);
 	std::ifstream test("spielstand.txt");
-	bool dateiExistiert = test.good();
+	dateiExistiert = test.good();
 	fortsetzenButton = new QPushButton("Spiel fortsetzen", this);
 	layout->addWidget(fortsetzenButton);
 	fortsetzenButton->setVisible(dateiExistiert);
@@ -41,7 +41,11 @@ StartMenue::StartMenue(QWidget *parent)
 	start = new QPushButton("Los geht's", this);
 	layout->addWidget(start);
 	start->setVisible(false);
-	connect(start, &QPushButton::clicked, this, &QDialog::accept);
+	connect(start, &QPushButton::clicked, this, &StartMenue::startClicked);
+	zurueckMenuButton = new QPushButton("Zurück zum Menü", this);
+	layout->addWidget(zurueckMenuButton);
+	zurueckMenuButton->setVisible(false);
+	connect(zurueckMenuButton, &QPushButton::clicked, this, &StartMenue::zurueckZumMenueClicked);
 
 	layout->addStretch();
 }
@@ -60,6 +64,10 @@ void StartMenue::vsModusClicked() {
 	spieler2->setVisible(true);
 	start->setVisible(true);
 	kiModusGewaehlt = false;
+	fortsetzenButton->setVisible(false);
+	vsModus->setVisible(false);
+	kiMode->setVisible(false);
+	zurueckMenuButton->setVisible(true);
 }
 
 void StartMenue::kiModusClicked() {
@@ -67,7 +75,38 @@ void StartMenue::kiModusClicked() {
 	spieler2->setVisible(false);
 	start->setVisible(true);
 	kiModusGewaehlt = true;
-	
+	fortsetzenButton->setVisible(false);
+	vsModus->setVisible(false);
+	kiMode->setVisible(false);
+	zurueckMenuButton->setVisible(true);
+}
+
+void StartMenue::startClicked() {
+	QString name1 = spieler1->text().trimmed();
+	QString name2 = spieler2->text().trimmed();
+
+	if (name1.isEmpty()) {
+		QMessageBox::warning(this, "Ungültige Eingabe", "Spielernamen eingeben");
+		return;
+	}
+	if (!kiModusGewaehlt && name2.isEmpty()) {               
+		QMessageBox::warning(this, "Ungültige Eingabe", "Spielernamen eingeben");
+		return;
+	}
+
+	accept();
+
+}
+
+
+void StartMenue::zurueckZumMenueClicked() {
+	spieler1->setVisible(false);
+	spieler2->setVisible(false);
+	start->setVisible(false);
+	zurueckMenuButton->setVisible(false);
+	fortsetzenButton->setVisible(dateiExistiert);
+	vsModus->setVisible(true);
+	kiMode->setVisible(true);
 }
 
 bool StartMenue::getKiModusGewaehlt() const {

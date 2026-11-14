@@ -98,11 +98,11 @@ bool Spielengine::istSchach(Figur::Farbe farbe) const {
 		for (int spalte = 0; spalte < 8; spalte++) {
 			Figur* aktuelleFigur = spielfeld->getFigur(reihe, spalte);
 			if (aktuelleFigur != nullptr && aktuelleFigur->getFarbe() == gegnerFarbe) {
-				if (aktuelleFigur->erlaubterZug(koenigPos) && istWegFrei(Position(reihe, spalte), koenigPos)) {
+				bool istSpringer = dynamic_cast<Springer*>(aktuelleFigur) != nullptr;
+				if (aktuelleFigur->erlaubterZug(koenigPos) && (istSpringer || istWegFrei(Position(reihe, spalte), koenigPos))) {
 					return true;
-			    }
-		    }
-			
+				}
+			}
 		}
 	}
 	return false;

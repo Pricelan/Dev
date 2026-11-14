@@ -30,6 +30,8 @@ private:
 	QPushButton* fortsetzenButton;
 	bool fortsetzenGewaehlt = false;
 	bool kiModusGewaehlt = false;
+	QPushButton* zurueckMenuButton;
+	bool dateiExistiert = false;
 
 protected:
 	void paintEvent(QPaintEvent* event) override;
@@ -39,6 +41,8 @@ private slots:
 	void vsModusClicked();
 	void kiModusClicked();
 	void fortsetzenClicked();
+	void zurueckZumMenueClicked();
+	void startClicked();
 	
 };
 

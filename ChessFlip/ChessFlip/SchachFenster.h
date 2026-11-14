@@ -24,6 +24,7 @@ private:
 	Ui::SchachFensterClass ui;
 	QPushButton* felder[8][8];
 	QPushButton* speichernButton;
+	QPushButton* zurueckButton;
 	Spielengine* spielengine;
 	QString symbolFuerFigur(Figur* figur);
 	QLineEdit* eingabefeld;
@@ -32,6 +33,7 @@ private:
 	void statusAktualisieren();
 	KiGegner* kiGegner;
 	void zugVerarbeiten(Position start, Position ziel);
+	bool spielVorbei = false;
 
 protected:
 	void closeEvent(QCloseEvent* event) override;
@@ -39,6 +41,7 @@ protected:
 private slots:
 	void zugAnnahmeClicked();
 	void speichernClicked();
+	void zurueckClicked();
 
 signals:
 	void spielBeendet();

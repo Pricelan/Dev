@@ -83,8 +83,18 @@ SchachFenster::SchachFenster(Spielengine* spielengine, KiGegner* kiGegner, QWidg
     aussenLayout->addWidget(speichernButton);
     connect(speichernButton, &QPushButton::clicked, this, &SchachFenster::speichernClicked);
     connect(eingabefeld, &QLineEdit::returnPressed, this, &SchachFenster::zugAnnahmeClicked);
+
+    zurueckButton = new QPushButton("Zurück zum Menü", this);
+    aussenLayout->addWidget(zurueckButton);
+    connect(zurueckButton, &QPushButton::clicked, this, &SchachFenster::zurueckClicked);
     setCentralWidget(zentral);
     resize(8 * 60, 8 * 60);
+
+    if (kiGegner != nullptr && spielengine->getAktuellerZug() == kiGegner->getFarbe()) {
+        Position kiStart, kiZiel;
+        kiGegner->ermittleZug(nullptr, kiStart, kiZiel);
+        zugVerarbeiten(kiStart, kiZiel);
+    }
     
 }
 
@@ -171,7 +181,9 @@ void SchachFenster::zugVerarbeiten(Position start, Position ziel) {
 
     if (spielengine->istSchachmatt(spielengine->getAktuellerZug())) {
         QMessageBox::information(this, "Spielende", gewinnerName + " hat gewonnen (Schachmatt)!");
+        spielVorbei = true;
         emit spielBeendet();
+        return;
     }
     if (kiGegner != nullptr && spielengine->getAktuellerZug() == kiGegner->getFarbe()) {
         Position kiStart, kiZiel;
@@ -202,11 +214,20 @@ void SchachFenster::statusAktualisieren() {
 }
 
 void SchachFenster::closeEvent(QCloseEvent* event) {
-    Protokollierer::speichern(*spielengine, "spielstand.txt");
+    if (spielVorbei) {
+        Protokollierer::spielstandLoeschen("spielstand.txt");
+    }
+    else {
+        Protokollierer::speichern(*spielengine, "spielstand.txt");
+    }
     QMainWindow::closeEvent(event);
 }
 
 void SchachFenster::speichernClicked() {
     Protokollierer::speichern(*spielengine, "spielstand.txt");
-    QMessageBox::information(this, "Gespeichert", "Speilstand wurde gespeichert.");
+    QMessageBox::information(this, "Gespeichert", "Spielstand wurde gespeichert.");
+}
+
+void SchachFenster::zurueckClicked() {
+    emit spielBeendet();
 }

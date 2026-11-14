@@ -2,6 +2,8 @@ AktuellerZug;Weiss
 RundenZaehler;0
 Spieler1Name;Test1
 Spieler2Name;Test2
+Teilnehmer1Farbe;Weiss
+Teilnehmer2Farbe;Schwarz
 letzterZugWarDoppelschritt;1
 letzterDoppelschritt;3;4
 Teilnehmer2IstKi;0

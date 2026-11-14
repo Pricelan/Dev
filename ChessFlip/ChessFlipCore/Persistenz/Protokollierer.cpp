@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <filesystem>
 #include "..\Backend\Bauer.h"
 #include "..\Backend\Koenig.h"
 #include "..\Backend\Springer.h"
@@ -18,6 +19,8 @@ void Protokollierer::speichern(const Spielengine& engine, const std::string& dat
 	datei << "RundenZaehler;" << engine.rundenZaehler << "\n";
 	datei << "Spieler1Name;" << engine.teilnehmer1->getName() << "\n";
 	datei << "Spieler2Name;" << engine.teilnehmer2->getName() << "\n";
+	datei << "Teilnehmer1Farbe;" << (engine.teilnehmer1->getFarbe() == Figur::Farbe::Weiss ? "Weiss" : "Schwarz") << "\n";
+	datei << "Teilnehmer2Farbe;" << (engine.teilnehmer2->getFarbe() == Figur::Farbe::Weiss ? "Weiss" : "Schwarz") << "\n";
 	datei << "letzterZugWarDoppelschritt;" << engine.letzterZugWarDoppelschritt << "\n";
 	datei << "letzterDoppelschritt;" << engine.letzterDoppelschritt.reihe << ";" << engine.letzterDoppelschritt.spalte << "\n";
 	datei << "Teilnehmer2IstKi;" << (dynamic_cast<KiGegner*>(engine.teilnehmer2) != nullptr) << "\n";
@@ -86,6 +89,12 @@ void Protokollierer::laden(Spielengine& engine, const std::string& dateiname) {
 		else if (teile[0] == "Spieler2Name") {
 			engine.teilnehmer2->setName(teile[1]);
 		}
+		else if (teile[0] == "Teilnehmer1Farbe") {
+			engine.teilnehmer1->setFarbe(teile[1] == "Weiss" ? Figur::Farbe::Weiss : Figur::Farbe::Schwarz);
+		}
+		else if (teile[0] == "Teilnehmer2Farbe") {
+			engine.teilnehmer2->setFarbe(teile[1] == "Weiss" ? Figur::Farbe::Weiss : Figur::Farbe::Schwarz);
+		}
 		else if (teile[0] == "letzterZugWarDoppelschritt") {
 			engine.letzterZugWarDoppelschritt = (teile[1] == "1");
 		}
@@ -119,6 +128,10 @@ void Protokollierer::laden(Spielengine& engine, const std::string& dateiname) {
 	}
 }
 
+void Protokollierer::spielstandLoeschen(const std::string& dateiname) {
+	std::filesystem::remove(dateiname);
+}
+
 std::vector<std::string> Protokollierer::teileAufteilen(const std::string& zeile) {
 	std::vector<std::string> teile;
 	std::stringstream ss(zeile);
@@ -130,3 +143,4 @@ std::vector<std::string> Protokollierer::teileAufteilen(const std::string& zeile
 	return teile;
 
 }
+

@@ -294,3 +294,21 @@ TEST_CASE("KI erkennt Narrenmatt-Moeglichkeit") {
 	REQUIRE(ziel.spalte == 7);
 }
 
+
+TEST_CASE("istSchach erkennt Springer-Schach ohne Absturz") {
+	Spieler spieler1(Figur::Farbe::Weiss, "Test1");
+	Spieler spieler2(Figur::Farbe::Schwarz, "Test2");
+	Spielengine engine(&spieler1, &spieler2);
+
+	engine.zugAusfuehren(Position(0, 6), Position(2, 5)); // Ng1-f3
+	engine.zugAusfuehren(Position(2, 5), Position(3, 3)); // Nf3-d4
+	engine.zugAusfuehren(Position(3, 3), Position(4, 1)); // Nd4-b5
+	engine.zugAusfuehren(Position(4, 1), Position(5, 3)); // Nb5-d6
+	Figur* figurAufD6 = engine.getSpielfeld()->getFigur(5, 3);
+	REQUIRE(figurAufD6 != nullptr);
+	REQUIRE(figurAufD6->getPosition().reihe == 5);
+	REQUIRE(figurAufD6->getPosition().spalte == 3);
+
+	REQUIRE(engine.istSchach(Figur::Farbe::Schwarz) == true);
+}
+
