@@ -234,7 +234,7 @@ std::string Spielengine::getAktuellerSpieler() const {
 
 bool Spielengine::istRochadeMoeglich(Position start, Position ziel) const {
 	Figur* koenig = spielfeld->getFigur(start.reihe, start.spalte);
-	if (dynamic_cast<Koenig*>(koenig) == nullptr) {
+	if (dynamic_cast<Koenig*>(koenig) == nullptr || koenig->getFarbe() != aktuellerZug) {
 		return false;
 	}
 	if (start.reihe != ziel.reihe || std::abs(ziel.spalte - start.spalte) != 2) {
@@ -304,10 +304,14 @@ void Spielengine::rochadeAusfuehren(Position start, Position ziel){
 
 bool Spielengine::istEnPassantMoeglich(Position start, Position ziel) const {
 	Figur* bauer = spielfeld->getFigur(start.reihe, start.spalte);
-	if (dynamic_cast<Bauer*>(bauer) == nullptr) {
+	if (dynamic_cast<Bauer*>(bauer) == nullptr || bauer->getFarbe() != aktuellerZug) {
 		return false;
 	}
 	if (std::abs(ziel.spalte - start.spalte) != 1 || std::abs(ziel.reihe - start.reihe) != 1) {
+		return false;
+	}
+	int richtung = (bauer->getFarbe() == Figur::Farbe::Weiss) ? +1 : -1;
+	if (ziel.reihe - start.reihe != richtung) {
 		return false;
 	}
 	Figur* zielFigur = spielfeld->getFigur(ziel.reihe, ziel.spalte);
