@@ -1,6 +1,7 @@
 #define CATCH_CONFIG_RUNNER
 #include <catch2/catch_session.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <cstdio>
 #include "Bauer.h"
 #include "Springer.h"
 #include "Turm.h"
@@ -312,3 +313,76 @@ TEST_CASE("istSchach erkennt Springer-Schach ohne Absturz") {
 	REQUIRE(engine.istSchach(Figur::Farbe::Schwarz) == true);
 }
 
+TEST_CASE("zeichenAlsUmwandlung lehnt unbekanntes Zeichen ab", "[parser]") {
+	FigurTyp typ = FigurTyp::Turm;
+	REQUIRE(zeichenAlsUmwandlung('X', typ) == false);
+	REQUIRE(typ == FigurTyp::Turm);          
+}
+
+TEST_CASE("zeichenAlsUmwandlung erkennt gueltige Zeichen", "[parser]") {
+	FigurTyp typ = FigurTyp::Turm;
+	REQUIRE(zeichenAlsUmwandlung('S', typ) == true);
+	REQUIRE(typ == FigurTyp::Springer);
+}
+
+TEST_CASE("zugDurchfuehren: gueltiger Zug wechselt den Spieler", "[engine]") {
+	Spieler spieler1(Figur::Farbe::Weiss, "Test1");
+	Spieler spieler2(Figur::Farbe::Schwarz, "Test2");
+	Spielengine engine(&spieler1, &spieler2);
+
+	ZugErgebnis e = engine.zugDurchfuehren(Position{ 1, 4 }, Position{ 3, 4 });   
+
+	REQUIRE(e.gueltig == true);
+	REQUIRE(e.schachmatt == false);
+	REQUIRE(engine.getAktuellerZug() == Figur::Farbe::Schwarz);
+}
+
+TEST_CASE("zugDurchfuehren: ungueltiger Zug aendert nichts", "[engine]") {
+	Spieler spieler1(Figur::Farbe::Weiss, "Test1");
+	Spieler spieler2(Figur::Farbe::Schwarz, "Test2");
+	Spielengine engine(&spieler1, &spieler2);
+
+	ZugErgebnis e = engine.zugDurchfuehren(Position{ 1, 4 }, Position{ 4, 4 });   
+	REQUIRE(e.gueltig == false);
+	REQUIRE(engine.getAktuellerZug() == Figur::Farbe::Weiss);
+	REQUIRE(engine.getSpielfeld()->getFigur(1, 4) != nullptr );   
+}
+
+TEST_CASE("zugAusText: Narrenmatt wird nachgespielt", "[wiederholung]") {
+	Spieler spieler1(Figur::Farbe::Weiss, "Test1");
+	Spieler spieler2(Figur::Farbe::Schwarz, "Test2");
+	Spielengine engine(&spieler1, &spieler2);
+
+	std::vector<std::string> zuege = { "f2f3", "e7e5", "g2g4", "d8h4" };
+
+	ZugErgebnis e;
+	for (const std::string& z : zuege) {
+		e = engine.zugAusText(z);
+		REQUIRE(e.gueltig == true);
+	}
+	REQUIRE(e.schachmatt == true);
+	REQUIRE(e.gewinner == "Test2");
+}
+
+TEST_CASE("Protokoll: Datei schreiben, laden und nachspielen", "[wiederholung]") {
+	const std::string datei = "test_zugprotokoll.txt";
+	Protokollierer::neuesProtokoll(datei, "Test1", "Test2", false);
+	Protokollierer::zugAnhaengen(datei, "f2f3");
+	Protokollierer::zugAnhaengen(datei, "e7e5");
+	Protokollierer::zugAnhaengen(datei, "g2g4");
+	Protokollierer::zugAnhaengen(datei, "d8h4");
+
+	std::vector<std::string> zuege = Protokollierer::zuegeLaden(datei);
+	REQUIRE(zuege.size() == 4);      
+
+	Spieler spieler1(Figur::Farbe::Weiss, "Test1");
+	Spieler spieler2(Figur::Farbe::Schwarz, "Test2");
+	Spielengine engine(&spieler1, &spieler2);
+
+	ZugErgebnis e;
+	for (const std::string& z : zuege) {
+		e = engine.zugAusText(z);
+	}
+	REQUIRE(e.schachmatt == true);
+	std::remove(datei.c_str());        
+}

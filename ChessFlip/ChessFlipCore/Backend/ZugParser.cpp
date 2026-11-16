@@ -25,3 +25,32 @@ bool parseZugString(const std::string& eingabe, Position& start, Position& ziel)
     return true;
     
     }
+
+std::string zugAlsText(Position start, Position ziel) {
+    std::string text;
+    text += static_cast<char>('a' + start.spalte);
+    text += static_cast<char>('1' + start.reihe);
+    text += static_cast<char>('a' + ziel.spalte);
+    text += static_cast<char>('1' + ziel.reihe);
+    return text;
+}
+
+char umwandlungAlsZeichen(FigurTyp typ) {
+    switch (typ) {
+    case FigurTyp::Dame:  return 'D';
+    case FigurTyp::Turm:  return 'T';
+    case FigurTyp::Laeufer:   return 'L';
+    case FigurTyp::Springer:   return 'S';
+    default:              return '?';
+    }
+}
+
+bool zeichenAlsUmwandlung(char zeichen, FigurTyp& typ) {
+    switch (zeichen) {
+    case 'D': typ = FigurTyp::Dame; return true;
+    case 'T': typ = FigurTyp::Turm; return true;
+    case 'S': typ = FigurTyp::Springer; return true;
+    case 'L': typ = FigurTyp::Laeufer; return true;
+    default:  return false;
+    }
+}

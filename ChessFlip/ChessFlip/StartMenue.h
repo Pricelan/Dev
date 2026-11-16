@@ -18,6 +18,7 @@ public:
 	QString getSpieler2Name() const;
 	bool getFortsetzenGewaehlt() const;
 	bool getKiModusGewaehlt() const;
+	bool getWiederholungGewaehlt() const;
 
 
 private:
@@ -32,6 +33,9 @@ private:
 	bool kiModusGewaehlt = false;
 	QPushButton* zurueckMenuButton;
 	bool dateiExistiert = false;
+	bool protokollExistiert = false;
+	QPushButton* wiederholungButton;                          
+	bool wiederholungGewaehlt = false;
 
 protected:
 	void paintEvent(QPaintEvent* event) override;
@@ -43,6 +47,7 @@ private slots:
 	void fortsetzenClicked();
 	void zurueckZumMenueClicked();
 	void startClicked();
+	void wiederholungClicked();
 	
 };
 

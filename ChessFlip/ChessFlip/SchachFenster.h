@@ -11,6 +11,8 @@
 #include <QVBoxLayout>
 #include "Spielengine.h"
 #include "KiGegner.h"
+#include <vector>
+#include <string>
 
 class SchachFenster : public QMainWindow
 {
@@ -19,6 +21,7 @@ class SchachFenster : public QMainWindow
 public:
 	SchachFenster(Spielengine* spielengine, KiGegner* kiGegner = nullptr, QWidget *parent = nullptr);
 	~SchachFenster();
+	void starteWiederholung(const std::vector<std::string>& zuege);
 
 private:
 	Ui::SchachFensterClass ui;
@@ -34,6 +37,10 @@ private:
 	KiGegner* kiGegner;
 	void zugVerarbeiten(Position start, Position ziel);
 	bool spielVorbei = false;
+	QPushButton* weiterButton;
+	std::vector<std::string> wiederholungsZuege;
+	size_t wiederholungsIndex = 0;        
+	bool wiederholungsModus = false;
 
 protected:
 	void closeEvent(QCloseEvent* event) override;
@@ -42,6 +49,7 @@ private slots:
 	void zugAnnahmeClicked();
 	void speichernClicked();
 	void zurueckClicked();
+	void weiterClicked();
 
 signals:
 	void spielBeendet();

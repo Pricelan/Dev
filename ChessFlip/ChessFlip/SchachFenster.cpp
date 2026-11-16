@@ -8,10 +8,10 @@
 #include "Laeufer.h"
 #include "Springer.h"
 #include "ZugParser.h"
+#include "../ChessFlipCore/Persistenz/Protokollierer.h"
 #include <Qlabel>
 #include <QMessageBox>
 #include "FigurTyp.h"
-#include "../ChessFlipCore/Persistenz/Protokollierer.h"
 #include "KiGegner.h"
 
 SchachFenster::SchachFenster(Spielengine* spielengine, KiGegner* kiGegner, QWidget *parent)
@@ -84,6 +84,11 @@ SchachFenster::SchachFenster(Spielengine* spielengine, KiGegner* kiGegner, QWidg
     connect(speichernButton, &QPushButton::clicked, this, &SchachFenster::speichernClicked);
     connect(eingabefeld, &QLineEdit::returnPressed, this, &SchachFenster::zugAnnahmeClicked);
 
+    weiterButton = new QPushButton("Nächster Zug", this);
+    aussenLayout->addWidget(weiterButton);
+    weiterButton->setVisible(wiederholungsModus);
+    connect(weiterButton, &QPushButton::clicked, this, &SchachFenster::weiterClicked);
+
     zurueckButton = new QPushButton("Zurück zum Menü", this);
     aussenLayout->addWidget(zurueckButton);
     connect(zurueckButton, &QPushButton::clicked, this, &SchachFenster::zurueckClicked);
@@ -132,21 +137,17 @@ void SchachFenster::zugAnnahmeClicked() {
 
 void SchachFenster::zugVerarbeiten(Position start, Position ziel) {
 
-    if (spielengine->istRochadeMoeglich(start, ziel)) {
-        spielengine->rochadeAusfuehren(start, ziel);
-    }
-    else if (spielengine->istEnPassantMoeglich(start, ziel)) {
-        spielengine->enPassantAusfuehren(start, ziel);
-    }
-    else {
-        if (!spielengine->pruefeZug(start, ziel)) {
-            QMessageBox::warning(this, "Ungültiger Zug", "Der Zug kann nach Fide-Regeln nicht durchgeführt werden");
-            return;
-        }
-        spielengine->zugAusfuehren(start, ziel);
-    }
+   
+    bool kiZug = (kiGegner != nullptr &&
+        spielengine->getAktuellerZug() == kiGegner->getFarbe());
 
-    if (spielengine->istBauernumwandlungFaellig(ziel)) {
+    FigurTyp typ = FigurTyp::Dame;
+    bool umgewandelt = false;
+
+   
+    if (!kiZug && spielengine->fuehrtZugZurUmwandlung(start, ziel)) {
+        umgewandelt = true;
+
         QMessageBox box;
         box.setText("Bauernumwandlung - wähle eine Figur: ");
         QPushButton* damebutton = box.addButton("♕", QMessageBox::ActionRole);
@@ -156,41 +157,86 @@ void SchachFenster::zugVerarbeiten(Position start, Position ziel) {
         box.exec();
 
         if (box.clickedButton() == damebutton) {
-            spielengine->wandleBauerUm(ziel, FigurTyp::Dame);
+            typ = FigurTyp::Dame;
         }
         else if (box.clickedButton() == springerbutton) {
-            spielengine->wandleBauerUm(ziel, FigurTyp::Springer);
+            typ = FigurTyp::Springer;
         }
         else if (box.clickedButton() == laeuferbutton) {
-            spielengine->wandleBauerUm(ziel, FigurTyp::Laeufer);
+            typ = FigurTyp::Laeufer;
         }
         else if (box.clickedButton() == turmbutton) {
-            spielengine->wandleBauerUm(ziel, FigurTyp::Turm);
+            typ = FigurTyp::Turm;
         }
-
     }
-    QString gewinnerName = QString::fromStdString(spielengine->getAktuellerSpieler());
 
-    bool geflippt = spielengine->naechsteRunde();
+ 
+    ZugErgebnis e = spielengine->zugDurchfuehren(start, ziel, typ);
+    if (!e.gueltig) {
+        QMessageBox::warning(this, "Ungültiger Zug",
+            "Der Zug kann nach Fide-Regeln nicht durchgeführt werden");
+        return;
+    }
+
+    
+    std::string text = zugAlsText(start, ziel);
+    if (umgewandelt) {
+        text += umwandlungAlsZeichen(typ);
+    }
+    Protokollierer::zugAnhaengen("zugprotokoll.txt", text);
+
+    
     eingabefeld->setText("");
     brettAktualisieren();
     statusAktualisieren();
-    if (geflippt) {
+    if (e.geflippt) {
         QMessageBox::information(this, "Flip!", "Die Seiten wurden getauscht!");
     }
-
-    if (spielengine->istSchachmatt(spielengine->getAktuellerZug())) {
-        QMessageBox::information(this, "Spielende", gewinnerName + " hat gewonnen (Schachmatt)!");
+    if (e.schachmatt) {
+        QMessageBox::information(this, "Spielende",
+            QString::fromStdString(e.gewinner) + " hat gewonnen (Schachmatt)!");
         spielVorbei = true;
         emit spielBeendet();
         return;
     }
+
+    
     if (kiGegner != nullptr && spielengine->getAktuellerZug() == kiGegner->getFarbe()) {
         Position kiStart, kiZiel;
         kiGegner->ermittleZug(nullptr, kiStart, kiZiel);
         zugVerarbeiten(kiStart, kiZiel);
     }
+}
 
+
+void SchachFenster::starteWiederholung(const std::vector<std::string>& zuege) {
+    wiederholungsZuege = zuege;
+    wiederholungsIndex = 0;
+    wiederholungsModus = true;
+    eingabefeld->setEnabled(false);
+    speichernButton->setEnabled(false);
+    weiterButton->setVisible(true);
+    brettAktualisieren();
+    statusAktualisieren();
+}
+
+void SchachFenster::weiterClicked() {
+    if (wiederholungsIndex >= wiederholungsZuege.size()) {
+        QMessageBox::information(this, "Wiederholung", "Die Partie ist zu Ende.");
+        return;
+    }
+    ZugErgebnis e = spielengine->zugAusText(wiederholungsZuege[wiederholungsIndex]);
+    if (!e.gueltig) {
+        QMessageBox::warning(this, "Wiederholung", "Ungültiger Zug im Protokoll");
+        return;
+    }
+    wiederholungsIndex++;
+    brettAktualisieren();
+    statusAktualisieren();
+    if (e.schachmatt) {
+        QMessageBox::information(this, "Wiederholung",
+            QString::fromStdString(e.gewinner) + " gewinnt durch Schachmatt.");
+    }
 }
 
 
@@ -214,6 +260,10 @@ void SchachFenster::statusAktualisieren() {
 }
 
 void SchachFenster::closeEvent(QCloseEvent* event) {
+    if (wiederholungsModus) {                       
+        QMainWindow::closeEvent(event);
+        return;
+    }
     if (spielVorbei) {
         Protokollierer::spielstandLoeschen("spielstand.txt");
     }

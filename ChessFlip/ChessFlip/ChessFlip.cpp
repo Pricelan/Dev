@@ -19,6 +19,24 @@ int main(int argc, char* argv[])
         if (menue.exec() != QDialog::Accepted) {
             return 0;
         }
+        if (menue.getWiederholungGewaehlt()) {                                   
+            std::vector<std::string> zuege = Protokollierer::zuegeLaden("zugprotokoll.txt");
+
+            Spieler weiss(Figur::Farbe::Weiss, "Weiß");
+            Spieler schwarz(Figur::Farbe::Schwarz, "Schwarz");
+            Spielengine wiederholungsEngine(&weiss, &schwarz);
+
+            SchachFenster fenster(&wiederholungsEngine, nullptr);  
+            fenster.starteWiederholung(zuege);
+            fenster.show();
+
+            QEventLoop warten;
+            QObject::connect(&fenster, &SchachFenster::spielBeendet, &warten, &QEventLoop::quit);
+            warten.exec();
+            fenster.close();
+            continue;                                        
+        }
+
         std::string name1, name2;
         if (menue.getFortsetzenGewaehlt()) {
             name1 = "Platzhalter 1";
@@ -50,6 +68,9 @@ int main(int argc, char* argv[])
 
         if (menue.getFortsetzenGewaehlt()) {
             Protokollierer::laden(spielengine, "spielstand.txt");
+        }
+        else {
+            Protokollierer::neuesProtokoll("zugprotokoll.txt", name1, erstelleKiGegner ? "KI" : name2,erstelleKiGegner);
         }
 
         SchachFenster schachfenster(&spielengine, kiGegner);                

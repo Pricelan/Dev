@@ -1,0 +1,6 @@
+# ChessFlip Zugprotokoll
+Andy;KI;1
+e2e4
+a7a5
+f2f3
+a5a4

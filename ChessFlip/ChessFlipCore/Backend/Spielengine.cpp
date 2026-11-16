@@ -7,6 +7,8 @@
 #include "Laeufer.h"
 #include "Turm.h"
 #include <cmath>
+#include "ZugParser.h"
+
 
 Spielengine::Spielengine(Teilnehmer* teilnehmer1, Teilnehmer* teilnehmer2) : spielfeld(new Spielfeld()), teilnehmer1(teilnehmer1), teilnehmer2(teilnehmer2),
 aktuellerZug(Figur::Farbe::Weiss), rundenZaehler(0) {}
@@ -231,6 +233,68 @@ std::string Spielengine::getAktuellerSpieler() const {
 
 
 }
+
+ZugErgebnis Spielengine::zugDurchfuehren(Position start, Position ziel, FigurTyp umwandlung) {
+	ZugErgebnis ergebnis;
+
+	if (istRochadeMoeglich(start, ziel)) {
+		rochadeAusfuehren(start, ziel);
+	}
+	else if (istEnPassantMoeglich(start, ziel)) {
+		enPassantAusfuehren(start, ziel);
+	}
+	else {
+		if (!pruefeZug(start, ziel)) {
+			return ergebnis;
+		}
+		zugAusfuehren(start, ziel);
+	}
+	if (istBauernumwandlungFaellig(ziel)) {
+		wandleBauerUm(ziel, umwandlung);
+	}
+
+	ergebnis.gewinner = getAktuellerSpieler();
+	ergebnis.geflippt = naechsteRunde();
+	ergebnis.gueltig = true;
+	ergebnis.schachmatt = istSchachmatt(getAktuellerZug());
+	return ergebnis;
+}
+
+bool Spielengine::fuehrtZugZurUmwandlung(Position start, Position ziel) const {
+	Figur* figur = spielfeld->getFigur(start.reihe, start.spalte);
+	if (dynamic_cast<Bauer*>(figur) == nullptr) {
+		return false;
+	}
+	if (figur->getFarbe() != getAktuellerZug()) {
+		return false;
+	}
+	if (!pruefeZug(start, ziel)) {
+		return false;
+	}
+	int zielReihe = (figur->getFarbe() == Figur::Farbe::Weiss) ? 7 : 0;
+	return ziel.reihe == zielReihe;
+}
+
+ZugErgebnis Spielengine::zugAusText(const std::string& text) {
+	ZugErgebnis leer;                                   
+	if (text.size() != 4 && text.size() != 5) {
+		return leer;
+	}
+
+	Position start, ziel;
+	if (!parseZugString(text.substr(0, 4), start, ziel)) {
+		return leer;
+	}
+
+	FigurTyp typ = FigurTyp::Dame;
+	if (text.size() == 5) {
+		if (!zeichenAlsUmwandlung(text[4], typ)) {
+			return leer;
+		}
+	}
+	return zugDurchfuehren(start, ziel, typ);
+}
+
 
 bool Spielengine::istRochadeMoeglich(Position start, Position ziel) const {
 	Figur* koenig = spielfeld->getFigur(start.reihe, start.spalte);

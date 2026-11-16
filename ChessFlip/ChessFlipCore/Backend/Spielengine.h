@@ -6,6 +6,14 @@
 #include "FigurTyp.h"
 
 
+struct ZugErgebnis {
+    bool gueltig = false;
+    bool geflippt = false;
+    bool schachmatt = false;
+    std::string gewinner;
+};
+
+
 class Spielengine {
     friend class Protokollierer;
 public:
@@ -36,6 +44,9 @@ public:
     int getRundenZaehler() const { return rundenZaehler; }
     std::string getAktuellerSpieler() const;
     void setAktuellerZug(Figur::Farbe farbe) { aktuellerZug = farbe; }
+    ZugErgebnis zugDurchfuehren(Position start, Position ziel, FigurTyp umwandlung = FigurTyp::Dame);
+    bool fuehrtZugZurUmwandlung(Position start, Position ziel) const;
+    ZugErgebnis zugAusText(const std::string& text);
         
 
 private:

@@ -144,3 +144,35 @@ std::vector<std::string> Protokollierer::teileAufteilen(const std::string& zeile
 
 }
 
+void Protokollierer::neuesProtokoll(const std::string& dateiname, const std::string& name1, const std::string& name2, bool kiModus) {
+	std::ofstream datei(dateiname);
+	if (!datei) {
+		return;
+	}
+	datei << "# ChessFlip Zugprotokoll\n";
+	datei << name1 << ";" << name2 << ";" << (kiModus ? 1 : 0) << "\n";
+}
+
+void Protokollierer::zugAnhaengen(const std::string& dateiname, const std::string& zug) {
+	std::ofstream datei(dateiname, std::ios::app);
+	if (!datei) {
+		return;
+	}
+	datei << zug << "\n";
+}
+
+std::vector<std::string> Protokollierer::zuegeLaden(const std::string& dateiname) {
+	std::vector<std::string> zuege;
+	std::ifstream datei(dateiname);
+	if (!datei) {
+		return zuege;                      
+	}
+	std::string zeile;
+	while (std::getline(datei, zeile)) {
+		if (zeile.empty()) { continue; }
+		if (zeile[0] == '#') { continue; }               
+		if (zeile.find(';') != std::string::npos) { continue; } 
+		zuege.push_back(zeile);
+	}
+	return zuege;
+}

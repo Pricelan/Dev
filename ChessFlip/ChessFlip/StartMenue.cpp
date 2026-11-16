@@ -7,6 +7,7 @@
 #include <QLabel>
 #include <QPainter>
 #include <fstream>
+#include "../ChessFlipCore/Persistenz/Protokollierer.h"
 
 StartMenue::StartMenue(QWidget *parent)
 	: QDialog(parent)
@@ -32,6 +33,11 @@ StartMenue::StartMenue(QWidget *parent)
 	layout->addWidget(fortsetzenButton);
 	fortsetzenButton->setVisible(dateiExistiert);
 	connect(fortsetzenButton, &QPushButton::clicked, this, &StartMenue::fortsetzenClicked);
+	wiederholungButton = new QPushButton("Partie wiederholen", this);
+	layout->addWidget(wiederholungButton);
+	protokollExistiert = !Protokollierer::zuegeLaden("zugprotokoll.txt").empty();
+	wiederholungButton->setVisible(protokollExistiert);
+	connect(wiederholungButton, &QPushButton::clicked, this, &StartMenue::wiederholungClicked);
 	vsModus = new QPushButton("VS-Modus starten", this);
 	layout->addWidget(vsModus);
 	connect(vsModus, &QPushButton::clicked, this, &StartMenue::vsModusClicked);
@@ -64,6 +70,7 @@ void StartMenue::vsModusClicked() {
 	spieler2->setVisible(true);
 	start->setVisible(true);
 	kiModusGewaehlt = false;
+	wiederholungButton->setVisible(false);
 	fortsetzenButton->setVisible(false);
 	vsModus->setVisible(false);
 	kiMode->setVisible(false);
@@ -75,6 +82,7 @@ void StartMenue::kiModusClicked() {
 	spieler2->setVisible(false);
 	start->setVisible(true);
 	kiModusGewaehlt = true;
+	wiederholungButton->setVisible(false);
 	fortsetzenButton->setVisible(false);
 	vsModus->setVisible(false);
 	kiMode->setVisible(false);
@@ -98,6 +106,16 @@ void StartMenue::startClicked() {
 
 }
 
+void StartMenue::wiederholungClicked() {
+	wiederholungGewaehlt = true;
+	accept();
+}
+
+bool StartMenue::getWiederholungGewaehlt() const {
+	return wiederholungGewaehlt;
+}
+
+
 
 void StartMenue::zurueckZumMenueClicked() {
 	spieler1->setVisible(false);
@@ -105,6 +123,7 @@ void StartMenue::zurueckZumMenueClicked() {
 	start->setVisible(false);
 	zurueckMenuButton->setVisible(false);
 	fortsetzenButton->setVisible(dateiExistiert);
+	wiederholungButton->setVisible(protokollExistiert);
 	vsModus->setVisible(true);
 	kiMode->setVisible(true);
 }
